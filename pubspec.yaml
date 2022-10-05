@@ -48,7 +48,6 @@ dependencies:
   flutter_html: ^3.0.0-alpha.5
   fl_country_code_picker: ^0.0.1
   toast: ^0.3.0
-  fluttertoast: ^8.0.9
   google_fonts: ^3.0.1
   flutter_launcher_icons: ^0.10.0
   circular_bottom_navigation: ^2.1.0

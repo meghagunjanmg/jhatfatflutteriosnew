@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_paystack/flutter_paystack.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -111,15 +110,7 @@ class SubscritionState extends State<Subscription> {
       if (value.statusCode == 200) {
         var jsonData = jsonDecode(value.body);
         if (jsonData['status'] == "1") {
-          Fluttertoast.showToast(
-              msg: "Subscription Applied",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.black,
-              textColor: Colors.white,
-              fontSize: 16.0
-          );
+
         }
       }
     }).catchError((e) {
@@ -309,13 +300,11 @@ class SubscritionState extends State<Subscription> {
     setState(() {
       showDialogBox = false;
     });
-    Fluttertoast.showToast(
-        msg: "ERROR: " + response.message.toString());
+
 
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    Fluttertoast.showToast(
-        msg: "ERROR: " + response.toString());
+
   }
 }

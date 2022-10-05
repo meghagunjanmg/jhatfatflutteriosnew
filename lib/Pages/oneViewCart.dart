@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:horizontal_calendar_view_widget/date_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -1212,30 +1211,14 @@ class _oneViewCartState extends State<oneViewCart> {
                                       iduploaded != null) createCart(context);
                                   else if(is_id_req == 1 &&
                                       iduploaded == null) {
-                                    Fluttertoast.showToast(
-                                      msg: "Upload Id Proof",
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.CENTER,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.black,
-                                      textColor: Colors.white,
-                                      fontSize: 16.0
-                                  );
+
                                   }
 
                                   if (is_pres_req == 1 &&
                                       presuploaded != null) createCart(context);
                                   else if(is_pres_req == 1 &&
                                       presuploaded == null) {
-                                    Fluttertoast.showToast(
-                                      msg: "Upload Prescription",
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.CENTER,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.black,
-                                      textColor: Colors.white,
-                                      fontSize: 16.0
-                                  );
+
                                   }
 
                                   if (is_pres_req == 0 &&
@@ -1250,15 +1233,7 @@ class _oneViewCartState extends State<oneViewCart> {
                                 }
                               }
                               else{
-                                Fluttertoast.showToast(
-                                    msg: "Select Delivery Address",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.CENTER,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.black,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0
-                                );
+
                               }
                             },
                             child: Text("Pay $currency "
