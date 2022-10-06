@@ -1,8 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:firebase_auth/firebase_auth.dart';
-
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +49,7 @@ class OtpVerify extends StatefulWidget {
 
 class _OtpVerifyState extends State<OtpVerify> {
   final TextEditingController _controller = TextEditingController();
-  late FirebaseMessaging messaging;
+ /// late FirebaseMessaging messaging;
   bool isDialogShowing = false;
   dynamic token = '';
   var showDialogBox = false;
@@ -62,15 +59,15 @@ class _OtpVerifyState extends State<OtpVerify> {
   late String verificationId;
   String errorMessage = '';
   String contact = '';
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  ///final FirebaseAuth _auth = FirebaseAuth.instance;
   late Timer _timer;
 
   @override
   void initState() {
-    messaging = FirebaseMessaging.instance;
-    messaging.getToken().then((value) {
-      token = value;
-    });
+    // messaging = FirebaseMessaging.instance;
+    // messaging.getToken().then((value) {
+    //   token = value;
+    // });
 
 
     super.initState();
@@ -91,7 +88,7 @@ class _OtpVerifyState extends State<OtpVerify> {
 
     print(contact);
 
-    generateOtp('+91$contact');
+    ///generateOtp('+91$contact');
   }
 
   @override
@@ -188,7 +185,7 @@ class _OtpVerifyState extends State<OtpVerify> {
                           SizedBox(height: 10.0),
                       InkWell(
                         onTap: () {
-                          generateOtp('+91$contact');
+                          ///generateOtp('+91$contact');
                         },
                         child: const Padding(
                           padding: EdgeInsets.all(10.0),
@@ -222,9 +219,9 @@ class _OtpVerifyState extends State<OtpVerify> {
                       showDialogBox = true;
                     });
                   }
-                  /////hitService("123456", context);
+                  hitService("123456", context);
 
-                  verifyOtp();
+                  ///verifyOtp();
                   },
                 child: Container(
                   alignment: Alignment.center,
@@ -312,106 +309,106 @@ class _OtpVerifyState extends State<OtpVerify> {
         });
       });
     } else {
-      messaging.getToken().then((value) {
-        token = value;
-        // hitService(verificaitonPin, context);
-      });
+      // messaging.getToken().then((value) {
+      //   token = value;
+      //   // hitService(verificaitonPin, context);
+      // });
     }
   }
 
 
-  //Method for generate otp from firebase
-  Future<void> generateOtp(String contact) async {
-    var smsOTPSent = (String verId, [int? forceCodeResend]) {
-      verificationId = verId;
-      print("** "+verificationId);
-    };
-    try {
-      await _auth.verifyPhoneNumber(
-          phoneNumber: contact,
-          codeAutoRetrievalTimeout: (String verId) {
-            verificationId = verId;
-          },
-          codeSent: smsOTPSent,
-          timeout: const Duration(seconds: 60),
-          verificationCompleted: (AuthCredential phoneAuthCredential) {
-            verifyOtp();
-          },
-          verificationFailed: (Exception exception) {
-            // Navigator.pop(context, exception.message);
-          });
-
-    } catch (e) {
-      handleError(e as FirebaseAuthException);
-      // Navigator.pop(context, (e as PlatformException).message);
-    }
-  }
-
-  //Method for verify otp entered by user
-  Future<void> verifyOtp() async {
-
-    if (smsOTP == null || smsOTP == '') {
-      showAlertDialog(context, 'please enter 6 digit otp');
-      return;
-    }
-    try {
-      final AuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: smsOTP,
-      );
-
-       await _auth.signInWithCredential(credential);
-
-      print(smsOTP);
-      hitService(smsOTP, context);
-
-    } catch (e) {
-      print(e.toString());
-
-      handleError(e as FirebaseAuthException);
-    }
-  }
-
-  //Method for handle the errors
-  void handleError(FirebaseAuthException error) {
-
-    switch (error.code) {
-      case 'ERROR_INVALID_VERIFICATION_CODE':
-        FocusScope.of(context).requestFocus(FocusNode());
-        setState(() {
-          errorMessage = 'Invalid Code';
-        });
-        showAlertDialog(context, 'Invalid Code');
-        break;
-      default:
-        showAlertDialog(context, error.message.toString());
-        break;
-    }
-  }
-
-  //Basic alert dialogue for alert errors and confirmations
-  void showAlertDialog(BuildContext context, String message) {
-    // set up the AlertDialog
-    final CupertinoAlertDialog alert = CupertinoAlertDialog(
-      title: const Text('Error'),
-      content: Text('\n$message'),
-      actions: <Widget>[
-        CupertinoDialogAction(
-          isDefaultAction: true,
-          child: const Text('Ok'),
-          onPressed: () {
-            Navigator.of(context, rootNavigator: true).pop("Discard");
-          },
-        )
-      ],
-    );
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
+  // //Method for generate otp from firebase
+  // Future<void> generateOtp(String contact) async {
+  //   var smsOTPSent = (String verId, [int? forceCodeResend]) {
+  //     verificationId = verId;
+  //     print("** "+verificationId);
+  //   };
+  //   try {
+  //     await _auth.verifyPhoneNumber(
+  //         phoneNumber: contact,
+  //         codeAutoRetrievalTimeout: (String verId) {
+  //           verificationId = verId;
+  //         },
+  //         codeSent: smsOTPSent,
+  //         timeout: const Duration(seconds: 60),
+  //         verificationCompleted: (AuthCredential phoneAuthCredential) {
+  //           verifyOtp();
+  //         },
+  //         verificationFailed: (Exception exception) {
+  //           // Navigator.pop(context, exception.message);
+  //         });
+  //
+  //   } catch (e) {
+  //     handleError(e as FirebaseAuthException);
+  //     // Navigator.pop(context, (e as PlatformException).message);
+  //   }
+  // }
+  //
+  // //Method for verify otp entered by user
+  // Future<void> verifyOtp() async {
+  //
+  //   if (smsOTP == null || smsOTP == '') {
+  //     showAlertDialog(context, 'please enter 6 digit otp');
+  //     return;
+  //   }
+  //   try {
+  //     final AuthCredential credential = PhoneAuthProvider.credential(
+  //       verificationId: verificationId,
+  //       smsCode: smsOTP,
+  //     );
+  //
+  //      await _auth.signInWithCredential(credential);
+  //
+  //     print(smsOTP);
+  //     hitService(smsOTP, context);
+  //
+  //   } catch (e) {
+  //     print(e.toString());
+  //
+  //     handleError(e as FirebaseAuthException);
+  //   }
+  // }
+  //
+  // //Method for handle the errors
+  // void handleError(FirebaseAuthException error) {
+  //
+  //   switch (error.code) {
+  //     case 'ERROR_INVALID_VERIFICATION_CODE':
+  //       FocusScope.of(context).requestFocus(FocusNode());
+  //       setState(() {
+  //         errorMessage = 'Invalid Code';
+  //       });
+  //       showAlertDialog(context, 'Invalid Code');
+  //       break;
+  //     default:
+  //       showAlertDialog(context, error.message.toString());
+  //       break;
+  //   }
+  // }
+  //
+  // //Basic alert dialogue for alert errors and confirmations
+  // void showAlertDialog(BuildContext context, String message) {
+  //   // set up the AlertDialog
+  //   final CupertinoAlertDialog alert = CupertinoAlertDialog(
+  //     title: const Text('Error'),
+  //     content: Text('\n$message'),
+  //     actions: <Widget>[
+  //       CupertinoDialogAction(
+  //         isDefaultAction: true,
+  //         child: const Text('Ok'),
+  //         onPressed: () {
+  //           Navigator.of(context, rootNavigator: true).pop("Discard");
+  //         },
+  //       )
+  //     ],
+  //   );
+  //   // show the dialog
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return alert;
+  //     },
+  //   );
+  // }
 
 }

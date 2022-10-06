@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:location/location.dart' as loc;
 
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -1295,10 +1294,10 @@ class _HomeState extends State<Home> {
         admins = Adminsetting.fromJson(jsonData['data']);
         print("ADMIN RES: " + admins!.cityadminId.toString());
       if(admins!.status==1) {
-        FirebaseMessaging messaging = FirebaseMessaging.instance;
-        messaging.getToken().then((value) {
-          print(value);
-        });
+        // FirebaseMessaging messaging = FirebaseMessaging.instance;
+        // messaging.getToken().then((value) {
+        //   print(value);
+        // });
         getCurrency();
         Topbanner();
         hitService(lat.toString(), lng.toString());
@@ -1317,10 +1316,10 @@ class _HomeState extends State<Home> {
                 (Route<dynamic> route) => false);
       }
     }
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    messaging.getToken().then((value) {
-      print(value);
-    });
+    // FirebaseMessaging messaging = FirebaseMessaging.instance;
+    // messaging.getToken().then((value) {
+    //   print(value);
+    // });
     getCurrency();
     Topbanner();
     hitService(lat.toString(), lng.toString());

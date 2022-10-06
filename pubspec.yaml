@@ -43,7 +43,6 @@ dependencies:
   location: ^4.4.0
   shared_preferences: ^2.0.15
   flutter_local_notifications: ^9.9.0
-  firebase_auth: ^3.7.0
   pin_code_text_field: ^1.8.0
   flutter_html: ^3.0.0-alpha.5
   fl_country_code_picker: ^0.0.1
@@ -69,7 +68,6 @@ dependencies:
   flutter_polyline_points: ^1.0.0
   carousel_slider: ^4.1.1
   sqflite: ^2.0.3+1
-  firebase_messaging: ^13.0.0
   google_api_headers: ^1.1.1
   flutter_google_places_hoc081098: ^1.0.1
   flutter_typeahead: ^3.1.3

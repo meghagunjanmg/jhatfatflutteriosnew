@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -46,7 +45,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
   bool showDialogBox = false;
   dynamic token = '';
-  FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+  ///FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   @override
   void initState() {
@@ -256,26 +255,26 @@ class _RegisterFormState extends State<RegisterForm> {
         }
       });
     } else {
-      firebaseMessaging.getToken().then((value) {
-        setState(() {
-          token = value;
-        });
-        print('${value}');
-        hitService(name, email, referal, context);
-        Navigator.pushNamed(context, LoginRoutes.verification);
-
-      });
+      // firebaseMessaging.getToken().then((value) {
+      //   setState(() {
+      //     token = value;
+      //   });
+      //   print('${value}');
+      //   hitService(name, email, referal, context);
+      //   Navigator.pushNamed(context, LoginRoutes.verification);
+      //
+      // });
 
     }
   }
 
   void firebaseMessagingListner() async {
     if (Platform.isIOS) iosPermission();
-    firebaseMessaging.getToken().then((value) {
-      setState(() {
-        token = value;
-      });
-    });
+    // firebaseMessaging.getToken().then((value) {
+    //   setState(() {
+    //     token = value;
+    //   });
+    // });
   }
 
   void iosPermission() {
