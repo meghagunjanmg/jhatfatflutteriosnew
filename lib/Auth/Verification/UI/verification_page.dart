@@ -93,7 +93,6 @@ class _OtpVerifyState extends State<OtpVerify> {
 
     generateOtp('+91$contact');
   }
-
   @override
   Widget build(BuildContext context) {
 //    MobileNumberArg mobileNumberArg = ModalRoute.of(context).settings.arguments;
