@@ -1012,50 +1012,45 @@ class _ItemsPageState extends State<ItemsPage>
                         ),
                       ),
 
-                      Spacer(),
                       Positioned(
                           child: Visibility(
                               visible: isCartCount,
                               child: Align(
                                   alignment: Alignment.bottomCenter,
-                                  child: Container(
-                                      color: kMainColor,
-                                      height: 60.0,
-                                      child: Row(
-                                          children: <Widget>[
-                                            Image.asset(
-                                              'images/icons/ic_cart wt.png',
-                                              height: 19.0,
-                                              width: 18.3,
-                                            ),
-                                            SizedBox(width: 20.7),
-                                            Text(
-                                              '$cartCount items | $currency $totalAmount',
-                                              style: bottomBarTextStyle.copyWith(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                            Spacer(),
-                                            TextButton(
-                                              onPressed: () => hitViewCart(context),
-                                              child: Text(
-                                                'View Cart',
-                                                style: Theme
-                                                    .of(context)
-                                                    .textTheme
-                                                    .caption!
-                                                    .copyWith(
-                                                    color: kMainColor,
-                                                    fontWeight: FontWeight.bold),
-                                              ),
-                                            ),
-                                          ]
+                                  child:
+                                  GestureDetector(
+                                      onTap:() { Navigator.pushNamed(
+                                          context, PageRoutes.viewCart)
+                                          .then((value) {
+                                        setList(productVarientList);
+                                        getCartCount();
+                                      });},
+                                      child: Container(
+                                          color: kMainColor,
+                                          height: 60.0,
+                                          child: Row(
+                                              children: <Widget>[
+                                                Image.asset(
+                                                  'images/icons/ic_cart wt.png',
+                                                  height: 19.0,
+                                                  width: 18.3,
+                                                ),
+                                                SizedBox(width: 20.7),
+                                                DefaultTextStyle(
+                                                  style: bottomBarTextStyle.copyWith(
+                                                      fontSize: 15,
+                                                      fontWeight: FontWeight.w500),
+                                                  child: Text(
+                                                      '$cartCount items | $currency $totalAmount'
+                                                  ),
+                                                )
+                                              ]
+                                          )
                                       )
                                   )
                               )
                           )
                       )
-
                     ]
                 ),
               ),
