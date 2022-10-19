@@ -287,7 +287,7 @@ class _oneViewCartState extends State<oneViewCart> {
       var vae = {
         DatabaseHelper.productId: product_id,
         DatabaseHelper.productName: product_name,
-        DatabaseHelper.price: (price_d * itemCount),
+        DatabaseHelper.price:price_d,
         DatabaseHelper.unit: unit,
         DatabaseHelper.quantitiy: quantity,
         DatabaseHelper.addQnty: itemCount,
@@ -1600,7 +1600,7 @@ class _oneViewCartState extends State<oneViewCart> {
         DatabaseHelper.productName: product_name,
         DatabaseHelper.storeName: storename,
         DatabaseHelper.vendor_id: vendorid,
-        DatabaseHelper.price: (price * itemCount),
+        DatabaseHelper.price: price,
         DatabaseHelper.unit: unit,
         DatabaseHelper.quantitiy: quantity,
         DatabaseHelper.addQnty: itemCount,
