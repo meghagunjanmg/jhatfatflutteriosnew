@@ -59,7 +59,7 @@ class _OtpVerifyState extends State<OtpVerify> {
   var verificaitonPin = "";
   late String phoneNo;
   late String smsOTP="";
-  late String verificationId;
+  String verificationId="";
   String errorMessage = '';
   String contact = '';
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -334,14 +334,12 @@ class _OtpVerifyState extends State<OtpVerify> {
           codeSent: smsOTPSent,
           timeout: const Duration(seconds: 60),
           verificationCompleted: (AuthCredential phoneAuthCredential) {
-            verifyOtp();
           },
           verificationFailed: (Exception exception) {
             // Navigator.pop(context, exception.message);
           });
 
     } catch (e) {
-      handleError(e as FirebaseAuthException);
       // Navigator.pop(context, (e as PlatformException).message);
     }
   }
@@ -367,25 +365,17 @@ class _OtpVerifyState extends State<OtpVerify> {
     } catch (e) {
       print(e.toString());
 
-      handleError(e as FirebaseAuthException);
+      handleError(e);
     }
   }
 
   //Method for handle the errors
-  void handleError(FirebaseAuthException error) {
-
-    switch (error.code) {
-      case 'ERROR_INVALID_VERIFICATION_CODE':
-        FocusScope.of(context).requestFocus(FocusNode());
+  void handleError(error) {
+     FocusScope.of(context).requestFocus(FocusNode());
         setState(() {
-          errorMessage = 'Invalid Code';
+          errorMessage = error.toString();
         });
         showAlertDialog(context, 'Invalid Code');
-        break;
-      default:
-        showAlertDialog(context, error.message.toString());
-        break;
-    }
   }
 
   //Basic alert dialogue for alert errors and confirmations

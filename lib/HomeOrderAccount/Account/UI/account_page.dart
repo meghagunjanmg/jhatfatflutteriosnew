@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,6 +8,9 @@ import 'package:jhatfat/Components/list_tile.dart';
 import 'package:jhatfat/HomeOrderAccount/Account/UI/ListItems/saved_addresses_page.dart';
 import 'package:jhatfat/Routes/routes.dart';
 import 'package:jhatfat/Themes/colors.dart';
+import 'package:http/http.dart' as http;
+
+import '../../../baseurlp/baseurl.dart';
 
 class AccountPage extends StatelessWidget {
   @override
@@ -134,6 +139,8 @@ class _AccountState extends State<Account> {
             onTap: () async {
               Navigator.pushNamed(context, PageRoutes.settings);
             }        ),
+        DeleteTile(phoneNumber),
+
         LogoutTile(),
       ],
     );
@@ -193,6 +200,71 @@ class LogoutTile extends StatelessWidget {
     );
   }
 }
+
+
+class DeleteTile extends StatelessWidget {
+  String phoneNumber;
+
+  DeleteTile(this.phoneNumber);
+
+  @override
+  Widget build(BuildContext context) {
+    return BuildListTile(
+      image: 'images/account/ic_menu_logoutact.png',
+      text: 'Delete Profile',
+      onTap: () async {
+        showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Delete Profile'),
+                content: Text('Are you sure?'),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('No'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  TextButton(
+                      child: Text('Yes'),
+                      onPressed: () async {
+                          hitService(phoneNumber,context);
+
+                      })
+                ],
+              );
+            });
+      },
+    );
+  }
+}
+void hitService(phoneNumber,context) async {
+    String url = deleteaccount;
+    Uri myUri = Uri.parse(url);
+    await http.post(myUri, body: {
+      'user_phone': phoneNumber,
+    }).then((response) async {
+      print('Response Body: *-*- ${response.body}');
+      if (response.statusCode == 200) {
+        print('Response Body: *-*- ${response.body}');
+        var jsonData = jsonDecode(response.body);
+        if (jsonData['status'] == "1") {
+          SharedPreferences prefs =
+              await SharedPreferences.getInstance();
+          prefs.clear();
+           Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (context) {
+                return LoginNavigator();
+              }), (Route<dynamic> route) => false);
+        }
+      } else {
+      }
+    }).catchError((e) {
+      print(e);
+    });
+}
+
+
 
 class UserDetailsState extends State<UserDetails> {
   var userName = '';
