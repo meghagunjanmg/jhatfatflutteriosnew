@@ -313,7 +313,7 @@ class _OtpVerifyState extends State<OtpVerify> {
     } else {
       messaging.getToken().then((value) {
         token = value;
-        // hitService(verificaitonPin, context);
+           hitService(verificaitonPin, context);
       });
     }
   }
@@ -326,16 +326,19 @@ class _OtpVerifyState extends State<OtpVerify> {
       print("** "+verificationId);
     };
     try {
-      await _auth.verifyPhoneNumber(
+      _auth.verifyPhoneNumber(
           phoneNumber: contact,
           codeAutoRetrievalTimeout: (String verId) {
             verificationId = verId;
           },
           codeSent: smsOTPSent,
-          timeout: const Duration(seconds: 60),
+          timeout: const Duration(seconds: 120),
           verificationCompleted: (AuthCredential phoneAuthCredential) {
+
           },
           verificationFailed: (Exception exception) {
+            print("ERROR  "+exception.toString());
+            handleError(exception);
             // Navigator.pop(context, exception.message);
           });
 
@@ -346,7 +349,6 @@ class _OtpVerifyState extends State<OtpVerify> {
 
   //Method for verify otp entered by user
   Future<void> verifyOtp() async {
-
     if (smsOTP == null || smsOTP == '') {
       showAlertDialog(context, 'please enter 6 digit otp');
       return;
@@ -356,15 +358,15 @@ class _OtpVerifyState extends State<OtpVerify> {
         verificationId: verificationId,
         smsCode: smsOTP,
       );
+      print("ERROR**  "+credential.toString());
 
-       await _auth.signInWithCredential(credential);
+      _auth.signInWithCredential(credential);
 
       print(smsOTP);
       hitService(smsOTP, context);
 
     } catch (e) {
-      print(e.toString());
-
+      print("ERROR***  "+ e.toString());
       handleError(e);
     }
   }
@@ -375,7 +377,7 @@ class _OtpVerifyState extends State<OtpVerify> {
         setState(() {
           errorMessage = error.toString();
         });
-        showAlertDialog(context, 'Invalid Code');
+        showAlertDialog(context, 'Something went wrong');
   }
 
   //Basic alert dialogue for alert errors and confirmations

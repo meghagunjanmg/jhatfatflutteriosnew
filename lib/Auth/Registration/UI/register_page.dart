@@ -247,6 +247,7 @@ class _RegisterFormState extends State<RegisterForm> {
         'user_image': 'usre.png'
       }).then((value) {
         print('Response Body: - ${value.body.toString()}');
+        print('Response Body: - ${value.statusCode.toString()}');
         if (value.statusCode == 200) {
           setState(() {
             showDialogBox = false;
@@ -262,7 +263,7 @@ class _RegisterFormState extends State<RegisterForm> {
         });
         print('${value}');
         hitService(name, email, referal, context);
-        Navigator.pushNamed(context, LoginRoutes.verification);
+       //// Navigator.pushNamed(context, LoginRoutes.verification);
 
       });
 

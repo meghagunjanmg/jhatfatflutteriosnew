@@ -11,7 +11,9 @@ import 'package:geocoder2/geocoder2.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:page_transition/page_transition.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:responsive_grid/responsive_grid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:toast/toast.dart';
@@ -38,8 +40,11 @@ import 'package:jhatfat/restaturantui/ui/resturanthome.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../Themes/constantfile.dart';
+import '../../../Themes/style.dart';
 import '../../../bean/adminsetting.dart';
+import '../../../restaturantui/pages/rasturantlistpage.dart';
 import '../../../restaturantui/pages/restaurant.dart';
+import '../../../subscription/SubscribeStore.dart';
 import '../Closed.dart';
 import 'appcategory/appcategory.dart';
 
@@ -77,6 +82,7 @@ class _HomeState extends State<Home> {
   List<BannerDetails> topBannerImage = [];
   List<VendorList> nearStores = [];
   List<VendorList> newnearStores = [];
+  List<Vendors> substores = [];
   List<VendorList> nearStoresShimmer = [
     VendorList(),
     VendorList(),
@@ -111,11 +117,14 @@ class _HomeState extends State<Home> {
 
   static String id="";
 
+  bool subscription = false;
 
   @override
   void initState() {
     super.initState();
-      getData();
+    checksubscription();
+
+    getData();
   }
 
 
@@ -425,6 +434,7 @@ class _HomeState extends State<Home> {
                       Navigator.push(context, MaterialPageRoute
                         (builder: (context) =>
                       new AppCategory(
+                        detail.vendorCategoryId,
                           detail.vendorName.toString(), detail.vendorId,
                           detail.distance)));
                     }
@@ -482,17 +492,15 @@ class _HomeState extends State<Home> {
               // ),
 
               Padding(
-                padding: EdgeInsets.all(20),
-                child: GridView.count(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 0,
-                  mainAxisSpacing: 0,
-                  childAspectRatio: 100 / 90,
-                  controller: ScrollController(keepScrollOffset: false),
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  // childAspectRatio: itemWidth/(itemHeight),
-                  children: (nearStores != null && nearStores.length > 0)
+                  padding: EdgeInsets.all(20),
+                  child:
+                  ResponsiveGridList(
+                    rowMainAxisAlignment: MainAxisAlignment.center,
+                    squareCells: true,
+                    desiredItemWidth: 120,
+                    shrinkWrap: true,
+                    minSpacing: 2, children:
+                  (nearStores != null && nearStores.length > 0)
                       ? nearStores.map((e) {
                     return ReusableCard(
                       cardChild: CardContent(
@@ -504,7 +512,6 @@ class _HomeState extends State<Home> {
                       ),
                     );
                   }).toList()
-
                       : nearStoresShimmer.map((e) {
                     return ReusableCard(
                         cardChild: Shimmer(
@@ -522,94 +529,174 @@ class _HomeState extends State<Home> {
                         ),
                         onPress: () {});
                   }).toList(),
-                ),
+                  )
               ),
-              Padding(
-                padding: EdgeInsets.only(top: 2, bottom: 2),
-                child: Builder(
-                  builder: (context) {
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute
-                          (builder: (context) =>
-                        new AppCategory(pickBannerImage[0].vendorName,
-                            pickBannerImage[0].vendorId, "22")));
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 10),
-                        child: Material(
-                          borderRadius:
-                          BorderRadius.circular(20.0),
-                          clipBehavior: Clip.hardEdge,
-                          child: Container(
-                            height: 100,
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width *
-                                0.90,
+
+              ResponsiveGridList(
+                  rowMainAxisAlignment: MainAxisAlignment.center,
+                  desiredItemWidth: MediaQuery
+                      .of(context)
+                      .size
+                      .width - 200,
+                  shrinkWrap: true,
+                  minSpacing: 2, children:[
+                Padding(
+                  padding: EdgeInsets.only(top: 2, bottom: 2),
+                  child: Builder(
+                    builder: (context) {
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute
+                            (builder: (context) =>
+                          new AppCategory(pickBannerImage[0].vendorCategoryId,pickBannerImage[0].vendorName,
+                              pickBannerImage[0].vendorId, "22")));
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 10),
+                          child: Material(
+                            borderRadius:
+                            BorderRadius.circular(20.0),
+                            clipBehavior: Clip.hardEdge,
+                            child: Container(
 //                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                            decoration: BoxDecoration(
-                              color: white_color,
-                              borderRadius:
-                              BorderRadius.circular(20.0),
-                            ),
-                            child: Image.network(
-                              pickImage,
-                              fit: BoxFit.fill,
+                              decoration: BoxDecoration(
+                                color: white_color,
+                                borderRadius:
+                                BorderRadius.circular(20.0),
+                              ),
+                              child: Image.network(
+                                pickImage,
+                                  fit: BoxFit.fill,
+                                height: 150,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-
+                      );
+                    },
+                  ),
                 ),
-              ),
+              ]),
 
+              ( !subscription )?
+              ResponsiveGridList(
+                  rowMainAxisAlignment: MainAxisAlignment.center,
+                  desiredItemWidth: MediaQuery
+                      .of(context)
+                      .size
+                      .width - 200,
+                  shrinkWrap: true,
+                  minSpacing: 2, children:[
+                Padding(
+                  padding: EdgeInsets.only(top: 2, bottom: 2),
+                  child: Builder(
+                    builder: (context) {
+                      return InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, PageRoutes.subscription);
+
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 10),
+                          child: Material(
+                            borderRadius:
+                            BorderRadius.circular(20.0),
+                            clipBehavior: Clip.hardEdge,
+                            child: Container(
+//                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
+                              decoration: BoxDecoration(
+                                color: white_color,
+                                borderRadius:
+                                BorderRadius.circular(20.0),
+                              ),
+                              child: Image.network(
+                                subsImage,
+                                fit: BoxFit.fill,
+                                height: 150,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ])
+        :
               Padding(
                 padding: EdgeInsets.only(top: 5, bottom: 2),
-                child: Builder(
-                  builder: (context) {
-                    return InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(context, PageRoutes.subscription);
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 10),
-                        child: Material(
-                          borderRadius:
-                          BorderRadius.circular(20.0),
-                          clipBehavior: Clip.hardEdge,
-                          child: Container(
-                            height: 100,
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width *
-                                0.90,
-//                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
-                            decoration: BoxDecoration(
-                              color: white_color,
-                              borderRadius:
-                              BorderRadius.circular(20.0),
-                            ),
-                            child: Image.network(
-                              subsImage,
-                              fit: BoxFit.fill,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+                child:
+    Column(
+    children: <Widget>[
 
-                ),
+    Padding(
+      padding: EdgeInsets.all(fixPadding),
+      child:
+      Column(
+      children:[
+      Padding(
+      padding: EdgeInsets.only(top: 8.0, left: 24.0,right: 24.0),
+                  child:
+                  Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+        Text(
+        'Subscribed stores',
+        style: headingStyle,
+      ),
+      InkWell(
+        onTap: () {
+          Navigator.push(
+              context,
+              PageTransition(
+                  type: PageTransitionType
+                      .bottomToTop,
+                  child: SubscribeStore()));
+        },
+        child: Text('View all', style: moreStyle),
+      ),
+    ]),
+      ),
+                  SizedBox(
+                      height: 150,
+                      width: MediaQuery. of(context). size. width,
+                      child:
+    ListView.builder(
+      itemCount: (substores.length/2).toInt()+1,
+    scrollDirection: Axis.horizontal,
+    itemBuilder: (BuildContext context, int index) =>
+        Padding(padding: const EdgeInsets.all(2.0),
+          child: InkWell(onTap: () {
+    Navigator.push(context, MaterialPageRoute
+    (builder: (context) =>
+    new AppCategory(
+    substores[index].vendorCategoryId,
+    substores[index].vendorName.toString(), substores[index].vendorId,
+    substores[index].distance)));
+          },
+            child: Container(
+              width: 120.0,
+              child: ListTile(
+                  title: Image.network('${imageBaseUrl}${substores[index].vendorLogo}',
+                    width: 100.0,
+                    height: 100.0,),
+                  subtitle: Container(
+                    alignment: Alignment.topCenter,
+                    child: Text(substores[index].vendorName!),
+                  )
               ),
-
-
+            ),
+          ),
+        ),
+    ),
+                  )
+        ]
+    )
+    ),
+    ])),
               Visibility(
                 visible: (!isFetch && listImage.length == 0) ? false : true,
                 child: Padding(
@@ -709,19 +796,12 @@ class _HomeState extends State<Home> {
                         ////hitService1();
                       },
                       child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 10),
+                        padding: EdgeInsets.all(20),
                         child: Material(
                           borderRadius:
                           BorderRadius.circular(20.0),
                           clipBehavior: Clip.hardEdge,
                           child: Container(
-                            height: 250,
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width *
-                                0.90,
 //                                            padding: EdgeInsets.symmetric(horizontal: 10.0,vertical: 10.0),
                             decoration: BoxDecoration(
                               color: white_color,
@@ -748,56 +828,7 @@ class _HomeState extends State<Home> {
                     style: TextStyle(fontSize: 12),
                   )
 
-              // Padding(
-              //   padding: EdgeInsets.all(0),
-              //   child: GridView.count(
-              //     crossAxisCount: 1,
-              //     childAspectRatio: 50/25,
-              //     controller: ScrollController(keepScrollOffset: false),
-              //     shrinkWrap: true,
-              //     scrollDirection: Axis.vertical,
-              //     children: (newnearStores != null && newnearStores.length > 0)
-              //         ?
-              //     newnearStores.map((e) {
-              //       if(e.vendors.toString().length!=null) {
-              //         return ReusableCard(
-              //           cardChild: CardContentNew(
-              //               image: '${imageBaseUrl}${e.category_image}',
-              //               text: '${e.category_name}',
-              //               list: e.vendors,
-              //               ui_type: e.ui_type,
-              //               id: e.vendor_category_id,
-              //               context: context,
-              //               lat: lat,
-              //               lng: lng
-              //           ),
-              //           // onPress: () => hitNavigator(
-              //           //     context,
-              //           //     e.category_name,
-              //           //     e.ui_type,
-              //           //     e.vendor_category_id),
-              //         );
-              //       }
-              //     }).toList()
-              //         : nearStoresShimmer.map((e) {
-              //       return ReusableCard(
-              //           cardChild: Shimmer(
-              //             duration: Duration(seconds: 3),
-              //             //Default value
-              //             color: Colors.white,
-              //             //Default value
-              //             enabled: true,
-              //             //Default value
-              //             direction: ShimmerDirection.fromLTRB(),
-              //             //Default Value
-              //             child: Container(
-              //               color: kTransparentColor,
-              //             ),
-              //           ),
-              //           onPress: () {});
-              //     }).toList(),
-              //   ),
-              // ),
+
             ],
           ),
         ),
@@ -1146,7 +1177,7 @@ class _HomeState extends State<Home> {
             cityName = pref.getString("addr")!;
             lat = double.parse(pref.getString("lat")!);
             lng = double.parse(pref.getString("lng")!);
-          });
+       });
       print("HOME_ORDER_HOME"+lat.toString()+lng.toString());
     } catch (e) {
       print(e);
@@ -1169,7 +1200,7 @@ class _HomeState extends State<Home> {
         detail.uiType == 1) {
       Navigator.push(context, MaterialPageRoute
         (builder: (context) =>
-      new AppCategory(detail.vendorName, detail.vendorId, "22")));
+      new AppCategory(detail.vendorCategoryId,detail.vendorName, detail.vendorId, "22")));
     }
 
 
@@ -1285,6 +1316,42 @@ class _HomeState extends State<Home> {
       }
     });
   }
+  void checksubscription() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    var url = checksubs;
+    Uri myUri = Uri.parse(url);
+    var value = await http.post(myUri , body: {
+    'user_phone': prefs.getString('user_phone')});
+    var jsonData = jsonDecode(value.body.toString());
+    if (jsonData['status'] == "1") {
+      setState(() {
+        subscription = true;
+        callSubStore();
+      });
+      }
+      else {
+      setState(() {
+        subscription = false;
+      });
+      }
+    }
+  void callSubStore() async {
+    var url = subsstore;
+    Uri myUri = Uri.parse(url);
+    var value = await http.get(myUri);
+    var jsonData = jsonDecode(value.body.toString());
+    if (jsonData['status'] == "1") {
+      var tagObjsJson = jsonDecode(value.body)['data'] as List;
+      List<Vendors> tagObjs = tagObjsJson
+          .map((tagJson) => Vendors.fromJson(tagJson))
+          .toList();
+      setState(() {
+        substores.clear();
+        substores = tagObjs;
+      });
+    }
+  }
 
   void calladminsetting() async {
     var url = adminsettings;
@@ -1321,6 +1388,8 @@ class _HomeState extends State<Home> {
     messaging.getToken().then((value) {
       print(value);
     });
+
+
     getCurrency();
     Topbanner();
     hitService(lat.toString(), lng.toString());

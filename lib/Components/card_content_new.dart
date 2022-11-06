@@ -16,11 +16,13 @@ import 'package:jhatfat/pharmacy/pharmastore.dart';
 import 'package:jhatfat/restaturantui/pages/restaurant.dart';
 import 'package:jhatfat/restaturantui/ui/resturanthome.dart';
 
+import '../bean/venderbean.dart';
+
 
 class CardContentNew extends StatelessWidget {
   final String text;
   final String image;
-  final List<dynamic> list;
+  final List<Vendors> list;
   final String ui_type;
   final int id;
   final BuildContext context;
@@ -137,7 +139,6 @@ class CardContentNew extends StatelessWidget {
                   maxHeight: 120,
                 ),
                 child:
-
                   ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: list.length,
@@ -163,6 +164,7 @@ class CardContentNew extends StatelessWidget {
                                                   MaterialPageRoute(
                                                       builder: (context) =>
                                                           AppCategory(
+                                                            tagObjs[index].vendor_category_id,
                                                               tagObjs[index]
                                                                   .vendor_name,
                                                               tagObjs[index]

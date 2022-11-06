@@ -246,6 +246,7 @@ class StoresPageState extends State<StoresPage> {
                                     hitNavigator(
                                         context,
                                         nearStores[index].vendor_name,
+                                        nearStores[index].vendor_category_id,
                                         nearStores[index].vendor_id,
                                         nearStores[index].distance);
                                   } else {
@@ -580,7 +581,7 @@ class StoresPageState extends State<StoresPage> {
     );
   }
 
-  hitNavigator(BuildContext context, vendor_name, vendor_id, distance) async {
+  hitNavigator(BuildContext context, vendor_name,vendorCategoryId, vendor_id, distance) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (isCartCount &&
         prefs.getString("vendor_id") != null &&
@@ -591,7 +592,7 @@ class StoresPageState extends State<StoresPage> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  AppCategory(vendor_name, vendor_id, distance))).then((value) {
+                  AppCategory(vendorCategoryId,vendor_name, vendor_id, distance))).then((value) {
         getCartCount();
       });
     }
@@ -603,7 +604,7 @@ class StoresPageState extends State<StoresPage> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  AppCategory(vendor_name, vendor_id, distance))).then((value) {
+                  AppCategory(vendorCategoryId,vendor_name, vendor_id, distance))).then((value) {
         getCartCount();
       });
     }
@@ -616,13 +617,13 @@ class StoresPageState extends State<StoresPage> {
     db.deleteAll().then((value) {
       prefs.setString("vendor_id", '${vendor_id}');
       prefs.setString("store_name", '${vendor_name}');
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  AppCategory(vendor_name, vendor_id, distance))).then((value) {
-        getCartCount();
-      });
+      // Navigator.push(
+      //     context,
+      //     MaterialPageRoute(
+      //         builder: (context) =>
+      //             AppCategory(vendor_name, vendor_id, distance))).then((value) {
+      //   getCartCount();
+      // });
     });
   }
 }

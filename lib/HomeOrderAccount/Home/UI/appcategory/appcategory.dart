@@ -17,13 +17,15 @@ import 'package:jhatfat/bean/categorylist.dart';
 import 'package:jhatfat/bean/vendorbanner.dart';
 import 'package:jhatfat/databasehelper/dbhelper.dart';
 import 'package:jhatfat/dealofferpack/dealproduct.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AppCategory extends StatefulWidget {
   final String pageTitle;
   final dynamic vendor_id;
   final dynamic distance;
+  final dynamic vendorCategoryId;
 
-  AppCategory(this.pageTitle, this.vendor_id, this.distance) {
+  AppCategory(this.vendorCategoryId,this.pageTitle, this.vendor_id, this.distance) {
     setStoreName(pageTitle);
   }
 
@@ -34,13 +36,14 @@ class AppCategory extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return AppCategoryState(pageTitle, vendor_id);
+    return AppCategoryState(vendorCategoryId,pageTitle, vendor_id);
   }
 }
 
 class AppCategoryState extends State<AppCategory> {
   final String pageTitle;
   final dynamic vendor_id;
+  final dynamic vendorCategoryId;
   bool isCartCount = false;
   bool isFetch = false;
   int cartCount = 0;
@@ -49,7 +52,7 @@ class AppCategoryState extends State<AppCategory> {
 
   TextEditingController searchController = TextEditingController();
 
-  AppCategoryState(this.pageTitle, this.vendor_id);
+  AppCategoryState(this.vendorCategoryId,this.pageTitle, this.vendor_id);
 
   List<VendorBanner> listImage = [];
   List<String> listImages = ['', '', '', '', ''];
@@ -276,7 +279,8 @@ class AppCategoryState extends State<AppCategory> {
                         ],
                       ),
                     ),                  ],
-                  bottom: PreferredSize(
+                  bottom:
+                  PreferredSize(
                       child: GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -325,7 +329,8 @@ class AppCategoryState extends State<AppCategory> {
                           Size(MediaQuery.of(context).size.width, 52)),
                 ),
         ),
-        body: Container(
+        body:
+        Container(
           height:
               MediaQuery.of(context).size.height - (isSearchOpen ? 83 : 135),
           width: MediaQuery.of(context).size.width,
@@ -333,6 +338,27 @@ class AppCategoryState extends State<AppCategory> {
             primary: true,
             child: Column(
               children: [
+                (vendorCategoryId==18)?
+                Container(
+                    color: kMainColor,
+                    padding: EdgeInsets.all(20),
+                    margin: EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children:[
+                        Center(child: Text("For More Pan Store Items, Visit Our Web",
+                          style: TextStyle(fontSize: 20),
+                        )),
+                    Center(child: Text(
+                            'jhatfat.com/web',
+                            style: TextStyle(decoration: TextDecoration.underline,fontSize: 20),
+                          ),
+                )
+                   ] ),
+                )
+                :
+                Text(" "),
+
                 Visibility(
                   visible: (!isFetch && listImage.length == 0) ? false : true,
                   child: Padding(
