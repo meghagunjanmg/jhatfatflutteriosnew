@@ -90,7 +90,7 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
     } else if (status.isDenied) {
       _requestPermission();
     } else if (status.isPermanentlyDenied) {
-      openAppSettings();
+      //openAppSettings();
     }
   }
 

@@ -59,7 +59,7 @@ _requestPermission() async {
   } else if (status.isDenied) {
     _requestPermission();
   } else if (status.isPermanentlyDenied) {
-    openAppSettings();
+    //openAppSettings();
   }
 
 
@@ -68,7 +68,7 @@ _requestPermission() async {
   } else if (status1.isDenied) {
     _requestPermission();
   } else if (status1.isPermanentlyDenied) {
-    openAppSettings();
+    //openAppSettings();
   }
 }
 class GoMarket extends StatelessWidget {
