@@ -239,17 +239,19 @@ int numberLimit = 10;
                                     setState(() {
                                       showDialogBox = false;
                                     });
-                                    Toast.show("Enter valid mobile number!", duration: Toast.lengthShort, gravity:  Toast.bottom);
+                                    Toast.show("Enter Valid mobile number!", duration: Toast.lengthShort, gravity:  Toast.bottom);
                                   } else {
                                             store(_controller.text);
                                     hitService(isoCode, _controller.text, context);
                                   }
                                 }
                               },
-                                child: Text(
+                                child:
+                                Text(
                                   AppLocalizations.of(context)!.continueText.toString(),
                                   style: TextStyle(
                                       color: kWhiteColor,
+                                      overflow: TextOverflow.visible,
                                       fontWeight: FontWeight.w400),
                                 ),
                             ),

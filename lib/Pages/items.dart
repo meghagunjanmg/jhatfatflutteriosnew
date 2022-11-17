@@ -50,6 +50,22 @@ class _ItemsPageState extends State<ItemsPage>
   List<SubCategoryList> subCategoryListApp = [];
   List<SubCategoryList> subCategoryListDemo = [
     SubCategoryList(
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+    ),
+    SubCategoryList(
+      '',
+      '',
+      '',
+      '',
       '',
       '',
       '',
@@ -62,26 +78,6 @@ class _ItemsPageState extends State<ItemsPage>
       '',
       '',
       '',
-      '',
-      '',
-    ),
-    SubCategoryList(
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-    ),
-    SubCategoryList(
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-    ),
-    SubCategoryList(
       '',
       '',
       '',
@@ -547,17 +543,35 @@ class _ItemsPageState extends State<ItemsPage>
                 height: 8.0,
                 ),
                 Text(
-                '$currency ${(productVarientList[index]
-                    .data.length > 0)
-                ? productVarientList[index]
-                    .data[productVarientList[index]
-                    .selectPos].price
-                    : 0}',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .caption),
-                SizedBox(
+                    (productVarientList[index]
+                        .data.length < 0||productVarientList[index]
+                        .data[productVarientList[index]
+                        .selectPos].strick_price
+                            <=
+                            productVarientList[index]
+                        .data[productVarientList[index]
+                        .selectPos].price ||
+                        productVarientList[index]
+                            .data[productVarientList[index]
+                            .selectPos].strick_price==null )
+                ? ''
+                    :'$currency  ${productVarientList[index]
+                        .data[productVarientList[index]
+                        .selectPos].strick_price}',
+
+                style: TextStyle(decoration: TextDecoration.lineThrough)),
+
+                  Text(
+                      '$currency ${(productVarientList[index]
+                          .data.length > 0)
+                          ? productVarientList[index]
+                          .data[productVarientList[index]
+                          .selectPos].price
+                          : 0}',
+                      //style: TextStyle(decoration: TextDecoration.lineThrough)
+                  ),
+
+                  SizedBox(
                 height: 20.0,
                 ),
                 ],
@@ -1028,24 +1042,37 @@ class _ItemsPageState extends State<ItemsPage>
                    child: Container(
                               color: kMainColor,
                               height: 60.0,
-                              child: Row(
-                                  children: <Widget>[
-                                    Image.asset(
-                                      'images/icons/ic_cart wt.png',
-                                      height: 19.0,
-                                      width: 18.3,
-                                    ),
-                                    SizedBox(width: 20.7),
-                                    DefaultTextStyle(
-                                      style: bottomBarTextStyle.copyWith(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500),
-                                      child: Text(
-                                          '$cartCount items | $currency $totalAmount'
-                                      ),
-                                    )
-                                  ]
-                              )
+                              child:
+    Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: <Widget>[
+      Image.asset(
+        'images/icons/ic_cart wt.png',
+        height: 19.0,
+        width: 18.3,
+      ),
+      DefaultTextStyle(
+        style: bottomBarTextStyle.copyWith(
+            fontSize: 15,
+            fontWeight: FontWeight.w500),
+        child: Text(
+            '$cartCount items | $currency $totalAmount'
+        ),
+      ),
+    Flexible(fit: FlexFit.tight, child: SizedBox()),
+      Align(
+          alignment: Alignment.centerRight,
+          child: DefaultTextStyle(
+            style: bottomBarTextStyle.copyWith(
+                fontSize: 15,
+                fontWeight: FontWeight.w500),
+            child: const Text(
+                'Go to cart'
+            ),
+          )
+      ),
+    ],
+    )
                           )
                       )
                   )
@@ -1086,17 +1113,25 @@ class _ItemsPageState extends State<ItemsPage>
       if (value == 0) {
         db.getCountVendor()
             .then((value) {
-          if (value != null && value < 3) {
-            db.insert(vae);
-            getCartCount();
 
-          }
-          else {
-            showMyDialog2(context);
-          }
+           if(prefs.getString("allowmultishop").toString()!="1") {
+             if (value != null && value < 3) {
+               db.insert(vae);
+               getCartCount();
+             }
+             else {
+               showMyDialog2(context);
+             }
+           }
+            else{
+             db.insert(vae);
+             getCartCount();
+           }
         }
         );
-      } else {
+      }
+
+      else {
         if (itemCount == 0) {
           db.delete(int.parse('${varient_id}'));
           getCartCount();
@@ -1137,32 +1172,66 @@ class _ItemsPageState extends State<ItemsPage>
           List<SubCategoryList> tagObjs = tagObjsJson
               .map((tagJson) => SubCategoryList.fromJson(tagJson))
               .toList();
+          List<Tab> tabss = <Tab>[];
+          List<SubCategoryList> toRemove = [];
+
+          setState(() {
+            for (SubCategoryList tagd in tagObjs) {
+                tabss.add(Tab(
+                  text: tagd.subcatName,
+                ));
+                toRemove.add(tagd);
+            }
+            setState(() {
+              subCategoryListApp.clear();
+              tabs.clear();
+              subCategoryListApp = toRemove;
+              tabs = tabss;
+              tabController = TabController(length: tabs.length, vsync: this);
+            });
+            setState(() {
+              productVarientList = [];
+              hitTabSeriveList(subCategoryListApp[0].subcatId);
+            });
+
+            tabController.addListener(() {
+              if (!tabController.indexIsChanging) {
+                setState(() {
+                  productVarientList = [];
+                  hitTabSeriveList(
+                      subCategoryListApp[tabController.index].subcatId);
+                });
+              }
+            });
+          });
+        }
+        else{
           setState(() {
             List<Tab> tabss = <Tab>[];
-            for (SubCategoryList tagd in tagObjs) {
               tabss.add(Tab(
-                text: tagd.subcat_name,
+                text: category_name,
               ));
-            }
             subCategoryListApp.clear();
             tabs.clear();
-            subCategoryListApp = tagObjs;
+            subCategoryListApp = [];
             tabs = tabss;
+
             tabController = TabController(length: tabs.length, vsync: this);
             tabController.addListener(() {
               if (!tabController.indexIsChanging) {
                 setState(() {
                   productVarientList = [];
                   hitTabSeriveList(
-                      subCategoryListApp[tabController.index].subcat_id);
+                      subCategoryListApp[tabController.index].subcatId);
                 });
               }
             });
             setState(() {
               productVarientList = [];
-              hitTabSeriveList(subCategoryListApp[0].subcat_id);
+              ///hitTabSeriveList(subCategoryListApp[0].subcat_id);
             });
           });
+
         }
       }
     } on Exception catch (_) {

@@ -356,25 +356,21 @@ class _OrderMapRestState extends State<OrderMapRest> {
               Expanded(
                 child: Stack(
                   children: <Widget>[
-                    GoogleMap(
-                      mapType: MapType.normal,
-                      markers: Set<Marker>.of(markers.values),
-                      polylines: Set<Polyline>.of(polylines.values),
-                      initialCameraPosition: CameraPosition(
-                          target: LatLng(snapshot.data!.docs.singleWhere(
-                                  (element) =>
-                              element.id == user_id.toString())['latitude'],
-                              snapshot.data!.docs.singleWhere(
-                                      (element) =>
-                                  element.id == user_id.toString())['longitude']),
-                          zoom: 14),
-                      onMapCreated: (GoogleMapController controller) async {
-                        setState(() {
-                          _controller = controller;
-                          _added = true;
-                        });
-                        getDirections();
-                      },
+                    Stack(
+                        alignment: Alignment.center,
+                        children: <Widget>[
+                          Image.asset("images/map.png",
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width,
+                              color: Color.fromRGBO(255, 255, 255, 0.5),
+                              colorBlendMode: BlendMode.modulate,
+                              alignment: Alignment.center,
+                              fit: BoxFit.fill),
+                          Text("Waiting for order to be picked...",
+                            style: TextStyle(fontSize: 32),),
+                        ]
                     ),
 
                     Positioned(

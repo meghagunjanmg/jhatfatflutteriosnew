@@ -72,6 +72,7 @@ class RestaurantState extends State<Restaurant> {
   bool isCategoryFetch = false;
   bool isSlideFetch = false;
   bool isFetchRestStore = false;
+  bool isFetch = false;
 
   @override
   void initState() {
@@ -278,6 +279,7 @@ class RestaurantState extends State<Restaurant> {
   void hitRestaurantService() async {
     setState(() {
       isFetchRestStore = true;
+      isFetch = false;
     });
 
     var url = nearbyrest;
@@ -297,6 +299,7 @@ class RestaurantState extends State<Restaurant> {
               .toList();
           setState(() {
             isFetchRestStore = false;
+            isFetch = true;
             nearStores.clear();
             nearStoresSearch.clear();
             nearStores = tagObjs;
@@ -305,17 +308,13 @@ class RestaurantState extends State<Restaurant> {
         } else {
           setState(() {
             isFetchRestStore = false;
+            isFetch = false;
+            nearStores.clear();
+            nearStoresSearch.clear();
           });
         }
-      } else {
-        setState(() {
-          isFetchRestStore = false;
-        });
       }
     }).catchError((e) {
-      setState(() {
-        isFetchRestStore = false;
-      });
       print(e);
       Timer(Duration(seconds: 5), () {
         hitRestaurantService();
@@ -572,7 +571,8 @@ class RestaurantState extends State<Restaurant> {
               ];
             },
             body: SafeArea(
-              child: Container(
+              child:
+              Container(
                 height: height,
                 width: width,
                 decoration: BoxDecoration(
@@ -599,6 +599,28 @@ class RestaurantState extends State<Restaurant> {
 //                         ],
 //                       ),
 //                     ),
+
+                    (!isFetch)?
+                    Visibility(
+                        visible: true,
+                      child: Padding(
+                        padding: EdgeInsets.all(fixPadding),
+                        child: Text(
+                          'No Restaurants available in your area.',
+                          style: headingStyle,
+                        ),
+                      ))
+                  :
+                    Visibility(
+                        visible: false,
+                        child: Padding(
+                          padding: EdgeInsets.all(fixPadding),
+                          child: Text(
+                            'No Restaurants available in your area.',
+                            style: headingStyle,
+                          ),
+                        ))
+,
                     Visibility(
                       visible: (!isSlideFetch && listImage.length > 0)
                           ? true

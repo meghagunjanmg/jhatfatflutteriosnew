@@ -27,6 +27,7 @@ class Closed extends StatefulWidget {
 class _ClosedState extends State<Closed> {
   String ClosedImage = '';
   List<BannerDetails> ClosedBannerImage = [];
+  bool isLoading = false;
 
   _ClosedState();
 
@@ -37,6 +38,9 @@ class _ClosedState extends State<Closed> {
     ClosedBanner();
   }
   void ClosedBanner() async {
+    setState(() {
+      isLoading = true;
+    });
     var url2 = closed_banner;
     Uri myUri2 = Uri.parse(url2);
     var response = await http.get(myUri2);
@@ -53,17 +57,44 @@ class _ClosedState extends State<Closed> {
             ClosedBannerImage = tagObjs;
             ClosedImage = imageBaseUrl + tagObjs[0].bannerImage;
           });
+
+          setState(() {
+            isLoading = false;
+          });
         }
       }
     } on Exception catch (_) {
-
+      setState(() {
+        isLoading = true;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Dialog(
+    return
+      Scaffold(
+        body:
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          // Loading
+          Align(
+            alignment: Alignment.center,
+            child: isLoading
+                ? Container(
+              child: Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(kMainColor),
+                ),
+              ),
+              color: Colors.white.withOpacity(0.8),
+            )
+                : Container(),
+          ),
+        Align(
+            alignment: Alignment.center,
+        child: Dialog(
         child: Container(
         decoration: BoxDecoration(
         color: white_color,
@@ -75,7 +106,8 @@ class _ClosedState extends State<Closed> {
     fit: BoxFit.fill,
     ),
     ),
-    ),
+        ))]
+        ),
 );
   }
 

@@ -321,10 +321,19 @@ class SingleProductState2 extends State<SingleProductPage_2> {
                                               height: 8.0,
                                             ),
                                             Text(
-                                                '${widget.currencyda} ${widget.productVarintList[index].price}',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .caption),
+                                                (widget.productVarintList[index].toString().length < 0||widget.productVarintList[index].strick_price
+                                                    <=
+                                                    widget.productVarintList[index].price ||
+                                                    widget.productVarintList[index].strick_price==null )
+                                                    ? ''
+                                                    :'$widget.currencyda  ${widget.productVarintList[index].strick_price}',
+
+                                                style: TextStyle(decoration: TextDecoration.lineThrough)),
+
+                              Text(
+                              '${widget.currencyda} ${widget.productVarintList[index].price}',
+                              //style: TextStyle(decoration: TextDecoration.lineThrough)
+                              ),
                                             SizedBox(
                                               height: 20.0,
                                             ),
@@ -630,11 +639,19 @@ class SingleProductState2 extends State<SingleProductPage_2> {
       if (value == 0) {
         db.getCountVendor()
             .then((value) {
-          if (value != null && value < 3) {
-            db.insert(vae);
+
+          if(prefs.getString("allowmultishop").toString()!="1") {
+            if (value != null && value < 3) {
+              db.insert(vae);
+              getCartCount();
+            }
+            else {
+              showMyDialog2(context);
+            }
           }
-          else {
-            showMyDialog2(context);
+          else{
+            db.insert(vae);
+            getCartCount();
           }
         });
       } else {

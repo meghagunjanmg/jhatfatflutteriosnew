@@ -98,15 +98,17 @@ class OrderPageState extends State<OrderPage> {
                     onGoingOrders[i].cart_id) {
                   print("IF " + onGoingOrders[i].data[j].order_cart_id + " " +
                       onGoingOrders[i].cart_id);
-                  vendor = vendor +","+ onGoingOrders[i].data[j].vendor_name;
+                  if( !vendor.contains(onGoingOrders[i].data[j].vendor_name)) {
+                    vendor = vendor +"\n"+ onGoingOrders[i].data[j].vendor_name;
+                  }
                 }
               }
-
               VendorName.add(vendor);
               vendor = '';
               print("NAME " + i.toString() + " " + vendor);
             }
           }
+          VendorName.toSet().toList();
         }
         if (countFetch == 4) {
           setState(() {
@@ -171,7 +173,9 @@ class OrderPageState extends State<OrderPage> {
                     onGoingOrders[i].cart_id) {
                   print("IF " + onGoingOrders[i].data[j].order_cart_id + " " +
                       onGoingOrders[i].cart_id);
-                  vendor = vendor +","+ onGoingOrders[i].data[j].vendor_name;
+                  if( !vendor.contains(onGoingOrders[i].data[j].vendor_name)) {
+                    vendor = vendor +"\n"+ onGoingOrders[i].data[j].vendor_name;
+                  }
                 }
               }
 
@@ -247,7 +251,9 @@ class OrderPageState extends State<OrderPage> {
                     onGoingOrders[i].cart_id) {
                   print("IF " + onGoingOrders[i].data[j].order_cart_id + " " +
                       onGoingOrders[i].cart_id);
-                  vendor = vendor +","+ onGoingOrders[i].data[j].vendor_name;
+                  if( !vendor.contains(onGoingOrders[i].data[j].vendor_name)) {
+                    vendor = vendor +"\n"+ onGoingOrders[i].data[j].vendor_name;
+                  }
                 }
               }
 
@@ -255,6 +261,7 @@ class OrderPageState extends State<OrderPage> {
               vendor = '';
               print("NAME " + i.toString() + " " + vendor);
             }
+
           }
         }
       }
@@ -820,7 +827,6 @@ class OrderPageState extends State<OrderPage> {
               color: Colors.transparent,
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height - 157,
-              alignment: Alignment.center,
               child: SingleChildScrollView(
                 primary: true,
                 child: Column(
@@ -974,7 +980,8 @@ class OrderPageState extends State<OrderPage> {
                                                     ),
                                                   ),
                                                   Text(
-                                      VendorName[t],
+                                                  VendorName[t]
+                                      ,
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .caption!

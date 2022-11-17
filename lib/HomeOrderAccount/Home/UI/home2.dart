@@ -75,6 +75,7 @@ class _HomeState extends State<Home> {
   String subsImage = '';
   String bigImage = '';
   String TopImage = '';
+  String subsenddate = '';
   var lat = 30.3253;
   var lng = 78.0413;
   List<BannerDetails> listImage = [];
@@ -117,7 +118,8 @@ class _HomeState extends State<Home> {
 
   static String id="";
 
-  bool subscription = false;
+  bool subscriptionbanner = true;
+  bool subscriptionStore = false;
 
   @override
   void initState() {
@@ -326,16 +328,14 @@ class _HomeState extends State<Home> {
             children: <Widget>[
               (admins!.surge==1)
                   ?
-              Padding(
-                  padding: EdgeInsets.only(top: 8.0, left: 24.0),
-                  child:
+              Wrap(
+                  children:<Widget>[
                     Text(
                       admins!.surgeMsg.toString(),
                       textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
+                      overflow: TextOverflow.visible,
                       style: TextStyle(fontSize: 16,color: Colors.blue),
-                    )
-
+                    )]
               )
                   :
           Padding(
@@ -351,6 +351,7 @@ class _HomeState extends State<Home> {
                 padding: EdgeInsets.only(top: 8.0, left: 24.0),
                 child: Row(
                   children: <Widget>[
+
                     GestureDetector(
                       onTap: ()async {
 
@@ -371,13 +372,32 @@ class _HomeState extends State<Home> {
                         )
                         );
                       },
-                    child: Text(
-                      admins!.topMessage.toString(),
-                      style: Theme
+                    child:
+                        Align(
+                          alignment: Alignment.center,
+                    child:Container(
+                      width: MediaQuery
                           .of(context)
-                          .textTheme
-                          .bodyText1,
-                    ),
+                          .size
+                          .width * 0.85,
+                      height: 60,
+                      alignment: Alignment(0.05, -0.5),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(11.0),
+                        image: DecorationImage(
+                          image: AssetImage("assets/back.png"),
+                          fit : BoxFit.fill,
+                          ),
+                        ),
+                        child:   Text(
+                          admins!.topMessage.toString(),
+                          style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w900),
+                        ),
+                        //padding: <-- Using to shift text position a little bit for your requirement
+                      ),
+
+                        ),
                 ),
           ],
               ),
@@ -578,7 +598,7 @@ class _HomeState extends State<Home> {
               ),
             ),
 
-              ( !subscription )?
+              (subscriptionbanner)?
               Padding(
                 padding: EdgeInsets.only(top: 5, bottom: 2),
                 child: Builder(
@@ -619,6 +639,8 @@ class _HomeState extends State<Home> {
 
                 ),
               )        :
+                  Container(),
+              (subscriptionStore)?
               Padding(
                 padding: EdgeInsets.only(top: 5, bottom: 2),
                 child:
@@ -630,6 +652,17 @@ class _HomeState extends State<Home> {
       child:
       Column(
       children:[
+        (subsenddate.isNotEmpty)?
+            Align(
+              alignment: Alignment.centerLeft,
+      child: Padding(
+      padding: EdgeInsets.all(10),
+                  child:Text("Your Subscription ends on "+subsenddate,style: TextStyle(fontSize: 18,color: kMainColor,fontWeight: FontWeight.bold),),
+      )):
+        Padding(
+          padding: EdgeInsets.only(top: 8.0, left: 24.0,right: 24.0),
+          child:Text(""),
+        ),
       Padding(
       padding: EdgeInsets.only(top: 8.0, left: 24.0,right: 24.0),
                   child:
@@ -690,7 +723,10 @@ class _HomeState extends State<Home> {
         ]
     )
     ),
-    ])),
+    ]))
+              :
+                  Container(),
+
               Visibility(
                 visible: (!isFetch && listImage.length == 0) ? false : true,
                 child: Padding(
@@ -1320,15 +1356,40 @@ class _HomeState extends State<Home> {
     var jsonData = jsonDecode(value.body.toString());
     if (jsonData['status'] == "1") {
       setState(() {
-        subscription = true;
+         subscriptionbanner = false;
+         subscriptionStore = true;
         callSubStore();
       });
       }
-      else {
+      else if(jsonData['status'] == "2") {
       setState(() {
-        subscription = false;
+        subscriptionbanner = false;
+        subscriptionStore = false;
+        subsenddate = '';
+        ///callSubStore();
       });
       }
+      else{
+      setState(() {
+        subscriptionbanner = true;
+        subscriptionStore = false;
+        subsenddate = '';
+        ///callSubStore();
+      });
+    }
+
+      if(jsonData['enddate']!=null || jsonData['enddate'].toString().isNotEmpty){
+        setState(() {
+          subsenddate=jsonData['enddate'].toString();
+        });
+      }
+
+    if(jsonData['allowmultishop']!=null || jsonData['allowmultishop'].toString().isNotEmpty){
+      prefs.setString("allowmultishop", jsonData['allowmultishop'].toString());
+    }
+    else{
+      prefs.setString("allowmultishop", "0");
+    }
     }
   void callSubStore() async {
     var url = subsstore;
@@ -1348,6 +1409,7 @@ class _HomeState extends State<Home> {
   }
 
   void calladminsetting() async {
+
     var url = adminsettings;
     Uri myUri = Uri.parse(url);
     var value = await http.get(myUri);
@@ -1369,6 +1431,7 @@ class _HomeState extends State<Home> {
         location.changeSettings(
             interval: 300, accuracy: loc.LocationAccuracy.high);
         location.enableBackgroundMode(enable: true);
+
       }
       else {
         Navigator.pushAndRemoveUntil(

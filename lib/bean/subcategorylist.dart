@@ -1,26 +1,52 @@
 class SubCategoryList {
+  dynamic subcatId;
+  dynamic categoryId;
+  dynamic subcatName;
+  dynamic subcatImage;
+  dynamic createdAt;
+  dynamic updatedAt;
+  dynamic istabacco;
+  dynamic ispres;
+  dynamic isid;
+  dynamic isbasket;
 
-  dynamic subcat_id;
-  dynamic category_id;
-  dynamic subcat_name;
-  dynamic subcat_image;
-  dynamic created_at;
-  dynamic updated_at;
+  SubCategoryList(
+      this.subcatId,
+      this.categoryId,
+      this.subcatName,
+      this.subcatImage,
+      this.createdAt,
+      this.updatedAt,
+      this.istabacco,
+      this.ispres,
+      this.isid,
+      this.isbasket);
 
-
-
-  SubCategoryList(this.subcat_id, this.category_id, this.subcat_name,
-      this.subcat_image, this.created_at, this.updated_at);
-
-  factory SubCategoryList.fromJson(dynamic json) {
-    return SubCategoryList(
-        json['subcat_id'], json['category_id'], json['subcat_name'],
-        json['subcat_image'], json['created_at'], json['updated_at']);
+  SubCategoryList.fromJson(Map<String, dynamic> json) {
+  subcatId = json['subcat_id'];
+  categoryId = json['category_id'];
+  subcatName = json['subcat_name'];
+  subcatImage = json['subcat_image'];
+  createdAt = json['created_at'];
+  updatedAt = json['updated_at'];
+  istabacco = json['istabacco'];
+  ispres = json['ispres'];
+  isid = json['isid'];
+  isbasket = json['isbasket'];
   }
 
-  @override
-  String toString() {
-    return 'SubCategoryList{subcat_id: $subcat_id, category_id: $category_id, subcat_name: $subcat_name, subcat_image: $subcat_image, created_at: $created_at, updated_at: $updated_at}';
+  Map<String, dynamic> toJson() {
+  final Map<String, dynamic> data = new Map<String, dynamic>();
+  data['subcat_id'] = this.subcatId;
+  data['category_id'] = this.categoryId;
+  data['subcat_name'] = this.subcatName;
+  data['subcat_image'] = this.subcatImage;
+  data['created_at'] = this.createdAt;
+  data['updated_at'] = this.updatedAt;
+  data['istabacco'] = this.istabacco;
+  data['ispres'] = this.ispres;
+  data['isid'] = this.isid;
+  data['isbasket'] = this.isbasket;
+  return data;
   }
-
-}
+  }

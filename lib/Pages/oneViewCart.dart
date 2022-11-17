@@ -124,10 +124,6 @@ class _oneViewCartState extends State<oneViewCart> {
     getCartItem();
     getResStoreName();
     getStoreName();
-
-    iduploaded = null;
-    presuploaded = null;
-
     getid();
 
     firstDate = toDateMonthYear(DateTime.now());
@@ -670,9 +666,6 @@ class _oneViewCartState extends State<oneViewCart> {
   }
 
   void callThisMethod(bool isVisible) {
-    debugPrint('_HomeScreenState.callThisMethod: isVisible: ${isVisible}');
-    iduploaded = null;
-    presuploaded = null;
     getid();
     getCartItem();
     getResCartItem();
@@ -1349,6 +1342,10 @@ class _oneViewCartState extends State<oneViewCart> {
   }
 
   void createResCart(BuildContext context) async {
+
+    iduploaded = null;
+    presuploaded = null;
+
     if (cartListII.length > 0) {
       if (totalAmount > 0.0 && addressDelivery != null) {
         var url = returant_order;
@@ -1528,6 +1525,10 @@ class _oneViewCartState extends State<oneViewCart> {
                 //     duration: Toast.LENGTH_SHORT);
                 CartDetail details = CartDetail.fromJson(jsonData['data']);
                 getVendorPayment2(vendorId!, details, orderArray.toString());
+
+
+                iduploaded = null;
+                presuploaded = null;
               } else {
                 // Toast.show(jsonData['message'], context,
                 //     duration: Toast.LENGTH_SHORT);
@@ -1870,6 +1871,7 @@ class _oneViewCartState extends State<oneViewCart> {
       setState(() {
         debugPrint("SELECTED IMAGE PICK   $imageFile");
       });
+
     } else {
       print("You have not taken image");
     }

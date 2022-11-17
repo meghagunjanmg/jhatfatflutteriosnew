@@ -226,35 +226,34 @@ class AddressTile2 extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding:  EdgeInsets.only(left: 18.0,right: 18.0),
-          child: AddressTile1(),
+          padding: EdgeInsets.only(left: 18.0,right: 18.0,bottom: 18.0),
+          child: Text(          "Pickup Address: "+ '${pickup}',
+            textDirection: TextDirection.ltr,
+            textAlign: TextAlign.start,
+            style:
+            TextStyle(color: Colors.black, fontSize: 14),
+          ),
         ),
 
         Padding(
+          padding:  EdgeInsets.only(left: 18.0,right: 18.0),
+          child: AddressTile1(),
+        ),
+        Padding(
           padding: EdgeInsets.only(left: 18.0,right: 18.0,bottom: 18.0),
-          child: Text(          "Pickup Address: "+ '${pickup}',
-          textDirection: TextDirection.ltr,
-          textAlign: TextAlign.start,
-          style:
-          TextStyle(color: Colors.black, fontSize: 14),
+          child: Text(
+            "Drop Address: "+ '${drop}',
+            textDirection: TextDirection.ltr,
+            textAlign: TextAlign.start,
+            style:
+            TextStyle(color: Colors.black, fontSize: 14),
+          ),
         ),
-        ),
-
       Padding(
         padding:  EdgeInsets.only(left: 18.0,right: 18.0),
         child: AddressTile2(),
       ),
 
-      Padding(
-        padding: EdgeInsets.only(left: 18.0,right: 18.0,bottom: 18.0),
-        child: Text(
-          "Drop Address: "+ '${drop}',
-          textDirection: TextDirection.ltr,
-          textAlign: TextAlign.start,
-          style:
-          TextStyle(color: Colors.black, fontSize: 14),
-        ),
-      ),
         Padding(
           padding: EdgeInsets.all(18.0),
           child: TextField(

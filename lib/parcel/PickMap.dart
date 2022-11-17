@@ -59,6 +59,7 @@ class SetLocationState extends State<SetLocation> {
   Completer<GoogleMapController> _controller = Completer();
 
   var isVisible = false;
+  bool button = false;
 
   var currentAddress = '';
 
@@ -75,9 +76,13 @@ class SetLocationState extends State<SetLocation> {
   @override
   void initState() {
     super.initState();
+    setState(() {
+      button = false;
+    });
+
     getdata();
 
-   /// _getLocation();
+    /// _getLocation();
   }
 
   Future<void> getdata() async {
@@ -167,6 +172,7 @@ class SetLocationState extends State<SetLocation> {
           googleMapApiKey: apiKey);
       setState(() {
         currentAddress = data1.address;
+        button = true;
       });
     });
   }
@@ -186,6 +192,9 @@ class SetLocationState extends State<SetLocation> {
     // }).catchError((e) {
     //   print(e);
     // });
+    setState(() {
+      button = false;
+    });
 
     final Prediction? p = await PlacesAutocomplete.show(
       context: context,
@@ -378,6 +387,7 @@ class SetLocationState extends State<SetLocation> {
             ),
           ),
 
+          (button)?
           ElevatedButton(
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -396,7 +406,25 @@ class SetLocationState extends State<SetLocation> {
               style:
               TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400),
             ),
-          ),
+          )
+              :
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                primary: Colors.grey,
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                textStyle:TextStyle(color: Colors.black, fontWeight: FontWeight.w400)),
+
+            onPressed: () {
+            },
+            child: Text(
+              'Continue',
+              style:
+              TextStyle(color: Colors.black, fontWeight: FontWeight.w400),
+            ),
+          )
 
         ],
       ),

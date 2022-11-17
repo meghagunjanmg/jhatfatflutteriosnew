@@ -3,7 +3,7 @@ class Languages {
     return {
       'bodyText1': 'Delivering almost',
       'bodyText2': 'Everything.',
-      'mobileText': 'Enter mobile number',
+      'mobileText': 'mobile number',
       'continueText': 'Continue',
       'vegetableText': 'VEGETABLES & FRUITS',
       'foodText': 'FOOD & MEALS',

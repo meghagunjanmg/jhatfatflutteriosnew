@@ -97,9 +97,6 @@ class OrderPlaced extends StatelessWidget {
               Spacer(
                 flex: 2,
               ),
-        Row(
-            children: <Widget>[
-
               Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),
               child: ElevatedButton(
@@ -141,8 +138,6 @@ class OrderPlaced extends StatelessWidget {
                     child: Text("Go To Home")
                 ),
               )
-        ]
-        ),
             ],
           ),
         ),
@@ -164,18 +159,17 @@ class OrderPlaced extends StatelessWidget {
             List<TodayOrderParcel> orders = tagObjsJson
                 .map((tagJson) => TodayOrderParcel.fromJson(tagJson))
                 .toList();
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      OrderMapParcelPage(
-                          pageTitle:
-                          orders[0].vendorName,
-                          ongoingOrders:
-                          orders[0],
-                          currency: currency,
-                          user_id: orders[0].cartId.toString()
-                      ),
-                ));
+            Navigator.pushAndRemoveUntil(context,
+                MaterialPageRoute(builder: (context) {
+                  return OrderMapParcelPage(
+                      pageTitle:
+                      orders[0].vendorName,
+                      ongoingOrders:
+                      orders[0],
+                      currency: currency,
+                      user_id: orders[0].cartId.toString()
+                  );
+                }), (Route<dynamic> route) => true);
 
           }
         }
@@ -200,28 +194,28 @@ class OrderPlaced extends StatelessWidget {
                     for (int j = 0; j < orders[i].data.length; j++) {
                       if (orders[i].data[j].order_cart_id ==
                           orders[i].cart_id) {
-                        vendor = vendor + "," + orders[i].data[j].vendor_name;
+                        vendor = vendor + "\n" + orders[i].data[j].vendor_name;
                       }
                     }
                     VendorName.add(vendor);
                     vendor = '';
                     print("NAME " + i.toString() + " " + vendor);
                   }
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            OrderMapPage(
-                              pageTitle:
-                              VendorName[0],
-                              ongoingOrders:
-                              orders.elementAt(0),
-                              currency: currency,
-                              user_id: orders
-                                  .elementAt(0)
-                                  .cart_id
-                                  .toString(),
-                            ),
-                      ));
+                  Navigator.pushAndRemoveUntil(context,
+                      MaterialPageRoute(builder: (context) {
+                        return  OrderMapPage(
+                          pageTitle:
+                          VendorName[0],
+                          ongoingOrders:
+                          orders.elementAt(0),
+                          currency: currency,
+                          user_id: orders
+                              .elementAt(0)
+                              .cart_id
+                              .toString(),
+                        );
+                      }), (Route<dynamic> route) => true);
+
 
                 }
                 if (uiType == "2") {
@@ -230,20 +224,17 @@ class OrderPlaced extends StatelessWidget {
                       .map((tagJson) =>
                       OrderHistoryRestaurant.fromJson(tagJson))
                       .toList();
-
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            OrderMapRestPage(
-                              pageTitle:
-                              orders[0].vendor_name,
-                              ongoingOrders:
-                              orders[0],
-                              currency: currency,
-                              user_id: orders[0].cart_id.toString(),
-                            ),
-                      ));
-
+                  Navigator.pushAndRemoveUntil(context,
+                      MaterialPageRoute(builder: (context) {
+                        return OrderMapRestPage(
+                          pageTitle:
+                          orders[0].vendor_name,
+                          ongoingOrders:
+                          orders[0],
+                          currency: currency,
+                          user_id: orders[0].cart_id.toString(),
+                        );
+                      }), (Route<dynamic> route) => true);
                 }
               }
             }

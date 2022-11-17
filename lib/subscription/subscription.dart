@@ -19,6 +19,8 @@ import 'package:jhatfat/bean/couponlist.dart';
 import 'package:jhatfat/bean/paymentstatus.dart';
 import 'package:jhatfat/bean/subscriptionlist.dart';
 
+import '../HomeOrderAccount/home_order_account.dart';
+
 class Subscription extends StatefulWidget {
 
   Subscription();
@@ -113,6 +115,22 @@ class SubscritionState extends State<Subscription> {
         if (jsonData['status'] == "1") {
           Fluttertoast.showToast(
               msg: "Subscription Applied",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black,
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (context) {
+                return HomeOrderAccount(0);
+              }), (Route<dynamic> route) => false);
+        }
+
+        else{
+          Fluttertoast.showToast(
+              msg: jsonData['message'],
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 1,
