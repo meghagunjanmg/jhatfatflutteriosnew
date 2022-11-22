@@ -1352,7 +1352,7 @@ class _oneViewCartState extends State<oneViewCart> {
         SharedPreferences pref = await SharedPreferences.getInstance();
         int? userId = pref.getInt('user_id');
         String? vendorId = pref.getString('res_vendor_id');
-        String? ui_type = pref.getString("ui_type");
+        String? ui_type = '2';
         List<OrderArray> orderArray = [];
         List<OrderAdonArray> orderAddonArray = [];
         for (RestaurantCartItem item in cartListII) {
@@ -1497,7 +1497,7 @@ class _oneViewCartState extends State<oneViewCart> {
           SharedPreferences pref = await SharedPreferences.getInstance();
           int? userId = pref.getInt('user_id');
           String? vendorId = pref.getString('vendor_id');
-          String? ui_type = pref.getString("ui_type");
+          String? ui_type = '1';
 
           List<OrderArrayGrocery> orderArray = [];
            for (CartItem item in cartListI) {

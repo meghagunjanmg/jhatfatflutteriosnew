@@ -194,13 +194,18 @@ class OrderPlaced extends StatelessWidget {
                     for (int j = 0; j < orders[i].data.length; j++) {
                       if (orders[i].data[j].order_cart_id ==
                           orders[i].cart_id) {
-                        vendor = vendor + "\n" + orders[i].data[j].vendor_name;
+                        if( !vendor.contains(orders[i].data[j].vendor_name)) {
+                          vendor =
+                              vendor + "\n" + orders[i].data[j].vendor_name;
+                        }
                       }
                     }
                     VendorName.add(vendor);
                     vendor = '';
                     print("NAME " + i.toString() + " " + vendor);
                   }
+                  VendorName.toSet().toList();
+
                   Navigator.pushAndRemoveUntil(context,
                       MaterialPageRoute(builder: (context) {
                         return  OrderMapPage(
