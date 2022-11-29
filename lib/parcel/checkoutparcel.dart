@@ -254,7 +254,7 @@ class ParcelCheckoutState extends State<ParcelCheckOut> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Parcel Charges'),
+                      Text('Parcel Charges per km'),
                       Text(
                           '${currency}'+'${widget.charges}'),
                     ],

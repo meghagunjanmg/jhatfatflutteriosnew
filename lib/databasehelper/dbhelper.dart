@@ -364,7 +364,12 @@ class DatabaseHelper {
         .rawQuery("SELECT COUNT(DISTINCT $varientId) FROM $table"));
     return count;
   }
-
+  Future<int?> getVendorcount() async {
+    Database db = await instance.database;
+    int? count = Sqflite.firstIntValue(await db
+        .rawQuery("SELECT COUNT(DISTINCT $vendor_id) FROM $table"));
+    return count;
+  }
   Future<int?> queryRowCount() async {
     Database db = await instance.database;
     int? counttable1 =

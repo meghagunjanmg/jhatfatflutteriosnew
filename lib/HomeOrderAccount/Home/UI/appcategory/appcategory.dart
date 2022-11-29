@@ -338,6 +338,27 @@ class AppCategoryState extends State<AppCategory> {
             primary: true,
             child: Column(
               children: [
+                (vendorCategoryId==18)?
+                Container(
+                    color: kMainColor,
+                    padding: EdgeInsets.all(20),
+                    margin: EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children:[
+                        Center(child: Text("For More Pan Store Items, Visit Our Web",
+                          style: TextStyle(fontSize: 20),
+                        )),
+                    Center(child: Text(
+                            'jhatfat.com/web',
+                            style: TextStyle(decoration: TextDecoration.underline,fontSize: 20),
+                          ),
+                )
+                   ] ),
+                )
+                :
+                Text(" "),
+
                 Visibility(
                   visible: (!isFetch && listImage.length == 0) ? false : true,
                   child: Padding(

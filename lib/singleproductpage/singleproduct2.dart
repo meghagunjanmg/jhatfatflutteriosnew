@@ -35,8 +35,8 @@ class SingleProductState2 extends State<SingleProductPage_2> {
 
   var cartCount = 0;
 
-  SingleProductState2(List<VarientList> productVarintList) {
-    setList(productVarintList);
+  SingleProductState2(List<VarientList> productVarint) {
+    setList(productVarint);
   }
 
   void setList(List<VarientList> tagObjs) {
@@ -636,11 +636,11 @@ class SingleProductState2 extends State<SingleProductPage_2> {
         DatabaseHelper.varientId: varient_id
 
       };
+      bool allow = (prefs.getString("allowmultishop").toString()!="1") ;
       if (value == 0) {
-        db.getCountVendor()
-            .then((value) {
-
-          if(prefs.getString("allowmultishop").toString()!="1") {
+        if(allow) {
+          db.getVendorcount()
+              .then((value) {
             if (value != null && value < 3) {
               db.insert(vae);
               getCartCount();
@@ -649,21 +649,27 @@ class SingleProductState2 extends State<SingleProductPage_2> {
               showMyDialog2(context);
             }
           }
-          else{
-            db.insert(vae);
-            getCartCount();
-          }
-        });
-      } else {
+          );
+        }
+        else{
+          db.insert(vae);
+          getCartCount();
+        }
+      }
+
+      else {
         if (itemCount == 0) {
           db.delete(int.parse('${varient_id}'));
+          getCartCount();
         } else {
           db.updateData(vae, int.parse('${varient_id}')).then((vay) {
             print('vay - $vay');
+            getCartCount();
           });
         }
       }
-      getCartCount();
+    }).catchError((e) {
+      print(e);
     });
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:circular_bottom_navigation/circular_bottom_navigation.dart';
 import 'package:circular_bottom_navigation/tab_item.dart';
@@ -140,13 +141,28 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
   @override
   Widget build(BuildContext context) {
     return
-     Scaffold(
+      WillPopScope(
+          onWillPop: () async {
+            if(_currentIndex!=0) {
+              Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => HomeOrderAccount(0)),
+                  (Route<dynamic> route) => false,
+            );
+            }else{
+              exit(0);
+            }
+            return true;
+          },
+
+        child:
+        Scaffold(
       body: IndexedStack(
         index: _currentIndex,
         children: _children,
       ),
       bottomNavigationBar: bottomNav(context),
-    );
+    ));
   }
 
   Widget bottomNav(BuildContext context) {

@@ -26,15 +26,15 @@ class LocationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SetLocation(lat, lng);
+    return SetLocatio(lat, lng);
   }
 }
 
-class SetLocation extends StatefulWidget {
+class SetLocatio extends StatefulWidget {
   final dynamic lat;
   final dynamic lng;
 
-  SetLocation(this.lat, this.lng);
+  SetLocatio(this.lat, this.lng);
 
   @override
   SetLocationState createState() => SetLocationState(lat, lng);
@@ -42,7 +42,7 @@ class SetLocation extends StatefulWidget {
 
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: apiKey);
 
-class SetLocationState extends State<SetLocation> {
+class SetLocationState extends State<SetLocatio> {
   dynamic lat;
   dynamic lng;
   CameraPosition? kGooglePlex;

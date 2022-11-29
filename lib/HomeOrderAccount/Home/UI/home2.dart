@@ -347,9 +347,19 @@ class _HomeState extends State<Home> {
                     style: TextStyle(fontSize: 12),
                   )
           ),
-              Padding(
+
+          Container(
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
+            height: 60,
+             alignment: Alignment.center,
+             child:
+             Padding(
                 padding: EdgeInsets.only(top: 8.0, left: 24.0),
-                child: Row(
+                child:
+                Row(
                   children: <Widget>[
 
                     GestureDetector(
@@ -373,35 +383,36 @@ class _HomeState extends State<Home> {
                         );
                       },
                     child:
-                        Align(
-                          alignment: Alignment.center,
-                    child:Container(
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width * 0.85,
-                      height: 60,
-                      alignment: Alignment(0.05, -0.5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(11.0),
-                        image: DecorationImage(
-                          image: AssetImage("assets/back.png"),
-                          fit : BoxFit.fill,
-                          ),
+                    Container(
+                        child:
+                          Stack(
+                            children: <Widget>[
+                              Container(
+                                alignment: Alignment.center,
+                                child: Image.asset(
+                                  'assets/backgg.png',
+                                  fit: BoxFit.fitWidth,
+                                  width: MediaQuery.of(context).size.width * 0.85 ,
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(5),
+                                  width: MediaQuery.of(context).size.width * 0.70,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    admins!.topMessage.toString(),
+                                    maxLines: 2,
+                                    style:  orderMapAppBarTextStyle
+                                        .copyWith(color: Colors.white,fontWeight: FontWeight.w900,fontSize: 15,fontFamily: 'OpenSans'),
+                                  ),)
+                            ],
                         ),
-                        child:   Text(
-                          admins!.topMessage.toString(),
-                          style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w900),
-                        ),
-                        //padding: <-- Using to shift text position a little bit for your requirement
-                      ),
-
-                        ),
+                    ),
                 ),
           ],
               ),
               ),
+          ),
               SizedBox(
                   height: 20
               ),
@@ -1201,25 +1212,24 @@ class _HomeState extends State<Home> {
 
   void getData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-
     try {
       setState(() {
             cityName = pref.getString("addr")!;
             lat = double.parse(pref.getString("lat")!);
             lng = double.parse(pref.getString("lng")!);
        });
+      calladminsetting();
+
       print("HOME_ORDER_HOME"+lat.toString()+lng.toString());
     } catch (e) {
       print(e);
     }
 
     if(pref.getString("lat")==null || pref.getString("lat").toString().isEmpty)
-{
-  _getLocation(context);
-}
+        {
+          _getLocation(context);
+        }
 
-
-    calladminsetting();
 
   }
 
@@ -1409,15 +1419,14 @@ class _HomeState extends State<Home> {
   }
 
   void calladminsetting() async {
-
     var url = adminsettings;
     Uri myUri = Uri.parse(url);
     var value = await http.get(myUri);
     var jsonData = jsonDecode(value.body.toString());
     if (jsonData['status'] == "1") {
-        admins = Adminsetting.fromJson(jsonData['data']);
-        print("ADMIN RES: " + admins!.cityadminId.toString());
-      if(admins!.status==1) {
+      admins = Adminsetting.fromJson(jsonData['data']);
+      print("ADMIN RES: " + admins!.cityadminId.toString());
+      if (admins!.status == 1) {
         FirebaseMessaging messaging = FirebaseMessaging.instance;
         messaging.getToken().then((value) {
           print(value);
@@ -1428,10 +1437,9 @@ class _HomeState extends State<Home> {
         hitBannerUrl();
         pickbanner();
         hitRestaurantService();
-        location.changeSettings(
-            interval: 300, accuracy: loc.LocationAccuracy.high);
-        location.enableBackgroundMode(enable: true);
-
+        // location.changeSettings(
+        //     interval: 300, accuracy: loc.LocationAccuracy.high);
+        // location.enableBackgroundMode(enable: true);
       }
       else {
         Navigator.pushAndRemoveUntil(
@@ -1441,22 +1449,6 @@ class _HomeState extends State<Home> {
                 (Route<dynamic> route) => false);
       }
     }
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    messaging.getToken().then((value) {
-      print(value);
-    });
-
-
-    getCurrency();
-    Topbanner();
-    hitService(lat.toString(), lng.toString());
-    hitBannerUrl();
-    pickbanner();
-    hitRestaurantService();
-    location.changeSettings(
-        interval: 300, accuracy: loc.LocationAccuracy.high);
-    location.enableBackgroundMode(enable: true);
-
   }
 }
 

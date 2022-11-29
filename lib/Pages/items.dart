@@ -1109,39 +1109,38 @@ class _ItemsPageState extends State<ItemsPage>
         DatabaseHelper.addedBasket: 0,
         DatabaseHelper.varientId: varient_id
       };
-
+      bool allow = (prefs.getString("allowmultishop").toString()!="1") ;
       if (value == 0) {
-        db.getCountVendor()
-            .then((value) {
-
-           if(prefs.getString("allowmultishop").toString()!="1") {
-             if (value != null && value < 3) {
-               db.insert(vae);
-               getCartCount();
-             }
-             else {
-               showMyDialog2(context);
-             }
-           }
-            else{
-             db.insert(vae);
-             getCartCount();
-           }
+        if(allow) {
+          db.getVendorcount()
+              .then((value) {
+                print("VENDORCOUNT"+value.toString());
+            if (value != null && value < 3) {
+              db.insert(vae);
+              getCartCount();
+            }
+            else {
+              showMyDialog2(context);
+              setList(productVarientList);
+            }
+          }
+          );
         }
-        );
+        else{
+          db.insert(vae);
+          getCartCount();
+        }
       }
 
       else {
         if (itemCount == 0) {
           db.delete(int.parse('${varient_id}'));
           getCartCount();
-
         } else {
           db.updateData(vae, int.parse('${varient_id}')).then((vay) {
             print('vay - $vay');
             getCatC();
             getCartCount();
-
           });
         }
       }
@@ -1177,10 +1176,13 @@ class _ItemsPageState extends State<ItemsPage>
 
           setState(() {
             for (SubCategoryList tagd in tagObjs) {
+              if (tagd.istabacco.toString() != "1") {
                 tabss.add(Tab(
                   text: tagd.subcatName,
                 ));
                 toRemove.add(tagd);
+              }else{
+              }
             }
             setState(() {
               subCategoryListApp.clear();

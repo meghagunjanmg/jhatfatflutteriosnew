@@ -29,6 +29,7 @@ class PageRoutes {
   static const String subscription = 'subscription';
   static const String livetrack = 'livetrack';
   static const String homeOrderAccountPage = 'home_order_account';
+  static const String homeOrderAccountPage3 = 'homeOrderAccountPage3';
   static const String homePage = 'home_page';
   static const String accountPage = 'account_page';
   static const String orderPage = 'order_page';
@@ -57,6 +58,7 @@ class PageRoutes {
   Map<String, WidgetBuilder> routes() {
     return {
       homeOrderAccountPage: (context) => HomeOrderAccount(0),
+      homeOrderAccountPage3: (context) => HomeOrderAccount(3),
       subscription: (context) => Subscription(),
       homePage: (context) => HomePage2(),
       orderPage: (context) => OrderPage(),
