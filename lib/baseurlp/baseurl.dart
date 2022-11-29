@@ -1,5 +1,5 @@
-var baseUrl = "https://jhatfat.umbeo.com/api/";
-var imageBaseUrl = "https://jhatfat.umbeo.com/";
+var baseUrl = "https://jhatfat.com/api/";
+var imageBaseUrl = "https://jhatfat.com/";
 
 var adminsettings = baseUrl + "adminsettings";
 var checksubs = baseUrl + "checksubs";
