@@ -16,6 +16,7 @@ import 'package:jhatfat/parcel/slideupparcel.dart';
 import 'package:location/location.dart' as loc;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../HomeOrderAccount/home_order_account.dart';
 import '../baseurlp/baseurl.dart';
 
 class OrderMapParcelPage extends StatelessWidget {
@@ -138,7 +139,17 @@ class _OrderMapParcelState extends State<OrderMapParcel> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+      WillPopScope(
+        onWillPop: () async {
+      Navigator.pushAndRemoveUntil(context,
+          MaterialPageRoute(builder: (context) {
+            return HomeOrderAccount(0);
+          }), (Route<dynamic> route) => true);
+      return true; //
+    },
+    child:
+      Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(52.0),
           child: AppBar(
@@ -215,6 +226,9 @@ class _OrderMapParcelState extends State<OrderMapParcel> {
                             colorBlendMode: BlendMode.modulate,
                             alignment: Alignment.center,
                             fit: BoxFit.fill),
+                        (widget.ongoingOrders!.orderStatus=="Completed")?
+                        Text("Completed",
+                          style: TextStyle(fontSize: 32),):
                         Text("Waiting for order to be picked...",
                           style: TextStyle(fontSize: 32),),
                       ]
@@ -711,6 +725,9 @@ class _OrderMapParcelState extends State<OrderMapParcel> {
                                       colorBlendMode: BlendMode.modulate,
                                       alignment: Alignment.center,
                                       fit: BoxFit.fill),
+                                  (widget.ongoingOrders!.orderStatus=="Completed")?
+                                  Text("Completed",
+                                    style: TextStyle(fontSize: 32),):
                                   Text("Waiting for order to be picked...",
                                     style: TextStyle(fontSize: 32),),
                                 ]
@@ -937,7 +954,7 @@ class _OrderMapParcelState extends State<OrderMapParcel> {
 
             },
 
-            ));
+            )));
     }
 
   _addMarker(LatLng position, String id, BitmapDescriptor descriptor) {
@@ -948,15 +965,15 @@ class _OrderMapParcelState extends State<OrderMapParcel> {
   }
 
   void mymap() async {
-
-    await _controller!
-        .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        target: LatLng(
-          _originLatitude,
-         _originLongitude,
-        ),
-        zoom: 14)));
-
+    Timer(Duration(minutes: 120), () async {
+      await _controller!
+          .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+          target: LatLng(
+            _originLatitude,
+            _originLongitude,
+          ),
+          zoom: 14)));
+    });
     _addMarker(LatLng(_originLatitude, _originLongitude), "source",await BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(90,90)), 'assets/delivery.png'));
     _addMarker(LatLng(_destLatitude, _destLongitude), "dest", BitmapDescriptor.defaultMarkerWithHue(90));
   }

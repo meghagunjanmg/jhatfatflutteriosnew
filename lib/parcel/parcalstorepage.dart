@@ -35,10 +35,10 @@ class ParcalPageState extends State<ParcalStoresPage> {
   List<NearStores> nearStores = [];
   List<NearStores> nearStoresSearch = [];
   List<NearStores> nearStoresShimmer = [
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
 
   ];
   List<String> listImages = ['', '', '', '', ''];

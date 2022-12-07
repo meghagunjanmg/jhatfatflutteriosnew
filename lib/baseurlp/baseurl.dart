@@ -12,6 +12,7 @@ var bigbanner = baseUrl + "bigbanner";
 var registerApi = baseUrl + "user_register";
 var verifyPhone = baseUrl + "verify_phone";
 var userRegistration = baseUrl + "checkuser";
+var parcel_check_location = baseUrl + "parcel_check_location";
 var userProfile = baseUrl + "myprofile";
 var forgotPassword = baseUrl + "forgot_password";
 var forgotPasswordVerify = baseUrl + "verify_otp";

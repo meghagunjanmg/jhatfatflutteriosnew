@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -338,7 +339,7 @@ class AppCategoryState extends State<AppCategory> {
             primary: true,
             child: Column(
               children: [
-                (vendorCategoryId==18)?
+                (vendorCategoryId==18 && Platform.isAndroid)?
                 Container(
                     color: kMainColor,
                     padding: EdgeInsets.all(20),

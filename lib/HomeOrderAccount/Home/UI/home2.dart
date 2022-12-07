@@ -103,10 +103,11 @@ class _HomeState extends State<Home> {
   List<NearStores> nearStores1 = [];
   List<NearStores> nearStoresSearch1 = [];
   List<NearStores> nearStoresShimmer1 = [
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
-    NearStores("", "", 0, "", "", "", "", "", "", "", "", "",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+    NearStores("", "", 0, "", "", "", "", "", "", "", "", "","",""),
+
   ];
   List<String> listImages1 = ['', '', '', '', ''];
   double userLat = 0.0;

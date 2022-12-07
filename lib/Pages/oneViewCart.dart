@@ -26,6 +26,7 @@ import 'package:jhatfat/bean/paymentstatus.dart';
 import 'package:jhatfat/databasehelper/dbhelper.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+import '../bean/orderarray.dart';
 import '../bean/resturantbean/restaurantcartitem.dart';
 import '../restaturantui/pages/payment_restaurant_page.dart';
 
@@ -63,6 +64,7 @@ class _oneViewCartState extends State<oneViewCart> {
   int idd = 0;
   int idd1 = 0;
   bool basketvalue = false;
+  List<instructionbean> instruction = [];
 
 
   int is_id_req = 0;
@@ -1386,7 +1388,7 @@ class _oneViewCartState extends State<oneViewCart> {
               // Toast.show(jsonData['message'], context,
               //     duration: Toast.LENGTH_SHORT);
               CartDetail details = CartDetail.fromJson(jsonData['data']);
-              getVendorPayment(vendorId!, details);
+              getVendorPayment(vendorId!, details,(totalAmount + deliveryCharge + packcharge));
             } else {
               // Toast.show(jsonData['message'], context,
               //     duration: Toast.LENGTH_SHORT);
@@ -1428,7 +1430,7 @@ class _oneViewCartState extends State<oneViewCart> {
     }
   }
 
-  void getVendorPayment(String vendorId, CartDetail details) async {
+  void getVendorPayment(String vendorId, CartDetail details,totalAmount) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       currency = preferences.getString('curency')!;
@@ -1452,7 +1454,7 @@ class _oneViewCartState extends State<oneViewCart> {
 
           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
             return PaymentRestPage(vendorId, details.order_id, details.cart_id,
-                double.parse(details.total_price.toString()), tagObjs);
+                double.parse(totalAmount.toString()), tagObjs);
           }));
         }
       }
@@ -1505,13 +1507,15 @@ class _oneViewCartState extends State<oneViewCart> {
                  int.parse('${item.varient_id}'),int.parse('${item.addedBasket}')));
            }
 
-           print(orderArray.toString()+" "+dateTimeSt.toString()+" "+radioList[idd1]+" "+presuploaded.toString());
 
+          print(orderArray.toString()+" "+dateTimeSt.toString()+" "+radioList[idd1]+" "+presuploaded.toString());
+          print(instruction.toString());
           Uri myUri = Uri.parse(url);
           http.post(myUri, body: {
             'user_id': userId.toString(),
             'order_array': orderArray.toString(),
             'delivery_date': dateTimeSt,
+            'instruction':instruction.toString(),
             'time_slot': '${radioList[idd1]}',
             'ui_type': ui_type,
             if(presuploaded!=null)  'pres':presuploaded
@@ -1520,18 +1524,43 @@ class _oneViewCartState extends State<oneViewCart> {
             print('order' + value.body);
             if (value.statusCode == 200) {
               var jsonData = jsonDecode(value.body);
-              if (jsonData['status'] == "1") {
+              if (jsonData['status'] == "1")
+              {
                 // Toast.show(jsonData['message'], context,
                 //     duration: Toast.LENGTH_SHORT);
                 CartDetail details = CartDetail.fromJson(jsonData['data']);
-                getVendorPayment2(vendorId!, details, orderArray.toString());
+                getVendorPayment2(vendorId!, details, orderArray.toString(),(totalAmount + deliveryCharge + packcharge));
 
+                setState(() {
+                  instruction = [];
+                  iduploaded = null;
+                  presuploaded = null;
+                });
 
-                iduploaded = null;
-                presuploaded = null;
-              } else {
+              }
+              else if(jsonData['status'] == "0"){
+                Fluttertoast.showToast(
+                    msg: jsonData['message'],
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.CENTER,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.black,
+                    textColor: Colors.white,
+                    fontSize: 16.0
+                );
+              }
+              else {
                 // Toast.show(jsonData['message'], context,
                 //     duration: Toast.LENGTH_SHORT);
+                Fluttertoast.showToast(
+                    msg: jsonData['message'],
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.CENTER,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.black,
+                    textColor: Colors.white,
+                    fontSize: 16.0
+                );
                 setState(() {
                   showDialogBox = false;
                 });
@@ -1577,7 +1606,7 @@ class _oneViewCartState extends State<oneViewCart> {
   }
 
   void getVendorPayment2(String vendorId, CartDetail details,
-      String orderArray) async {
+      String orderArray,totalAmount) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       currency = preferences.getString('curency')!;
@@ -1604,7 +1633,7 @@ class _oneViewCartState extends State<oneViewCart> {
                 vendorId,
                 details.order_id,
                 details.cart_id,
-                double.parse(details.total_price.toString()),
+                double.parse(totalAmount.toString()),
                 tagObjs,
                 orderArray);
           }));
@@ -1836,8 +1865,24 @@ class _oneViewCartState extends State<oneViewCart> {
                       // Spacer(),
                     ]),
               ),
-
-            ))
+            )),
+              SizedBox(height: 16,),
+    Padding(
+              padding: const EdgeInsets.symmetric(vertical: 7.0, horizontal: 13.3),
+    child:
+        TextField(
+          onChanged: (newText) {
+            addInstruction(store_name,newText);
+          },
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            hoverColor: kMainColor,
+            labelText: 'Instruction',
+            isDense: true, // Added this
+            contentPadding: EdgeInsets.all(8),  // Added this
+          ),
+        )
+    )
       ],
     );
   }
@@ -2077,6 +2122,13 @@ class _oneViewCartState extends State<oneViewCart> {
       }
     });
   }
+  List<instructionbean> instructions = [];
+  addInstruction(store_name,newText) {
+    instructions.add(instructionbean('"'+store_name+'"','"'+newText+'"'));
+    setState(() {
+      instruction = instructions.toSet().toList();
+    });
+    }
 }
 
 

@@ -13,16 +13,17 @@ class NearStores{
   dynamic vendor_loc;
   dynamic about;
   dynamic packaging_charges;
+  dynamic inrange;
 
   NearStores(this.vendor_name, this.vendor_phone, this.vendor_id,
-      this.vendor_logo, this.vendor_category_id,this.distance,this.lat,this.lng,this.delivery_range,this.online_status,this.vendor_loc,this.about,this.packaging_charges);
+      this.vendor_logo, this.vendor_category_id,this.distance,this.lat,this.lng,this.delivery_range,this.online_status,this.vendor_loc,this.about,this.packaging_charges,this.inrange);
 
   factory NearStores.fromJson(dynamic json) {
-    return NearStores(json['vendor_name'], json['vendor_phone'], json['vendor_id'],json['vendor_logo'],json['vendor_category_id'],json['distance'],json['lat'],json['lng'],json['delivery_range'],json['online_status'],json['vendor_loc'],json['about'],json['packaging_charges']);
+    return NearStores(json['vendor_name'], json['vendor_phone'], json['vendor_id'],json['vendor_logo'],json['vendor_category_id'],json['distance'],json['lat'],json['lng'],json['delivery_range'],json['online_status'],json['vendor_loc'],json['about'],json['packaging_charges'],json['inrange']);
   }
 
   @override
   String toString() {
-    return '{vendor_name: $vendor_name, vendor_phone: $vendor_phone, vendor_id: $vendor_id, vendor_logo: $vendor_logo, vendor_category_id: $vendor_category_id, distance: $distance, lat: $lat, lng: $lng, delivery_range: $delivery_range, online_status: $online_status, vendor_loc: $vendor_loc, about: $about,packaging_charges:$packaging_charges}';
+    return '{vendor_name: $vendor_name, vendor_phone: $vendor_phone, vendor_id: $vendor_id, vendor_logo: $vendor_logo, vendor_category_id: $vendor_category_id, distance: $distance, lat: $lat, lng: $lng, delivery_range: $delivery_range, online_status: $online_status, vendor_loc: $vendor_loc, about: $about,packaging_charges:$packaging_charges,inrange: $inrange}';
   }
 }

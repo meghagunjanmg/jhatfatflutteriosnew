@@ -27,7 +27,18 @@ class OrderArrayGrocery{
   }
 }
 
+class instructionbean{
 
+  String vendor_name;
+  String instruction;
+
+  instructionbean(this.vendor_name, this.instruction);
+
+  @override
+  String toString() {
+    return '{\"vendor_name\": $vendor_name, \"instruction\": $instruction}';
+  }
+}
 
 class OrderAdonArray{
   int addonid;

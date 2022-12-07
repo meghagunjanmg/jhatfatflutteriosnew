@@ -159,6 +159,7 @@ class OrderPlaced extends StatelessWidget {
             List<TodayOrderParcel> orders = tagObjsJson
                 .map((tagJson) => TodayOrderParcel.fromJson(tagJson))
                 .toList();
+            //Navigator.popUntil(context, (route) => false);
             Navigator.pushAndRemoveUntil(context,
                 MaterialPageRoute(builder: (context) {
                   return OrderMapParcelPage(
@@ -169,7 +170,7 @@ class OrderPlaced extends StatelessWidget {
                       currency: currency,
                       user_id: orders[0].cartId.toString()
                   );
-                }), (Route<dynamic> route) => true);
+                }), (Route<dynamic> route) => false);
 
           }
         }
@@ -205,7 +206,6 @@ class OrderPlaced extends StatelessWidget {
                     print("NAME " + i.toString() + " " + vendor);
                   }
                   VendorName.toSet().toList();
-
                   Navigator.pushAndRemoveUntil(context,
                       MaterialPageRoute(builder: (context) {
                         return  OrderMapPage(
@@ -219,7 +219,7 @@ class OrderPlaced extends StatelessWidget {
                               .cart_id
                               .toString(),
                         );
-                      }), (Route<dynamic> route) => true);
+                      }), (Route<dynamic> route) => false);
 
 
                 }
@@ -239,7 +239,7 @@ class OrderPlaced extends StatelessWidget {
                           currency: currency,
                           user_id: orders[0].cart_id.toString(),
                         );
-                      }), (Route<dynamic> route) => true);
+                      }), (Route<dynamic> route) => false);
                 }
               }
             }

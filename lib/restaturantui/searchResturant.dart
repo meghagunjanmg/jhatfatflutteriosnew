@@ -607,7 +607,8 @@ class SearchRestaurantStoreState extends State<SearchRestaurantStore> {
         nearStor.online_status,
         nearStor.vendor_loc,
         nearStor.about,
-    nearStor.packaging_charges);
+    nearStor.packaging_charges,
+    nearStor.inrange);
     Navigator.push(
         context,
         MaterialPageRoute(

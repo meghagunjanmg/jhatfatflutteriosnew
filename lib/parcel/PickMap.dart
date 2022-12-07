@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,8 @@ import 'package:jhatfat/Components/custom_appbar.dart';
 import 'package:jhatfat/Themes/colors.dart';
 import 'package:jhatfat/Themes/constantfile.dart';
 import 'package:jhatfat/bean/latlng.dart';
+
+import '../baseurlp/baseurl.dart';
 
 class PickMap extends StatelessWidget {
   final dynamic lat;
@@ -398,8 +402,8 @@ class SetLocationState extends State<SetLocation> {
                 textStyle:TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400)),
 
             onPressed: () {
-              setData();
-              Navigator.pop(context);
+              CheckLocation(lat,lng);
+
             },
             child: Text(
               'Continue',
@@ -445,6 +449,41 @@ class SetLocationState extends State<SetLocation> {
 
   void getMapLoc() async {
     _getCameraMoveLocation(LatLng(lat, lng));
+  }
+
+  void CheckLocation(lat, lng) {
+    var url = parcel_check_location;
+    Uri myUri = Uri.parse(url);
+    var client = http.Client();
+    client.post(myUri, body: {'lat': lat.toString(),'lng':lng.toString()})
+        .then((value) {
+      if (value.statusCode == 200) {
+        var jsonData = jsonDecode(value.body);
+        if (jsonData['status'] == 1) {
+          setData();
+          Navigator.pop(context);
+        }
+        else{
+          dailog(jsonData['message']);
+        }
+      }}).catchError((e) {
+      print(e);
+      });
+  }
+  Future<bool> dailog(message) async {
+    return (await showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+        title: new Text('Notice'),
+        content: new Text(message),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: new Text('OK'),
+          ),
+        ],
+      ),
+    )) ?? false;
   }
 }
 

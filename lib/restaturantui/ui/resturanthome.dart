@@ -843,11 +843,16 @@ class RestaurantState extends State<Restaurant> {
                                         itemBuilder: (context, index) {
                                           return GestureDetector(
                                             onTap: () {
-                                              // hitNavigator(context, nearStores[index]);
-                                              if((nearStores[index].online_status == "on" || nearStores[index].online_status == "On" || nearStores[index].online_status == "ON")){
+                                              if ((nearStores[index].online_status ==
+                                                  "off" ||
+                                                  nearStores[index].online_status == "Off" ||
+                                                  nearStores[index].online_status ==
+                                                      "OFF")) {
+                                              }
+                                              else if(nearStores[index].inrange == 0){
+                                              }
+                                              else{
                                                 hitNavigator(context, nearStores[index]);
-                                              }else{
-                                                Toast.show('Restaurant are closed now!', duration: Toast.lengthShort, gravity:  Toast.bottom);
                                               }
                                             },
                                             behavior: HitTestBehavior.opaque,
@@ -953,20 +958,61 @@ class RestaurantState extends State<Restaurant> {
                                                     ),
                                                   ),
                                                   Positioned(
-                                                    bottom: 20,
+                                                    bottom: 50,
                                                     child: Visibility(
-                                                      visible: (nearStores[index].online_status == "off" || nearStores[index].online_status == "Off" || nearStores[index].online_status == "OFF")?true:false,
+                                                      visible: (nearStores[index]
+                                                          .online_status ==
+                                                          "off" ||
+                                                          nearStores[index]
+                                                              .online_status ==
+                                                              "Off" ||
+                                                          nearStores[index]
+                                                              .online_status ==
+                                                              "OFF")
+                                                          ? true
+                                                          : false,
                                                       child: Container(
-                                                        height: 40,
-                                                        width: MediaQuery.of(context).size.width-10,
+                                                        height: 20,
+                                                        width: MediaQuery.of(context)
+                                                            .size
+                                                            .width -
+                                                            10,
                                                         alignment: Alignment.center,
                                                         color: kCardBackgroundColor,
-                                                        child: Text('Store Closed Now',style: TextStyle(
-                                                            color: red_color
-                                                        ),),
+                                                        child: Text(
+                                                          'Store Closed Now',
+                                                          style: TextStyle(
+                                                              color: red_color,
+                                                              fontSize: 15),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
+                                                  Positioned(
+                                                    bottom: 20,
+                                                    child: Visibility(
+                                                      visible: (nearStores[index]
+                                                          .inrange == 0)
+                                                          ? true
+                                                          : false,
+                                                      child: Container(
+                                                        height: 20,
+                                                        width: MediaQuery.of(context)
+                                                            .size
+                                                            .width -
+                                                            10,
+                                                        alignment: Alignment.center,
+                                                        color: kCardBackgroundColor,
+                                                        child: Text(
+                                                          'Store Out of Delivery Range',
+                                                          style: TextStyle(
+                                                              color: red_color,
+                                                              fontSize: 15),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+
                                                 ],
                                               ),
                                             ),

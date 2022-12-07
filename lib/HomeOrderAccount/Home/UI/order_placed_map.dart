@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Themes/constantfile.dart';
 import '../../../baseurlp/baseurl.dart';
+import '../../home_order_account.dart';
 
 class OrderMapPage extends StatelessWidget {
   final String? instruction;
@@ -134,13 +135,13 @@ class _OrderMapState extends State<OrderMap> {
       'cart_id': widget.ongoingOrders.cart_id
     })
         .then((value) {
+          print(value.body.toString());
       if (value.statusCode == 200 && value.body != null) {
         {
           var tagObjsJson = jsonDecode(value.body) as List;
           List<OngoingOrders> orders = tagObjsJson
               .map((tagJson) => OngoingOrders.fromJson(tagJson))
               .toList();
-
           setState(() {
             widget.ongoingOrders.order_status = orders[0].order_status;
           });
@@ -151,7 +152,18 @@ class _OrderMapState extends State<OrderMap> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+      WillPopScope(
+        onWillPop: () async {
+      Navigator.pushAndRemoveUntil(context,
+          MaterialPageRoute(builder: (context) {
+            return HomeOrderAccount(0);
+          }), (Route<dynamic> route) => true);
+      return true; //
+    },
+
+    child:
+    Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(52.0),
           child: AppBar(
@@ -231,6 +243,9 @@ class _OrderMapState extends State<OrderMap> {
                             colorBlendMode: BlendMode.modulate,
                             alignment: Alignment.center,
                             fit: BoxFit.fill),
+                        (widget.ongoingOrders.order_status=="Completed")?
+                        Text("Completed",
+                          style: TextStyle(fontSize: 32),):
                         Text("Waiting for order to be picked...",
                           style: TextStyle(fontSize: 32),),
                       ]
@@ -670,6 +685,9 @@ class _OrderMapState extends State<OrderMap> {
                                       colorBlendMode: BlendMode.modulate,
                                       alignment: Alignment.center,
                                       fit: BoxFit.fill),
+                                  (widget.ongoingOrders.order_status=="Completed")?
+                                  Text("Completed",
+                                    style: TextStyle(fontSize: 32),):
                                   Text("Waiting for order to be picked...",
                                     style: TextStyle(fontSize: 32),),
                                 ]
@@ -864,7 +882,7 @@ class _OrderMapState extends State<OrderMap> {
                     ],
                   );
               }
-            }));
+            })));
   }
 
   _addMarker(LatLng position, String id, BitmapDescriptor descriptor) {
@@ -875,14 +893,15 @@ class _OrderMapState extends State<OrderMap> {
   }
 
   void mymap() async {
-    await _controller!
-        .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        target: LatLng(
-          _originLatitude,
-          _originLongitude,
-        ),
-        zoom: 14)));
-
+    Timer(Duration(minutes: 120), () async {
+      await _controller!
+          .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+          target: LatLng(
+            _originLatitude,
+            _originLongitude,
+          ),
+          zoom: 14)));
+    });
     _addMarker(LatLng(_originLatitude, _originLongitude), "source",
         await BitmapDescriptor.fromAssetImage(
             ImageConfiguration(size: Size(90, 90)), 'assets/delivery.png'));
