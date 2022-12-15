@@ -542,7 +542,9 @@ class _ItemsPageState extends State<ItemsPage>
                 SizedBox(
                 height: 8.0,
                 ),
-                Text(
+                Row(
+                  children: [
+                  Text(
                     (productVarientList[index]
                         .data.length < 0||productVarientList[index]
                         .data[productVarientList[index]
@@ -555,12 +557,11 @@ class _ItemsPageState extends State<ItemsPage>
                             .data[productVarientList[index]
                             .selectPos].strick_price==null )
                 ? ''
-                    :'$currency  ${productVarientList[index]
+                    :'$currency ${productVarientList[index]
                         .data[productVarientList[index]
-                        .selectPos].strick_price}',
+                        .selectPos].strick_price} ',
 
                 style: TextStyle(decoration: TextDecoration.lineThrough)),
-
                   Text(
                       '$currency ${(productVarientList[index]
                           .data.length > 0)
@@ -570,7 +571,8 @@ class _ItemsPageState extends State<ItemsPage>
                           : 0}',
                       //style: TextStyle(decoration: TextDecoration.lineThrough)
                   ),
-
+                  ],
+                ),
                   SizedBox(
                 height: 20.0,
                 ),

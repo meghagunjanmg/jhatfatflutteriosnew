@@ -65,10 +65,8 @@ class SetLocationState extends State<SetLocatio> {
 
   Future<void> _goToTheLake(lat, lng) async {
     final CameraPosition _kLake = CameraPosition(
-        bearing: 192.8334901395799,
         target: LatLng(lat, lng),
-        tilt: 59.440717697143555,
-        zoom: 19.151926040649414);
+        zoom: 14.151926040649414);
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
 

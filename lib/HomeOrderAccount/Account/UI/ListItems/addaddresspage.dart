@@ -5,12 +5,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder2/geocoder2.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:toast/toast.dart';
 import 'package:jhatfat/Components/entry_field.dart';
 import 'package:jhatfat/Themes/colors.dart';
 import 'package:jhatfat/baseurlp/baseurl.dart';
@@ -104,10 +105,10 @@ class AddAddressState extends State<AddAddressPage> {
           if (value) {
             _getLocation(context);
           } else {
-            Toast.show('Location permission is required!', duration: Toast.lengthShort, gravity:  Toast.bottom);
+            //Toast.show('Location permission is required!', duration: Toast.lengthShort, gravity:  Toast.bottom);
           }
         }).catchError((e) {
-          Toast.show('Location permission is required!',  duration: Toast.lengthShort, gravity:  Toast.bottom);
+          //Toast.show('Location permission is required!',  duration: Toast.lengthShort, gravity:  Toast.bottom);
         });
       }
     } else if (permission == LocationPermission.denied) {
@@ -116,14 +117,14 @@ class AddAddressState extends State<AddAddressPage> {
           permissiond == LocationPermission.always) {
         _getLocation(context);
       } else {
-        Toast.show('Location permission is required!', duration: Toast.lengthShort, gravity:  Toast.bottom);
+        //Toast.show('Location permission is required!', duration: Toast.lengthShort, gravity:  Toast.bottom);
       }
     } else if (permission == LocationPermission.deniedForever) {
       await Geolocator.openAppSettings().then((value) {
         _getLocation(context);
 
       }).catchError((e) {
-        Toast.show('Location permission is required!', duration: Toast.lengthShort, gravity:  Toast.bottom);
+       // Toast.show('Location permission is required!', duration: Toast.lengthShort, gravity:  Toast.bottom);
       });
     }
   }
@@ -500,7 +501,16 @@ class AddAddressState extends State<AddAddressPage> {
                           stateController.text,
                           context);
                     } else {
-                      Toast.show('Enter all details carefully', duration: Toast.lengthShort, gravity:  Toast.bottom);
+
+                      Fluttertoast.showToast(
+                          msg: "Enter all details carefully",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.black,
+                          textColor: Colors.white,
+                          fontSize: 16.0
+                      );
                     }
                   },
                   child: Container(
@@ -532,9 +542,26 @@ class AddAddressState extends State<AddAddressPage> {
   void addAddres(dynamic area_id, dynamic city_id, house_no, street, pincode,
       state, BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    List<Location> locations = await locationFromAddress(street);
+    setState(() {
+      lat = locations[0].latitude;
+      lng = locations[0].longitude;
+    });
+
+    final marker = Marker(
+      markerId: MarkerId('location'),
+      position: LatLng(lat, lng),
+      icon: BitmapDescriptor.defaultMarker,
+    );
+    setState(() {
+      markers[MarkerId('location')] = marker;
+    });
+
+
+
     var url = addAddress;
     Uri myUri = Uri.parse(url);
-
     http.post(myUri, body: {
       'user_id': '${prefs.getInt('user_id')}',
       'user_name': '${prefs.getString('user_name')}',
@@ -600,8 +627,7 @@ class AddAddressState extends State<AddAddressPage> {
       lat = data.latitude;
       lng = data.longitude;
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString("lat", data.latitude.toStringAsFixed(8));
-      prefs.setString("lng", data.longitude.toStringAsFixed(8));
+
       GeoData data1 = await Geocoder2.getDataFromCoordinates(
           latitude: lat,
           longitude: lng,

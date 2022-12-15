@@ -327,6 +327,7 @@ class _HomeState extends State<Home> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
+
               (admins!.surge==1)
                   ?
               Wrap(
@@ -1404,8 +1405,16 @@ class _HomeState extends State<Home> {
     }
   void callSubStore() async {
     var url = subsstore;
+    Map<String, String> queryParams = {
+      'lat':  lat.toString(),
+      'lng':  lng.toString()
+    };
     Uri myUri = Uri.parse(url);
-    var value = await http.get(myUri);
+    final finalUri = myUri.replace(queryParameters: queryParams); //USE THIS
+
+    print("SUBSTORE: "+finalUri.toString());
+
+    var value = await http.get(finalUri);
     var jsonData = jsonDecode(value.body.toString());
     if (jsonData['status'] == "1") {
       var tagObjsJson = jsonDecode(value.body)['data'] as List;

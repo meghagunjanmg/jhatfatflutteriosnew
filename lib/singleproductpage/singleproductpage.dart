@@ -335,6 +335,8 @@ class SingleProductState extends State<SingleProductPage> {
                                             SizedBox(
                                               height: 8.0,
                                             ),
+                              Row(
+                              children: [
                                             Text(
                                                 (widget.productVarintList[index].toString().length < 0||widget.productVarintList[index].strick_price
                                                     <=
@@ -345,10 +347,10 @@ class SingleProductState extends State<SingleProductPage> {
 
                                                 style: TextStyle(decoration: TextDecoration.lineThrough)),
                                             Text(
-    '${widget.currency} ${widget.productVarintList[index].price}',
+    '${widget.currency} ${widget.productVarintList[index].price} ',
                                               //style: TextStyle(decoration: TextDecoration.lineThrough)
                                             ),
-
+]),
                                             SizedBox(
                                               height: 20.0,
                                             ),

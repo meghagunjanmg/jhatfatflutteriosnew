@@ -30,15 +30,15 @@ class DropMap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SetLocation(lat, lng);
+    return SetLocations(lat, lng);
   }
 }
 
-class SetLocation extends StatefulWidget {
+class SetLocations extends StatefulWidget {
   final dynamic lat;
   final dynamic lng;
 
-  SetLocation(this.lat, this.lng);
+  SetLocations(this.lat, this.lng);
 
   @override
   SetLocationState createState() => SetLocationState(lat, lng);
@@ -46,7 +46,7 @@ class SetLocation extends StatefulWidget {
 
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: apiKey);
 
-class SetLocationState extends State<SetLocation> {
+class SetLocationState extends State<SetLocations> {
   dynamic lat;
   dynamic lng;
   CameraPosition? kGooglePlex;
@@ -69,10 +69,8 @@ class SetLocationState extends State<SetLocation> {
 
   Future<void> _goToTheLake(lat, lng) async {
     final CameraPosition _kLake = CameraPosition(
-        bearing: 192.8334901395799,
         target: LatLng(lat, lng),
-        tilt: 59.440717697143555,
-        zoom: 19.151926040649414);
+        zoom: 14.151926040649414);
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
   }
@@ -113,8 +111,7 @@ class SetLocationState extends State<SetLocation> {
         Timer(Duration(seconds: 5), () async {
           double lat = position.latitude;
           double lng = position.longitude;
-          prefs.setString("lat", lat.toStringAsFixed(8));
-          prefs.setString("lng", lng.toStringAsFixed(8));
+
           GeoData data = await Geocoder2.getDataFromCoordinates(
               latitude: lat,
               longitude: lng,
@@ -165,8 +162,7 @@ class SetLocationState extends State<SetLocation> {
       lat = data.latitude;
       lng = data.longitude;
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString("lat", data.latitude.toStringAsFixed(8));
-      prefs.setString("lng", data.longitude.toStringAsFixed(8));
+
       GeoData data1 = await Geocoder2.getDataFromCoordinates(
           latitude: lat,
           longitude: lng,

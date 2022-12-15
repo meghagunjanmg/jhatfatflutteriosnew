@@ -502,9 +502,7 @@ class _SavedAddressesState extends State<SavedAddresses> {
                                                     value: index,
                                                     groupValue: idd,
                                                     onChanged: (value) {
-                                                      if(addressDelivery!=null && addressDelivery.length>0){
 
-                                                      }else{
                                                         setState(() {
                                                           idd = index;
                                                           showDialogBox = true;
@@ -513,7 +511,6 @@ class _SavedAddressesState extends State<SavedAddresses> {
                                                             showAddressList[index]
                                                                 .address_id,
                                                             widget.vendorId);
-                                                      }
                                                     }),
                                                 IconButton(
                                                     icon: Icon(Icons.delete),
@@ -533,19 +530,7 @@ class _SavedAddressesState extends State<SavedAddresses> {
                                           ),
                                         ],
                                       ),
-                                      Positioned(
-                                        top: 50,
-                                        child: Visibility(
-                                          visible:(addressDelivery != null && addressDelivery.length > 0)?true:false,
-                                          child: Container(
-                                            padding:EdgeInsets.symmetric(vertical: 10),
-                                            width: MediaQuery.of(context).size.width,
-                                            alignment: Alignment.center,
-                                            color:kCardBackgroundColor,
-                                            child: Text('We are not delivery this address',style: TextStyle(fontSize: 13),),
-                                          ),
-                                        ),
-                                      ),
+
                                     ],
                                   ),
                                 ),

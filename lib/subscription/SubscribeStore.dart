@@ -296,68 +296,71 @@ class _SubscribeStore extends State<SubscribeStore> {
                                                       fontSize: 13.0)),
                                             ],
                                           ),
+
+                                          Positioned(
+                                            bottom: 50,
+                                            child: Visibility(
+                                              visible: (nearStores[index]
+                                                  .online_status ==
+                                                  "off" ||
+                                                  nearStores[index]
+                                                      .online_status ==
+                                                      "Off" ||
+                                                  nearStores[index]
+                                                      .online_status ==
+                                                      "OFF")
+                                                  ? true
+                                                  : false,
+                                              child: Container(
+                                                margin: EdgeInsets.all(8),
+                                                height: 20,
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                    10,
+                                                alignment: Alignment.center,
+                                                color: kCardBackgroundColor,
+                                                child: Text(
+                                                  'Store Closed Now',
+                                                  style: TextStyle(
+                                                      color: red_color,
+                                                      fontSize: 15),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            bottom: 20,
+                                            child: Visibility(
+                                              visible: (nearStores[index]
+                                                  .inrange == 0)
+                                                  ? true
+                                                  : false,
+                                              child: Container(
+                                                margin: EdgeInsets.all(8),
+                                                height: 20,
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                    10,
+                                                alignment: Alignment.center,
+                                                color: kCardBackgroundColor,
+                                                child: Text(
+                                                  'Store Out of Delivery Range',
+                                                  style: TextStyle(
+                                                      color: red_color,
+                                                      fontSize: 15),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+
                                         ],
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              Positioned(
-                                bottom: 50,
-                                child: Visibility(
-                                  visible: (nearStores[index]
-                                      .online_status ==
-                                      "off" ||
-                                      nearStores[index]
-                                          .online_status ==
-                                          "Off" ||
-                                      nearStores[index]
-                                          .online_status ==
-                                          "OFF")
-                                      ? true
-                                      : false,
-                                  child: Container(
-                                    height: 20,
-                                    width: MediaQuery.of(context)
-                                        .size
-                                        .width -
-                                        10,
-                                    alignment: Alignment.center,
-                                    color: kCardBackgroundColor,
-                                    child: Text(
-                                      'Store Closed Now',
-                                      style: TextStyle(
-                                          color: red_color,
-                                          fontSize: 15),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 20,
-                                child: Visibility(
-                                  visible: (nearStores[index]
-                                      .inrange == 0)
-                                      ? true
-                                      : false,
-                                  child: Container(
-                                    height: 20,
-                                    width: MediaQuery.of(context)
-                                        .size
-                                        .width -
-                                        10,
-                                    alignment: Alignment.center,
-                                    color: kCardBackgroundColor,
-                                    child: Text(
-                                      'Store Out of Delivery Range',
-                                      style: TextStyle(
-                                          color: red_color,
-                                          fontSize: 15),
-                                    ),
-                                  ),
-                                ),
-                              ),
-
                             ],
                           ),
                         ),

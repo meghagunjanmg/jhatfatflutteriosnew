@@ -4,6 +4,9 @@ var imageBaseUrl = "https://jhatfat.com/";
 var adminsettings = baseUrl + "adminsettings";
 var checksubs = baseUrl + "checksubs";
 var subsstore = baseUrl + "subsstore";
+var deleteaccount = baseUrl + "deleteaccount";
+var ordercharges = baseUrl + "ordercharges";
+
 var top_msg_banner = baseUrl + "top_message_banner";
 var closed_banner = baseUrl + "closed_banner";
 var pickdropbanner = baseUrl + "parbanner";
@@ -12,8 +15,6 @@ var bigbanner = baseUrl + "bigbanner";
 var registerApi = baseUrl + "user_register";
 var verifyPhone = baseUrl + "verify_phone";
 var userRegistration = baseUrl + "checkuser";
-var deleteaccount = baseUrl + "deleteaccount";
-
 var parcel_check_location = baseUrl + "parcel_check_location";
 var userProfile = baseUrl + "myprofile";
 var forgotPassword = baseUrl + "forgot_password";

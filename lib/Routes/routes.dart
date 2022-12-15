@@ -21,6 +21,7 @@ import 'package:jhatfat/walletrewardreffer/reffer/ui/reffernearn.dart';
 import 'package:jhatfat/walletrewardreffer/reward/ui/reward.dart';
 import 'package:jhatfat/walletrewardreffer/wallet/ui/wallet.dart';
 
+import '../Pages/instructions.dart';
 import '../Pages/oneViewCart.dart';
 import '../restaturantui/ui/resturanthome.dart';
 
@@ -54,6 +55,7 @@ class PageRoutes {
   static const String pickmap = 'pickmap';
   static const String parcellocation = 'parcellocation';
   static const String restro = 'restro';
+  static const String instruction = 'instruction';
 
   Map<String, WidgetBuilder> routes() {
     return {
@@ -80,6 +82,7 @@ class PageRoutes {
       pickmap: (context) => PickMap(30.3165, 78.0322),
       dropmap: (context) => DropMap(30.3165, 78.0322),
       locationPage: (context) => LocationPage(30.3165, 78.0322),
+      instruction: (context) => instructions(),
     };
   }
 }
