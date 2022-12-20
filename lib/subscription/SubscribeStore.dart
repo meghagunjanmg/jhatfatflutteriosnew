@@ -296,9 +296,8 @@ class _SubscribeStore extends State<SubscribeStore> {
                                                       fontSize: 13.0)),
                                             ],
                                           ),
-
-                                          Positioned(
-                                            bottom: 50,
+                                          Container(
+                                            margin: EdgeInsets.all(8),
                                             child: Visibility(
                                               visible: (nearStores[index]
                                                   .online_status ==
@@ -329,8 +328,8 @@ class _SubscribeStore extends State<SubscribeStore> {
                                               ),
                                             ),
                                           ),
-                                          Positioned(
-                                            bottom: 20,
+                                          Container(
+                                            margin: EdgeInsets.all(8),
                                             child: Visibility(
                                               visible: (nearStores[index]
                                                   .inrange == 0)
@@ -354,7 +353,6 @@ class _SubscribeStore extends State<SubscribeStore> {
                                               ),
                                             ),
                                           ),
-
                                         ],
                                       ),
                                     ),

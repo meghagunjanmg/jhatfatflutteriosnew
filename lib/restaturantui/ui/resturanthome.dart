@@ -953,8 +953,9 @@ class RestaurantState extends State<Restaurant> {
                                                                         fontSize: 13.0)),
                                                               ],
                                                             ),
-                                                            Positioned(
-                                                              bottom: 50,
+
+                                                            Container(
+                                                              margin: EdgeInsets.all(8),
                                                               child: Visibility(
                                                                 visible: (nearStores[index]
                                                                     .online_status ==
@@ -968,13 +969,13 @@ class RestaurantState extends State<Restaurant> {
                                                                     ? true
                                                                     : false,
                                                                 child: Container(
+                                                                  margin: EdgeInsets.all(8),
                                                                   height: 20,
                                                                   width: MediaQuery.of(context)
                                                                       .size
                                                                       .width -
                                                                       10,
-                                                                  alignment: Alignment.centerLeft,
-                                                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                                                                  alignment: Alignment.center,
                                                                   color: kCardBackgroundColor,
                                                                   child: Text(
                                                                     'Store Closed Now',
@@ -985,21 +986,21 @@ class RestaurantState extends State<Restaurant> {
                                                                 ),
                                                               ),
                                                             ),
-                                                            Positioned(
-                                                              bottom: 20,
+                                                            Container(
+                                                              margin: EdgeInsets.all(8),
                                                               child: Visibility(
                                                                 visible: (nearStores[index]
                                                                     .inrange == 0)
                                                                     ? true
                                                                     : false,
                                                                 child: Container(
+                                                                  margin: EdgeInsets.all(8),
                                                                   height: 20,
                                                                   width: MediaQuery.of(context)
                                                                       .size
                                                                       .width -
                                                                       10,
-                                                                  alignment: Alignment.centerLeft,
-                                                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                                                                  alignment: Alignment.center,
                                                                   color: kCardBackgroundColor,
                                                                   child: Text(
                                                                     'Store Out of Delivery Range',
@@ -1010,7 +1011,6 @@ class RestaurantState extends State<Restaurant> {
                                                                 ),
                                                               ),
                                                             ),
-
                                                           ],
                                                         ),
                                                       ],

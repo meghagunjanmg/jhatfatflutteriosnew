@@ -271,6 +271,7 @@ class StoresPageState extends State<StoresPage> {
                                         padding: EdgeInsets.only(
                                             left: 20.0, top: 15, bottom: 15),
                                         child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
                                           children: <Widget>[
                                             Image.network(
                                               imageBaseUrl +
@@ -360,8 +361,8 @@ class StoresPageState extends State<StoresPage> {
                                                     ],
                                                   ),
 
-                                                  Positioned(
-                                                    bottom: 50,
+                                                  Container(
+                                                    margin: EdgeInsets.all(8),
                                                     child: Visibility(
                                                       visible: (nearStores[index]
                                                           .online_status ==
@@ -392,8 +393,8 @@ class StoresPageState extends State<StoresPage> {
                                                       ),
                                                     ),
                                                   ),
-                                                  Positioned(
-                                                    bottom: 20,
+                                                  Container(
+                                                    margin: EdgeInsets.all(8),
                                                     child: Visibility(
                                                       visible: (nearStores[index]
                                                           .inrange == 0)
