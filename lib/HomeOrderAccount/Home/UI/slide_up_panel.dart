@@ -187,6 +187,65 @@ class _SlideUpPanelState extends State<SlideUpPanel> {
                           ),
                         ]),
                   ),
+
+                  (widget.ongoingOrders.surgecharge>0)?
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 20.0),
+                    child: Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'Surge Charge',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                          Text(
+                            '${widget.ongoingOrders.surgecharge.toStringAsFixed(2)}',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ]),
+                  ): Container(),
+                  (widget.ongoingOrders.nightcharge>0)?
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 20.0),
+                    child: Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'Night Charge',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                          Text(
+                            '${widget.ongoingOrders.nightcharge.toStringAsFixed(2)}',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ]),
+                  ): Container(),
+                  (widget.ongoingOrders.convcharge>0)?
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 20.0),
+                    child: Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'Convenience Charge',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                          Text(
+                            '${widget.ongoingOrders.convcharge.toStringAsFixed(2)}',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ]),
+                  ): Container(),
+
                   Container(
                     color: Colors.white,
                     padding:

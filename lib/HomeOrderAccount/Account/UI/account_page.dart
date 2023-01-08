@@ -35,11 +35,13 @@ class _AccountState extends State<Account> {
   var userName = '';
   var phoneNumber = '';
   var emailId = '';
+  var message = '';
 
   @override
   void initState() {
     super.initState();
     getName();
+    getData();
   }
 
   Future<void> getName() async {
@@ -143,8 +145,30 @@ class _AccountState extends State<Account> {
         DeleteTile(phoneNumber),
 
         LogoutTile(),
+
+
+        Container(
+          margin: EdgeInsets.all(12),
+          alignment: Alignment.bottomCenter,
+          child:    Text(
+            message.toString(),
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 12),
+          )
+          ,
+        )
       ],
     );
+  }
+
+
+  Future<void> getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+
+      message = prefs.getString("message")!;
+    });
   }
 }
 

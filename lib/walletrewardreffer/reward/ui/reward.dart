@@ -53,8 +53,18 @@ class RewardState extends State<Reward> {
   @override
   void initState() {
     super.initState();
+    getData();
     getRewardValue();
     getHistory();
+  }
+
+  String message = '';
+  void getData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState((){
+      message = pref.getString("message")!;
+    });
+
   }
 
   void getRewardValue() async {
@@ -73,6 +83,7 @@ class RewardState extends State<Reward> {
       print('${value.body}');
       if (value.statusCode == 200 && jsonDecode(value.body)['status'] == "1") {
         var jsonData = jsonDecode(value.body);
+        getHistory();
         setState(() {
           rewardPoint = jsonData['data']['rewards'];
           if (double.parse(rewardPoint) == 0.0) {
@@ -103,7 +114,8 @@ class RewardState extends State<Reward> {
     client.post(myUri, body: {
       'user_id': '${userId}',
     }).then((value) {
-      print('${value.statusCode} ${value.body}');
+      print("REDEEM History "+value.body);
+
       if (value.statusCode == 200) {
         var jsonData = jsonDecode(value.body);
         if (jsonData['status'] == "1") {
@@ -152,24 +164,14 @@ class RewardState extends State<Reward> {
               visible: isRedeem ? true : false,
               child: Padding(
                 padding: EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                child:  ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: kMainColor,
-                      foregroundColor : kMainColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      primary: Colors.purple,
-                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                      textStyle:TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400)),
-
+                child:  TextButton(
                   onPressed: () {
                     redeemPoints();
                   },
                   child: Text(
                     'Redeem',
                     style: TextStyle(
-                        color: kWhiteColor, fontWeight: FontWeight.w400),
+                        color: kMainColor, fontWeight: FontWeight.w400),
                   ),
                   // color: kMainColor,
                   // highlightColor: kMainColor,
@@ -376,6 +378,18 @@ class RewardState extends State<Reward> {
                       );
                     },
                     itemCount: history.length),
+
+                Container(
+                  margin: EdgeInsets.all(12),
+                  alignment: Alignment.bottomCenter,
+                  child:    Text(
+                    message.toString(),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12),
+                  )
+                  ,
+                )
               ],
             )
           : Container(
@@ -396,6 +410,18 @@ class RewardState extends State<Reward> {
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: kMainTextColor),
+                  ),
+
+                  Container(
+                    margin: EdgeInsets.all(12),
+                    alignment: Alignment.bottomCenter,
+                    child:    Text(
+                      message.toString(),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12),
+                    )
+                    ,
                   )
                 ],
               ),
@@ -413,6 +439,8 @@ class RewardState extends State<Reward> {
     client.post(myUri, body: {
       'user_id': '${userId}',
     }).then((value) {
+      print("REDEEM REWARD "+value.body);
+
       if (value.statusCode == 200) {
         var redemData = jsonDecode(value.body);
         if (redemData['status'] == "1") {

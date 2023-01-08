@@ -41,9 +41,15 @@ class ParcelCheckOut extends StatefulWidget {
 class ParcelCheckoutState extends State<ParcelCheckOut> {
   dynamic currency = '';
 
+  int surge_charges = 0;
+  int night_charges = 0;
+  int conv_charges = 0;
+
   @override
   void initState() {
     getCurrency();
+    servicecharge();
+
     super.initState();
   }
 
@@ -51,6 +57,33 @@ class ParcelCheckoutState extends State<ParcelCheckOut> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       currency = preferences.getString('curency');
+    });
+  }
+  void servicecharge() async {
+    var url = servicecharges;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    int? userId = pref.getInt('user_id');
+
+    Uri myUri = Uri.parse(url);
+    http.post(myUri, body: {
+      'user_id': userId.toString(),
+    }).then((value) {
+      var jsonData = jsonDecode(value.body);
+      print("SERVICE "+value.body.toString());
+      if (jsonData['status'] == "1") {
+        setState(() {
+          surge_charges = jsonData['surge_charges'];
+          night_charges = jsonData['night_charges'];
+          conv_charges = jsonData['conv_charges'];
+        });
+      }
+      else{
+        setState(() {
+          surge_charges = 0;
+          night_charges = 0;
+          conv_charges = 0;
+        });
+      }
     });
   }
 
@@ -243,25 +276,133 @@ class ParcelCheckoutState extends State<ParcelCheckOut> {
                 ],
               ),
             ),
+
+            Container(
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(
+                  vertical: 4.0, horizontal: 20.0),
+              child: Row(
+                  mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      'Parcel Charges per km',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .caption,
+                    ),
+                    Text(
+                      '${currency}'+'${widget.charges}',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .caption,
+                    ),
+                  ]),
+            ),
+
+            (surge_charges>0)?
+            Container(
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(
+                  vertical: 4.0, horizontal: 20.0),
+              child: Row(
+                  mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      'Surge Charge',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .caption,
+                    ),
+                    Text(
+                      '$currency ${surge_charges.toStringAsFixed(2)}',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .caption,
+                    ),
+                  ]),
+            ): Container(),
+            (night_charges>0)?
+            Container(
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(
+                  vertical: 4.0, horizontal: 20.0),
+              child: Row(
+                  mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      'Night Charge',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .caption,
+                    ),
+                    Text(
+                      '$currency ${night_charges.toStringAsFixed(2)}',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .caption,
+                    ),
+                  ]),
+            ): Container(),
+            (conv_charges>0)?
+            Container(
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(
+                  vertical: 4.0, horizontal: 20.0),
+              child: Row(
+                  mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      'Convenience Charge',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .caption,
+                    ),
+                    Text(
+                      '$currency ${conv_charges}',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .caption,
+                    ),
+                  ]),
+            ): Container(),
+
+            SizedBox(
+              height: 10,
+            ),
+
+
             Container(
               color: kWhiteColor,
               alignment: Alignment.centerLeft,
               width: MediaQuery.of(context).size.width,
               padding:
-                  EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20, right: 20),
+              EdgeInsets.only(top: 20.0, bottom: 20.0, left: 20, right: 20),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Parcel Charges per km'),
+                      Text('Amount to be paid '),
                       Text(
-                          '${currency}'+'${widget.charges}'),
+                          '${currency}'+'${(widget.charges * widget.distance) + surge_charges + night_charges + conv_charges}'),
                     ],
                   ),
                 ],
               ),
             ),
+
             SizedBox(
               height: 10,
             ),
@@ -338,7 +479,7 @@ class ParcelCheckoutState extends State<ParcelCheckOut> {
               .toList();
           double? c = double.tryParse(widget.charges.toString());
           double? d = double.tryParse(widget.distance.toString());
-          double? t = c! * d!;
+          double? t =( c! * d! ) + surge_charges + night_charges + conv_charges;
 
               Navigator.push(context, MaterialPageRoute(builder: (context) {
             return PaymentParcelPage(

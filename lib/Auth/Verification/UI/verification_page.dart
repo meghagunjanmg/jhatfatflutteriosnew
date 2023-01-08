@@ -360,6 +360,7 @@ class _OtpVerifyState extends State<OtpVerify> {
         hitService(smsOTP, context);
       }
     }
+
     try {
       final AuthCredential credential = PhoneAuthProvider.credential(
         verificationId: verificationId,

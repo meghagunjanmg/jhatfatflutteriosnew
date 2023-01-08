@@ -49,6 +49,7 @@ class _oneViewCartState extends State<oneViewCart> {
   List<RestaurantCartItem> cartListII = [];
 
   var totalAmount = 0.0;
+  var couponAmount = 0.0;
   dynamic deliveryCharge = 0.0;
   dynamic storedeliveryCharge = 0.0;
 
@@ -67,8 +68,8 @@ class _oneViewCartState extends State<oneViewCart> {
   int idd1 = 0;
   bool basketvalue = false;
   List<instructionbean> instruction = [];
-
-
+  String Errormessage = '';
+  String message = '';
   int is_id_req = 0;
   int is_pres_req = 0;
   int is_basket_req = 0;
@@ -80,6 +81,12 @@ class _oneViewCartState extends State<oneViewCart> {
 
   bool isCoupon = false;
   double coupAmount = 0.0;
+
+  int surge_charges = 0;
+  int night_charges = 0;
+  int conv_charges = 0;
+
+
   int radioId = -1;
   List<CouponList> couponL = [];
   CouponList? selectedcoupon;
@@ -123,6 +130,8 @@ class _oneViewCartState extends State<oneViewCart> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? id_proof = prefs.getString('id_proof');
     setState((){
+      message = prefs.getString("message")!;
+
       iduploadedALready = id_proof.toString();
     });
   }
@@ -138,6 +147,7 @@ class _oneViewCartState extends State<oneViewCart> {
     getStoreName();
     getid();
     ordercharg();
+    servicecharge();
 
     firstDate = toDateMonthYear(DateTime.now());
     prepareData(firstDate);
@@ -158,6 +168,9 @@ class _oneViewCartState extends State<oneViewCart> {
 
 
     getCatC();
+
+
+
 
   }
 
@@ -259,14 +272,11 @@ class _oneViewCartState extends State<oneViewCart> {
           setState(() {
             isCartFetch = false;
             addressDelivery = addressWelcome.data!;
-            deliveryCharge =
-                double.parse('${addressDelivery?.delivery_charge}');
           });
         } else {
           setState(() {
             isCartFetch = false;
             //addressDelivery = null;
-            deliveryCharge = 0.0;
           });
           // Toast.show("Address not found!", context,
           //     duration: Toast.LENGTH_SHORT);
@@ -275,7 +285,6 @@ class _oneViewCartState extends State<oneViewCart> {
         setState(() {
           isCartFetch = false;
           //addressDelivery = null;
-          deliveryCharge = 0.0;
         });
 
         // Toast.show('No Address found!', context, duration: Toast.LENGTH_SHORT);
@@ -284,7 +293,6 @@ class _oneViewCartState extends State<oneViewCart> {
       setState(() {
         isCartFetch = false;
         //addressDelivery = null;
-        deliveryCharge = 0.0;
       });
     });
   }
@@ -324,8 +332,11 @@ class _oneViewCartState extends State<oneViewCart> {
       }
     });
 
+
     getCatC();
 
+
+    getCouponList();
 
   }
 
@@ -336,7 +347,7 @@ class _oneViewCartState extends State<oneViewCart> {
             alignment: Alignment.centerLeft,
             padding: EdgeInsets.all(10.0),
             color: kCardBackgroundColor,
-            child: Text('Time Slot \n(Order will be delivered instantly, given below is the maximum time)',
+            child: Text('Order will be delivered instantly, given below is the maximum time',
                 style: Theme
                     .of(context)
                     .textTheme
@@ -680,15 +691,17 @@ class _oneViewCartState extends State<oneViewCart> {
       });
     }
 
+
+
     if(radioId!=-1){
       if(couponL[radioId].type=='percentage') {
         setState(() {
-          totalAmount = totalAmount - ((double.parse(couponL[radioId].amount)/totalAmount)*100);
+          couponAmount = ((double.parse(couponL[radioId].amount)/100)*totalAmount);
         });
       }
       else{
         setState(() {
-          totalAmount = totalAmount - double.parse(couponL[radioId].amount);
+          couponAmount = double.parse(couponL[radioId].amount);
         });
       }
     }
@@ -697,15 +710,13 @@ class _oneViewCartState extends State<oneViewCart> {
 
   void callThisMethod(bool isVisible) {
     getCouponList();
-
     getid();
     getCartItem();
     getResCartItem();
     setidpres(cartListI);
-
     getCatC();
-
     ordercharg();
+    servicecharge();
 
   }
   _showDialog() async{
@@ -1001,14 +1012,41 @@ class _oneViewCartState extends State<oneViewCart> {
                             itemCount: cartListII.length)
                             : Container(),
 
-                        Divider(
+                        // Divider(
+                        //   color: kCardBackgroundColor,
+                        //   thickness: 6.7,
+                        // ),
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          padding: EdgeInsets.all(10.0),
                           color: kCardBackgroundColor,
-                          thickness: 6.7,
+                          child: Text('Order will be delivered instantly, given below is the maximum time',
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                  color: Color(0xff616161),
+                                  letterSpacing: 0.67)),
                         ),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(10.0),
+              color: kCardBackgroundColor,
+              child: Text('1) Order will be delivered within 30-60 mins.\n2) Order from 2-3 different shops will be delivered in 1-2 hour.\n3) Restraunt orders will be delivered instantly.',
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .headline6!
+                      .copyWith(
+                      color: Color(0xff616161),
+                      letterSpacing: 0.67)),
+            ),
 
                         (cartListI.isNotEmpty)
                             ?
-                        timewidget(context, itemHeight, itemWidth)
+                        //timewidget(context, itemHeight, itemWidth)
+                        Container()
                             :
                         Container(),
 
@@ -1044,7 +1082,7 @@ class _oneViewCartState extends State<oneViewCart> {
                                       .caption,
                                 ),
                                 Text(
-                                  '$currency ${totalAmount}',
+                                  '$currency ${totalAmount.toStringAsFixed(2)}',
                                   style: Theme
                                       .of(context)
                                       .textTheme
@@ -1052,10 +1090,8 @@ class _oneViewCartState extends State<oneViewCart> {
                                 ),
                               ]),
                         ),
-                        Divider(
-                          color: kCardBackgroundColor,
-                          thickness: 1.0,
-                        ),
+
+                        (surge_charges>0)?
                         Container(
                           color: Colors.white,
                           padding: EdgeInsets.symmetric(
@@ -1065,22 +1101,115 @@ class _oneViewCartState extends State<oneViewCart> {
                               MainAxisAlignment.spaceBetween,
                               children: <Widget>[
                                 Text(
-                                  'Service Fee',
+                                  'Surge Charge',
                                   style: Theme
                                       .of(context)
                                       .textTheme
                                       .caption,
                                 ),
-                                (cartListI.length>0)?
                                 Text(
-                                  '$currency $storedeliveryCharge',
+                                  '$currency ${surge_charges.toStringAsFixed(2)}',
                                   style: Theme
                                       .of(context)
                                       .textTheme
                                       .caption,
-                                ):
+                                ),
+                              ]),
+                        ): Container(),
+                        (night_charges>0)?
+                        Container(
+                          color: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 20.0),
+                          child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
                                 Text(
-                                  '$currency $deliveryCharge',
+                                  'Night Charge',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                                Text(
+                                  '$currency ${night_charges.toStringAsFixed(2)}',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                              ]),
+                        ): Container(),
+                        (conv_charges>0)?
+                        Container(
+                          color: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 20.0),
+                          child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  'Convenience Charge',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                                Text(
+                                  '$currency ${conv_charges}',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                              ]),
+                        ): Container(),
+                        (couponAmount>0)?
+                        Container(
+                          color: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 20.0),
+                          child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  'Coupon Discount',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                                Text(
+                                  '- $currency ${couponAmount.toStringAsFixed(2)}',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                              ]),
+                        ): Container(),
+
+                        (storedeliveryCharge==0.0)?
+                        Container(): Container(
+                          color: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 20.0),
+                          child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  'Delivery Charges',
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .caption,
+                                ),
+                                Text(
+                                  '$currency ${storedeliveryCharge.toStringAsFixed(2)}',
                                   style: Theme
                                       .of(context)
                                       .textTheme
@@ -1088,12 +1217,8 @@ class _oneViewCartState extends State<oneViewCart> {
                                 )
                               ]),
                         ),
-                        Divider(
-                          color: kCardBackgroundColor,
-                          thickness: 1.0,
-                        ),
 
-                        (cartListII.isNotEmpty)?
+                        (cartListII.isNotEmpty && packcharge>0)?
                         Container(
                           color: Colors.white,
                           padding: EdgeInsets.symmetric(
@@ -1110,7 +1235,7 @@ class _oneViewCartState extends State<oneViewCart> {
                                       .caption,
                                 ),
                                 Text(
-                                  '$currency $packcharge',
+                                  '$currency ${packcharge.toStringAsFixed(2)}',
                                   style: Theme
                                       .of(context)
                                       .textTheme
@@ -1120,11 +1245,6 @@ class _oneViewCartState extends State<oneViewCart> {
                         )
                             :
                         Container(),
-
-                        Divider(
-                          color: kCardBackgroundColor,
-                          thickness: 1.0,
-                        ),
 
                         Container(
                           color: Colors.white,
@@ -1143,7 +1263,8 @@ class _oneViewCartState extends State<oneViewCart> {
                                       .copyWith(fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  '$currency ${totalAmount + deliveryCharge + storedeliveryCharge}',
+                                  '$currency '
+                                      '${((totalAmount - couponAmount) + deliveryCharge + storedeliveryCharge + packcharge + surge_charges + night_charges + conv_charges).toStringAsFixed(2)}',
                                   style: Theme
                                       .of(context)
                                       .textTheme
@@ -1220,6 +1341,7 @@ class _oneViewCartState extends State<oneViewCart> {
                                                                 setState(() {
                                                                   radioId = -1;
                                                                   selectedcoupon=null;
+                                                                  couponAmount = 0.0;
                                                                   // showDialogBox =
                                                                   // true;
                                                                   //appCoupon(couponL[t].coupon_code);
@@ -1339,7 +1461,20 @@ class _oneViewCartState extends State<oneViewCart> {
                                         .caption!
                                         .copyWith(
                                         fontSize: 11.7,
-                                        color: Color(0xffb7b7b7)))
+                                        color: Color(0xffb7b7b7))),
+
+                                Text(
+                                    '${Errormessage != ''
+                                        ? '${Errormessage}'
+                                        : '' }'
+                                    ,
+                                    style: Theme
+                                        .of(context)
+                                        .textTheme
+                                        .caption!
+                                        .copyWith(
+                                        fontSize: 11.7,
+                                        color: Colors.red))
                               ],
                             ),
                           ),
@@ -1411,12 +1546,25 @@ class _oneViewCartState extends State<oneViewCart> {
                                 );
                               }
                             },
-                            child: Text("Pay $currency "
-                                '${totalAmount + deliveryCharge + storedeliveryCharge + packcharge}')
-                        ),
+                            child: Text("Pay $currency "+
+                                '${((totalAmount - couponAmount) + deliveryCharge + storedeliveryCharge + packcharge + surge_charges + night_charges + conv_charges).toStringAsFixed(2)}',
+                            ),
+                        )
                       ],
                     ),
                   ),
+
+                  Container(
+                    margin: EdgeInsets.all(12),
+                    alignment: Alignment.bottomCenter,
+                    child:    Text(
+                      message.toString(),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12),
+                    )
+                    ,
+                  )
                 ],
               ),
               Positioned.fill(
@@ -1442,9 +1590,12 @@ class _oneViewCartState extends State<oneViewCart> {
                       ),
                     ),
                   )),
+
+
             ],
           )
-              : Container(
+              :
+          Container(
             width: MediaQuery
                 .of(context)
                 .size
@@ -1490,7 +1641,19 @@ class _oneViewCartState extends State<oneViewCart> {
                         color: kWhiteColor,
                         fontWeight: FontWeight.w400),
                   ),
+                ),
+                Container(
+                  margin: EdgeInsets.all(12),
+                  alignment: Alignment.bottomCenter,
+                  child:    Text(
+                    message.toString(),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12),
+                  )
+                  ,
                 )
+
               ],
             ),
           ),
@@ -1553,7 +1716,7 @@ class _oneViewCartState extends State<oneViewCart> {
               }
 
 
-              getVendorPayment(vendorId!, details,(totalAmount + deliveryCharge + packcharge + storedeliveryCharge));
+              getVendorPayment(vendorId!, details,((totalAmount - couponAmount) + deliveryCharge + storedeliveryCharge + packcharge + surge_charges + night_charges + conv_charges).toStringAsFixed(2));
             } else {
               // Toast.show(jsonData['message'], context,
               //     duration: Toast.LENGTH_SHORT);
@@ -1700,7 +1863,7 @@ class _oneViewCartState extends State<oneViewCart> {
                 }
 
 
-                getVendorPayment2(vendorId!, details, orderArray.toString(),(totalAmount + deliveryCharge + storedeliveryCharge + packcharge));
+                getVendorPayment2(vendorId!, details, orderArray.toString(),((totalAmount - couponAmount) + deliveryCharge + storedeliveryCharge + packcharge + surge_charges + night_charges + conv_charges).toStringAsFixed(2));
 
                 pref.remove("instructions");
                 setState(() {
@@ -1869,6 +2032,7 @@ class _oneViewCartState extends State<oneViewCart> {
 
     getCatC();
 
+    getCouponList();
 
   }
 
@@ -2261,33 +2425,53 @@ class _oneViewCartState extends State<oneViewCart> {
   }
 
   void getCouponList() async {
+    getCartItem();
+
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? vendorId = preferences.getString('vendor_id');
+    String? vendorId ="";
+    if(cartListI.isNotEmpty) {
+      vendorId = '54';
+    }
+    else {
+      vendorId = preferences.getString('vendor_id');
+    }
+    List<OrderArrayGrocery> orderArray = [];
+    for (CartItem item in cartListI) {
+      orderArray.add(OrderArrayGrocery(int.parse('${item.add_qnty}'),
+          int.parse('${item.varient_id}'),int.parse('${item.addedBasket}')));
+    }
+
+
     setState(() {
       currency = preferences.getString('curency')!;
     });
-    var url = couponList;
-    Uri myUri = Uri.parse(url);
-    http.post(myUri, body: {
-      'cart_value': '$totalAmount',
-    }).then((value) {
-      if (value.statusCode == 200) {
-        var jsonData = jsonDecode(value.body);
-        if (jsonData['status'] == "1") {
-          var tagObjsJson = jsonDecode(value.body)['data'] as List;
-          List<CouponList> tagObjs = tagObjsJson
-              .map((tagJson) => CouponList.fromJson(tagJson))
-              .toList();
-          setState(() {
-            couponL.clear();
-            couponL = tagObjs;
-          });
+      var url = couponList;
+      Uri myUri = Uri.parse(url);
+      http.post(myUri, body: {
+        'cart_value': '$totalAmount',
+        'vendor_id': '$vendorId',
+        'order_array': orderArray.toString(),
+      }).then((value) {
+        print("COUPON "+value.body);
+
+        if (value.statusCode == 200) {
+          var jsonData = jsonDecode(value.body);
+          if (jsonData['status'] == "1") {
+            var tagObjsJson = jsonDecode(value.body)['data'] as List;
+            List<CouponList> tagObjs = tagObjsJson
+                .map((tagJson) => CouponList.fromJson(tagJson))
+                .toList();
+            setState(() {
+              couponL.clear();
+              couponL = tagObjs;
+            });
+          }
         }
-      }
-    }).catchError((e) {
-      print(e);
-    });
-  }
+      }).catchError((e) {
+        print(e);
+      });
+    }
+
   void appCoupon(couponCode,cart_id) {
     var url = applyCoupon;
     Uri myUri = Uri.parse(url);
@@ -2327,6 +2511,7 @@ class _oneViewCartState extends State<oneViewCart> {
 
   Future<void> ordercharg() async {
     getCartItem();
+    getResCartItem();
 
     var url = ordercharges;
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -2338,16 +2523,28 @@ class _oneViewCartState extends State<oneViewCart> {
           int.parse('${item.varient_id}'),int.parse('${item.addedBasket}')));
     }
 
-    print("order_array"+orderArray.toString());
-    print("order_array"+userId.toString());
+    List<OrderArray> restorderArray = [];
+    List<OrderAdonArray> orderAddonArray = [];
+    for (RestaurantCartItem item in cartListII) {
+      restorderArray.add(OrderArray(
+          int.parse('${item.add_qnty}'), int.parse('${item.varient_id}')));
+      if (item.addon.length > 0) {
+        for (AddonCartItem addItem in item.addon) {
+          orderAddonArray
+              .add(OrderAdonArray(int.parse('${addItem.addonid}')));
+        }
+      }
+    }
 
 
     Uri myUri = Uri.parse(url);
     http.post(myUri, body: {
       'user_id': userId.toString(),
       'order_array': orderArray.toString(),
+      'rest_order_array': restorderArray.toString(),
 
     }).then((value) {
+      print("ORDERCHARGE  "+value.body);
       var jsonData = jsonDecode(value.body);
       if (jsonData['status'] == '1') {
         setState(() {
@@ -2356,11 +2553,39 @@ class _oneViewCartState extends State<oneViewCart> {
       }
       else{
         setState(() {
-          storedeliveryCharge = 0;
+          storedeliveryCharge = 0.0;
+          Errormessage = jsonData['meesage'];
         });
       }
     });
 
+  }
+  void servicecharge() async {
+    var url = servicecharges;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    int? userId = pref.getInt('user_id');
+
+    Uri myUri = Uri.parse(url);
+    http.post(myUri, body: {
+      'user_id': userId.toString(),
+    }).then((value) {
+      var jsonData = jsonDecode(value.body);
+      print("SERVICE "+value.body.toString());
+      if (jsonData['status'] == "1") {
+        setState(() {
+          surge_charges = jsonData['surge_charges'];
+          night_charges = jsonData['night_charges'];
+          conv_charges = jsonData['conv_charges'];
+        });
+      }
+      else{
+        setState(() {
+          surge_charges = 0;
+          night_charges = 0;
+          conv_charges = 0;
+        });
+      }
+    });
   }
 
 }

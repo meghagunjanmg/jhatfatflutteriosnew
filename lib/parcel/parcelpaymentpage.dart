@@ -294,10 +294,6 @@ class PaymentParcelPageState extends State<PaymentParcelPage> {
       setState(() {
         showDialogBox = false;
       });
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return OrderPlaced(
-            payment_method, payment_status, order_id, rem_price, currency, "4");
-      }));
     });
   }
 

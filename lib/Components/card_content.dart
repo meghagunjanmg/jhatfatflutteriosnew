@@ -4,6 +4,7 @@ import 'package:jhatfat/Themes/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../HomeOrderAccount/Home/UI/Stores/stores.dart';
+import '../HomeOrderAccount/home_order_account.dart';
 import '../pharmacy/pharmastore.dart';
 import '../restaturantui/ui/resturanthome.dart';
 
@@ -110,16 +111,16 @@ class CardContent extends StatelessWidget {
           MaterialPageRoute(
               builder: (context) =>
                   StoresPharmaPage('${category_name}', vendor_category_id)));
-    } else if (ui_type == "parcal" || ui_type == "Parcal" || ui_type == "4") {
-      prefs.setString("vendor_cat_id", '${vendor_category_id}');
-      prefs.setString("ui_type", '${ui_type}');
-
-      // Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //         builder: (context) => ParcalStoresPage('${vendor_category_id}')));
-
-    }
+    }    else if (ui_type == "parcal" ||
+          ui_type == "Parcal" ||
+          ui_type == "4") {
+        prefs.setString("vendor_cat_id", '${vendor_category_id}');
+        prefs.setString("ui_type", '${ui_type}');
+        Navigator.pushAndRemoveUntil(context,
+            MaterialPageRoute(builder: (context) {
+              return HomeOrderAccount(2);
+            }), (Route<dynamic> route) => true);
+      }
   }
 
 }

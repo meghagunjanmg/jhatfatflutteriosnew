@@ -76,6 +76,7 @@ class EditAddresspageState extends State<EditAddresspage> {
   var isVisible = false;
 
   var currentAddress = '';
+  var message = '';
 
   EditAddresspageState(lat,lng, pincode, houseno, address, state, type) {
     pincodeController.text = '${pincode}';
@@ -90,10 +91,19 @@ class EditAddresspageState extends State<EditAddresspage> {
     this.lat = double.parse(lat);
     this.lng = double.parse(lng);
   }
+  Future<void> getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+
+      message = prefs.getString("message")!;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    getData();
+
     getCityList();
   }
 
@@ -445,6 +455,17 @@ class EditAddresspageState extends State<EditAddresspage> {
                   ),
                 ),
               ),
+              Container(
+                margin: EdgeInsets.all(12),
+                alignment: Alignment.bottomCenter,
+                child:    Text(
+                  message.toString(),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12),
+                )
+                ,
+              )
 
             ],
           ),

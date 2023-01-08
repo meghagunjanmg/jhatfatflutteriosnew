@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'package:jhatfat/Routes/routes.dart';
 import 'package:jhatfat/Themes/colors.dart';
@@ -30,9 +31,11 @@ class _RestaurantState extends State<Restaurant_Sub> {
   bool isCartCount = false;
 
   var cartCount = 0;
+  String message='';
 
   @override
   void initState() {
+    getdata();
     getCartCount();
     super.initState();
   }
@@ -84,6 +87,7 @@ class _RestaurantState extends State<Restaurant_Sub> {
 
 
   void getCartCount() {
+
     DatabaseHelper db = DatabaseHelper.instance;
     db.queryRowCountRest().then((value) {
       setState(() {
@@ -320,25 +324,48 @@ class _RestaurantState extends State<Restaurant_Sub> {
                 ),
               ];
             },
-            body: Container(
+            body:
+            Container(
               height: height,
               width: width,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
-                color: kMainColor,
-              ),
-              child: TabBarView(
-                children: [
-                  ProductTabData(widget.item,widget.currencySymbol,(){
-                    getCartCount();
-                  }),
-                  // ReviewTabData(widget.item),
-                  RestaurantInformation(widget.item),
-                ],
-              ),
-            ),
-          ),
+              child:  Column(
+                  children: [
+    Container(
+    height: height - 100 ,
+    width: width,
+    decoration: BoxDecoration(
+    borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
+    color: kMainColor,
+    ),
+    child: TabBarView(
+    children: [
+    ProductTabData(widget.item,widget.currencySymbol,(){
+    getCartCount();
+    }),
+    // ReviewTabData(widget.item),
+    RestaurantInformation(widget.item),
+    ],
+    ),
+    ),
+    Container(
+    margin: EdgeInsets.all(12),
+    alignment: Alignment.bottomCenter,
+    child:    Text(
+    message.toString(),
+    textAlign: TextAlign.center,
+    overflow: TextOverflow.ellipsis,
+    style: TextStyle(fontSize: 12),
+    )
+    ,
+    )
+
+                  ],
+                )
+
+          )
+          )
         ),
+
       ),
     );
   }
@@ -484,5 +511,12 @@ class _RestaurantState extends State<Restaurant_Sub> {
         return alert;
       },
     );
+  }
+
+  Future<void> getdata() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState((){
+      message = pref.getString("message")!;
+    });
   }
 }

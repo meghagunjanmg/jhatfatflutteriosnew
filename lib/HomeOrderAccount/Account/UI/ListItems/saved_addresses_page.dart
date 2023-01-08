@@ -59,13 +59,23 @@ class _SavedAddressesState extends State<SavedAddresses> {
   bool isFetchAdd = false;
   bool adminSelection = false;
   dynamic currency = '';
+  String message = "";
 
   List<ShowAddressNew> addressDelivery = [];
   final GlobalKey _textKey = GlobalKey();
   //AddressBloc _addressBloc;
+  Future<void> getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+
+      message = prefs.getString("message")!;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    getData();
 //    _addressBloc = BlocProvider.of<AddressBloc>(context);
 //    _addressBloc.add(FetchAddressesEvent());
     if (widget.vendorId != null &&
@@ -658,7 +668,21 @@ class _SavedAddressesState extends State<SavedAddresses> {
 
               ),
             ),
-          )
+          ),
+
+
+
+                Container(
+                  margin: EdgeInsets.all(12),
+                  alignment: Alignment.bottomCenter,
+                  child:    Text(
+                    message.toString(),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12),
+                  )
+                  ,
+                )
 ])
       );
   }

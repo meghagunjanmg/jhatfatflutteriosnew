@@ -27,7 +27,15 @@ class OfferScreenState extends State<OfferScreen> {
   void initState() {
     setNotificationListner();
     super.initState();
+    getData();
     getNotificationList();
+  }
+  String message = '';
+  void getData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      message = pref.getString("message")!;
+    });
   }
 
   void setNotificationListner() async {
@@ -159,18 +167,49 @@ class OfferScreenState extends State<OfferScreen> {
                         );
                       },
                       itemCount: notificationList.length)
+
+,
+
+
+                  Container(
+                    margin: EdgeInsets.all(12),
+                    alignment: Alignment.bottomCenter,
+                    child:    Text(
+                      message.toString(),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12),
+                    )
+                    ,
+                  )
+
+
                 ],
               ),
             )
-          : Center(
-              child: Text(
+          : Column(
+              children:[
+                Text(
                 'No offer available....',
                 style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.w400,
                     color: kMainTextColor),
               ),
-            ),
+          Container(
+            margin: EdgeInsets.all(12),
+            alignment: Alignment.bottomCenter,
+            child:    Text(
+              message.toString(),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12),
+            )
+            ,
+          )
+        ]
+
+      ),
     );
   }
 }

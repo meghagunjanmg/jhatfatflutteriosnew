@@ -100,6 +100,7 @@ class AddressTile2 extends StatelessWidget {
   String drop = '';
   String droplat = '';
   String droplng = '';
+  String message = '';
   final parcelcontroler = TextEditingController();
   final instructioncontroler = TextEditingController();
   final recievernamecontroler = TextEditingController();
@@ -122,6 +123,8 @@ class AddressTile2 extends StatelessWidget {
 
 
     setState(() {
+      message = prefs.getString("message")!;
+
       if(pickupaddress==null){
         pickup = "";
         pickuplat = "";
@@ -387,7 +390,17 @@ class AddressTile2 extends StatelessWidget {
               ),
             ),
           ),
-
+        Container(
+          margin: EdgeInsets.all(12),
+          alignment: Alignment.bottomCenter,
+          child:    Text(
+            message.toString(),
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 12),
+          )
+          ,
+        )
       ],
 
     ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:jhatfat/Themes/colors.dart';
 import 'package:jhatfat/baseurlp/baseurl.dart';
 import 'package:jhatfat/bean/orderbean.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SingleOrderPage extends StatefulWidget {
   final OngoingOrders ongoingOrders;
@@ -18,7 +19,16 @@ class SingleOrderPage extends StatefulWidget {
 class SingleOrderPageState extends State<SingleOrderPage> {
   final OngoingOrders ongoingOrders;
 
+
   SingleOrderPageState(this.ongoingOrders);
+
+  String message = '';
+  void getData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      message = pref.getString("message")!;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -299,6 +309,7 @@ class SingleOrderPageState extends State<SingleOrderPage> {
               SizedBox(
                 height: 10,
               ),
+
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Row(
@@ -371,6 +382,23 @@ class SingleOrderPageState extends State<SingleOrderPage> {
               SizedBox(
                 height: 15,
               ),
+
+
+
+              Container(
+                margin: EdgeInsets.all(12),
+                alignment: Alignment.bottomCenter,
+                child:    Text(
+                  message.toString(),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12),
+                )
+                ,
+              )
+
+
+
             ],
           ),
         ),

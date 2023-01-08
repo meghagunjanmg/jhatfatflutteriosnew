@@ -94,6 +94,7 @@ class StoresRestaurant{
   dynamic about;
   dynamic packaging_charges;
   dynamic inrange;
+  dynamic duration;
 
   StoresRestaurant(
       this.vendor_id,
@@ -125,18 +126,19 @@ class StoresRestaurant{
   this.about,
       this.packaging_charges,
       this.inrange,
+      this.duration,
       );
 
   factory StoresRestaurant.fromJson(dynamic json){
     return StoresRestaurant(json['vendor_id'], json['vendor_name'], json['owner'], json['cityadmin_id'], json['vendor_email'], json['vendor_phone'], json['vendor_logo'], json['vendor_loc'], json['lat'], json['lng'], json['opening_time'], json['closing_time'],
         json['vendor_pass'], json['created_at'], json['updated_at'], json['vendor_category_id'], json['comission'],
         json['delivery_range'], json['device_id'], json['otp'], json['phone_verified'], json['ui_type'], json['product_id'],
-        json['subcat_id'], json['distance'],json['online_status'], json['about'],json['packaging_charges'],json['inrange']);
+        json['subcat_id'], json['distance'],json['online_status'], json['about'],json['packaging_charges'],json['inrange'],json['duration']);
   }
 
   @override
   String toString() {
-    return '{vendor_id: $vendor_id, vendor_name: $vendor_name, owner: $owner, cityadmin_id: $cityadmin_id, vendor_email: $vendor_email, vendor_phone: $vendor_phone, vendor_logo: $vendor_logo, vendor_loc: $vendor_loc, lat: $lat, lng: $lng, opening_time: $opening_time, closing_time: $closing_time, vendor_pass: $vendor_pass, created_at: $created_at, updated_at: $updated_at, vendor_category_id: $vendor_category_id, comission: $comission, delivery_range: $delivery_range, device_id: $device_id, otp: $otp, phone_verified: $phone_verified, ui_type: $ui_type, product_id: $product_id, subcat_id: $subcat_id, distance: $distance, online_status: $online_status, about: $about,packaging_charges:$packaging_charges,inrange:$inrange}';
+    return '{vendor_id: $vendor_id, vendor_name: $vendor_name, owner: $owner, cityadmin_id: $cityadmin_id, vendor_email: $vendor_email, vendor_phone: $vendor_phone, vendor_logo: $vendor_logo, vendor_loc: $vendor_loc, lat: $lat, lng: $lng, opening_time: $opening_time, closing_time: $closing_time, vendor_pass: $vendor_pass, created_at: $created_at, updated_at: $updated_at, vendor_category_id: $vendor_category_id, comission: $comission, delivery_range: $delivery_range, device_id: $device_id, otp: $otp, phone_verified: $phone_verified, ui_type: $ui_type, product_id: $product_id, subcat_id: $subcat_id, distance: $distance, online_status: $online_status, about: $about,packaging_charges:$packaging_charges,inrange:$inrange , duration : $duration}';
   }
 }
 

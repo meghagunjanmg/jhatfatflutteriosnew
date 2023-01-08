@@ -29,6 +29,7 @@ class SingleProductPage extends StatefulWidget {
 class SingleProductState extends State<SingleProductPage> {
   var currentIndex = 0;
 
+  String message = '';
   bool isCartCount = false;
 
   var cartCount = 0;
@@ -71,6 +72,7 @@ class SingleProductState extends State<SingleProductPage> {
   @override
   void initState() {
     super.initState();
+    getData();
     getCartCount();
     getCartItem2();
   }
@@ -624,9 +626,22 @@ class SingleProductState extends State<SingleProductPage> {
                               );
                             })
                         : Container(),
+
                   ],
                 ),
               )),
+
+          Container(
+            margin: EdgeInsets.all(12),
+            alignment: Alignment.bottomCenter,
+            child:    Text(
+               message.toString(),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12),
+            )
+            ,
+          )
         ],
       ),
     );
@@ -698,6 +713,15 @@ class SingleProductState extends State<SingleProductPage> {
       }
     }).catchError((e) {
       print(e);
+    });
+  }
+
+
+  Future<void> getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+
+      message = prefs.getString("message")!;
     });
   }
 }

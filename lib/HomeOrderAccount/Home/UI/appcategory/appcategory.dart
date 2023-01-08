@@ -48,6 +48,7 @@ class AppCategoryState extends State<AppCategory> {
   bool isCartCount = false;
   bool isFetch = false;
   int cartCount = 0;
+  String message = "";
 
   bool isNoCategoryTrue = false;
 
@@ -71,6 +72,7 @@ class AppCategoryState extends State<AppCategory> {
   @override
   void initState() {
     super.initState();
+    getData();
     hitBannerUrl();
     Timer(Duration(seconds: 1), () {
       hitServices();
@@ -563,6 +565,20 @@ class AppCategoryState extends State<AppCategory> {
                                   fontSize: 18),
                             ),
                           ),
+
+
+                Container(
+                  margin: EdgeInsets.all(12),
+                  alignment: Alignment.bottomCenter,
+                  child:    Text(
+                    message.toString(),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12),
+                  )
+                  ,
+                )
+
               ],
             ),
           ),
@@ -619,6 +635,14 @@ class AppCategoryState extends State<AppCategory> {
                     ItemsPage(pageTitle,vendor_id, category_name, category_id, distance)))
         .then((value) {
       getCartCount();
+    });
+  }
+
+  Future<void> getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+
+      message = prefs.getString("message")!;
     });
   }
 }

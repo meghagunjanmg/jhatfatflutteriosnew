@@ -29,8 +29,17 @@ class RefferScreenState extends State<RefferScreen> {
   void initState() {
     super.initState();
     getRefferText();
+    getData();
   }
 
+  String message = '';
+  void getData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState((){
+      message = pref.getString("message")!;
+    });
+
+  }
   void getRefferText() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -225,7 +234,7 @@ class RefferScreenState extends State<RefferScreen> {
                       child: Container(
                         alignment: Alignment.center,
                         height: 52,
-                        margin: EdgeInsets.symmetric(horizontal: 20),
+                        margin: EdgeInsets.symmetric(horizontal: 20,vertical: 20),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                             color: kMainColor),
@@ -237,7 +246,19 @@ class RefferScreenState extends State<RefferScreen> {
                               color: kWhiteColor),
                         ),
                       ),
-                    ))
+                    )),
+
+                Container(
+                  margin: EdgeInsets.all(12),
+                  alignment: Alignment.bottomCenter,
+                  child:    Text(
+                    message.toString(),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12),
+                  )
+                  ,
+                )
               ],
             )
           : Container(
@@ -258,7 +279,7 @@ class RefferScreenState extends State<RefferScreen> {
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: kMainTextColor),
-                  )
+                  ),
                 ],
               ),
             ),

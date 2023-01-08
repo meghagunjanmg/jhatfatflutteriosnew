@@ -79,6 +79,7 @@ class PaymentPageState extends State<PaymentPage> {
 
   double coupAmount = 0.0;
 
+  bool wallet=false;
 
   List<CouponList> couponL = [];
 
@@ -120,7 +121,7 @@ class PaymentPageState extends State<PaymentPage> {
             } else {
               iswallet = false;
             }
-            totalAmount = totalAmount - walletAmount;
+            totalAmount = totalAmount;
             walletUsedAmount = walletAmount;
           } else if (totalAmount < walletAmount) {
             if (walletAmount > 0.0) {
@@ -232,7 +233,7 @@ class PaymentPageState extends State<PaymentPage> {
                 height: 5.0,
               ),
               Text(
-                'Amount to Pay $currency $totalAmount',
+                'Amount to Pay $currency $newtotalAmount',
                 style: Theme.of(context)
                     .textTheme
                     .headline6!
@@ -284,39 +285,58 @@ class PaymentPageState extends State<PaymentPage> {
                                 vertical: 10.0, horizontal: 20.0),
                             child: Column(
                               children: [
-                                Visibility(
-                                  visible: iswallet, //iswallet
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Image.asset(
-                                            'images/payment/wallet.png',
-                                            height: 20.3,
-                                          ),
-                                          SizedBox(
-                                            width: 25,
-                                          ),
-                                          Text(
-                                            'Wallet Amount',
-                                            style: TextStyle(fontSize: 14),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        '${currency} ${walletAmount}',
-                                        style: TextStyle(fontSize: 15),
-                                      ),
-                                    ],
-                                  ),
+                                Row(
+                                children:[
+                                  Checkbox(
+                                      value: wallet,
+                                      onChanged: (val) {
+                                        if (val==true) {
+                                          setState(() {
+                                            wallet = true;
+                                            newtotalAmount = newtotalAmount - walletAmount;
+                                          });
+                                        } else {
+                                          setState(() {
+                                            wallet = false;
+                                            newtotalAmount = newtotalAmount + walletAmount;
+                                          });
+                                        }
+                                      }),
+
+                                  Text('Use Wallet (Wallet Amount: ${walletAmount})'),
+                                ]
                                 ),
                                 SizedBox(
                                   height: 5,
                                 ),
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Image.asset(
+                                          'images/payment/amount.png',
+                                          height: 20.3,
+                                        ),
+                                        SizedBox(
+                                          width: 25,
+                                        ),
+                                        Text(
+                                          'Order Amount',
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      '${currency} ${totalAmount}',
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                  ],
+                                ),
+
                                 Visibility(
-                                  visible: iswallet, //iswallet
+                                  visible: wallet, //iswallet
                                   child: Row(
                                     mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -374,6 +394,7 @@ class PaymentPageState extends State<PaymentPage> {
                                     ],
                                   ),
                                 ),
+
                                 SizedBox(
                                   height: 5,
                                 ),
@@ -391,7 +412,7 @@ class PaymentPageState extends State<PaymentPage> {
                                           width: 25,
                                         ),
                                         Text(
-                                          'Order Amount',
+                                          'Amount to be paid ',
                                           style: TextStyle(fontSize: 15),
                                         ),
                                       ],
@@ -483,7 +504,7 @@ class PaymentPageState extends State<PaymentPage> {
                                           "Razor Pay") {
                                         openCheckout(
                                             "${paymentVia[index].payment_key}",
-                                            totalAmount * 100);
+                                            newtotalAmount * 100);
                                       } else if (paymentVia[index]
                                           .payment_mode ==
                                           "Paystack") {
@@ -742,10 +763,6 @@ class PaymentPageState extends State<PaymentPage> {
       setState(() {
         showDialogBox = false;
       });
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return OrderPlaced(
-            payment_method, payment_status, order_id, rem_price, currency, "1");
-      }));
     });
   }
 
@@ -933,7 +950,7 @@ class PaymentPageState extends State<PaymentPage> {
           _inProgress = false;
           showDialogBox = true;
         });
-        placedOrder("success", "RazorPay");
+        ///placedOrder("success", "RazorPay");
       }
     });
   }
@@ -968,5 +985,7 @@ class PaymentPageState extends State<PaymentPage> {
     });
   }
 
-  void _handleExternalWallet(ExternalWalletResponse response) {}
+  void _handleExternalWallet(ExternalWalletResponse response) {
+
+  }
 }

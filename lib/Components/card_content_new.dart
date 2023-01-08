@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:jhatfat/parcel/ParcelLocation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jhatfat/HomeOrderAccount/Home/UI/Stores/stores.dart';
 import 'package:jhatfat/HomeOrderAccount/Home/UI/appcategory/appcategory.dart';
@@ -16,6 +17,7 @@ import 'package:jhatfat/pharmacy/pharmastore.dart';
 import 'package:jhatfat/restaturantui/pages/restaurant.dart';
 import 'package:jhatfat/restaturantui/ui/resturanthome.dart';
 
+import '../HomeOrderAccount/home_order_account.dart';
 import '../bean/venderbean.dart';
 
 
@@ -85,6 +87,17 @@ class CardContentNew extends StatelessWidget {
             MaterialPageRoute(
                 builder: (context) =>
                     StoresPharmaPage('${category_name}', vendor_category_id)));
+      }
+      else if (ui_type == "parcal" ||
+          ui_type == "Parcal" ||
+          ui_type == "4") {
+        print("clicked");
+        prefs.setString("vendor_cat_id", '${vendor_category_id}');
+        prefs.setString("ui_type", '${ui_type}');
+        Navigator.pushAndRemoveUntil(context,
+            MaterialPageRoute(builder: (context) {
+              return HomeOrderAccount(2);
+            }), (Route<dynamic> route) => true);
       }
 
       // else if (ui_type == "parcal" || ui_type == "Parcal" || ui_type == "4") {

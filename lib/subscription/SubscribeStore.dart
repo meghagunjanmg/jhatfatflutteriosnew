@@ -35,6 +35,7 @@ class _SubscribeStore extends State<SubscribeStore> {
   List<NearStores> nearStoresSearch = [];
   double userLat = 0.0;
   double userLng = 0.0;
+  String message='';
 
   @override
   initState() {
@@ -49,9 +50,14 @@ class _SubscribeStore extends State<SubscribeStore> {
     });
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var url = subsstore;
+    Map<String, String> queryParams = {
+      'lat':  prefs.getString('lat').toString(),
+      'lng':  prefs.getString('lng').toString()
+    };
     Uri myUri = Uri.parse(url);
+    final finalUri = myUri.replace(queryParameters: queryParams); //USE THIS
 
-    http.get(myUri).then((value) {
+    http.get(finalUri).then((value) {
       print('${value.statusCode} ${value.body}');
       if (value.statusCode == 200) {
         print('Response Body: - ${value.body}');
@@ -68,7 +74,8 @@ class _SubscribeStore extends State<SubscribeStore> {
             nearStores = tagObjs;
             nearStoresSearch = List.from(nearStores);
           });
-        } else {
+        }
+        else {
           setState(() {
             isFetchStore = false;
           });
@@ -142,15 +149,18 @@ class _SubscribeStore extends State<SubscribeStore> {
                   .width * 0.85, 52)),
         ),
       ),
-      body: Container(
+      body:
+      Column(
+        children: [
+      Container(
         height: MediaQuery
             .of(context)
             .size
-            .height - 110,
+            .height - 200
+        ,
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child:
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -286,8 +296,7 @@ class _SubscribeStore extends State<SubscribeStore> {
                                                 size: 15,
                                               ),
                                               SizedBox(width: 10.0),
-                                              Text('${calculateTime(double.parse('${nearStores[index].lat}'), double.parse('${nearStores[index].lng}'), userLat, userLng)}',
-                                                  style: Theme.of(context)
+                                              Text('${nearStores[index].duration}',                                                  style: Theme.of(context)
                                                       .textTheme
                                                       .caption!
                                                       .copyWith(
@@ -312,7 +321,7 @@ class _SubscribeStore extends State<SubscribeStore> {
                                                   : false,
                                               child: Container(
                                                 margin: EdgeInsets.all(8),
-                                                height: 20,
+                                                height: 80,
                                                 width: MediaQuery.of(context)
                                                     .size
                                                     .width -
@@ -320,7 +329,7 @@ class _SubscribeStore extends State<SubscribeStore> {
                                                 alignment: Alignment.center,
                                                 color: kCardBackgroundColor,
                                                 child: Text(
-                                                  'Store Closed Now',
+                                                  'Store Closed Now\nStore open at ${nearStores[index].opening_time.toString()}',
                                                   style: TextStyle(
                                                       color: red_color,
                                                       fontSize: 15),
@@ -337,7 +346,7 @@ class _SubscribeStore extends State<SubscribeStore> {
                                                   : false,
                                               child: Container(
                                                 margin: EdgeInsets.all(8),
-                                                height: 20,
+                                                height: 80,
                                                 width: MediaQuery.of(context)
                                                     .size
                                                     .width -
@@ -401,11 +410,19 @@ class _SubscribeStore extends State<SubscribeStore> {
                     )
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),
       ),
+    Text(
+    message.toString(),
+    textAlign: TextAlign.center,
+    overflow: TextOverflow.ellipsis,
+    style: TextStyle(fontSize: 12),
+    )
+    ]
+      )
     );
   }
   getShareValue() async{
@@ -413,6 +430,7 @@ class _SubscribeStore extends State<SubscribeStore> {
     setState(() {
       userLat = double.parse('${prefs.getString('lat')}');
       userLng = double.parse('${prefs.getString('lng')}');
+      message= prefs.getString("message")!;
     });
   }
 

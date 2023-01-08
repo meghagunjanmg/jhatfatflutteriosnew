@@ -61,10 +61,12 @@ class AddAddressState extends State<AddAddressPage> {
   var isVisible = false;
 
   var currentAddress = '';
+  var message = '';
 
   @override
   void initState() {
     super.initState();
+    getData();
     getCityList();
     _getLocation(context);
   }
@@ -531,6 +533,17 @@ class AddAddressState extends State<AddAddressPage> {
                 ),
               ),
             ),
+            Container(
+              margin: EdgeInsets.all(12),
+              alignment: Alignment.bottomCenter,
+              child:    Text(
+                message.toString(),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12),
+              )
+              ,
+            )
 
           ],
         ),
@@ -615,6 +628,13 @@ class AddAddressState extends State<AddAddressPage> {
         showDialogBox = false;
       });
       print(e);
+    });
+  }
+  Future<void> getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+
+      message = prefs.getString("message")!;
     });
   }
 

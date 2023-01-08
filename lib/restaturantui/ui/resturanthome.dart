@@ -75,6 +75,7 @@ class RestaurantState extends State<Restaurant> {
   bool isFetch = false;
 
   String nodata='';
+  String message='';
 
   @override
   void initState() {
@@ -89,6 +90,7 @@ class RestaurantState extends State<Restaurant> {
   void getData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState((){
+      message = pref.getString("message")!;
       cityName = pref.getString("addr")!;
       lat = double.parse(pref.getString("lat")!);
       lng = double.parse(pref.getString("lng")!);
@@ -943,8 +945,7 @@ class RestaurantState extends State<Restaurant> {
                                                                   size: 15,
                                                                 ),
                                                                 SizedBox(width: 10.0),
-                                                                Text('${calculateTime(double.parse('${nearStores[index].lat}'), double.parse('${nearStores[index].lng}'), lat, lng)}',
-                                                                    style: Theme.of(context)
+                                                                Text('${nearStores[index].duration}',                                                                    style: Theme.of(context)
                                                                         .textTheme
                                                                         .caption!
                                                                         .copyWith(
@@ -970,15 +971,16 @@ class RestaurantState extends State<Restaurant> {
                                                                     : false,
                                                                 child: Container(
                                                                   margin: EdgeInsets.all(8),
-                                                                  height: 20,
+                                                                  height: 80,
                                                                   width: MediaQuery.of(context)
                                                                       .size
                                                                       .width -
                                                                       10,
-                                                                  alignment: Alignment.center,
+                                                                  padding: EdgeInsets.all(8),
+                                                                  alignment: Alignment.centerLeft,
                                                                   color: kCardBackgroundColor,
                                                                   child: Text(
-                                                                    'Store Closed Now',
+                                                                    'Store Closed Now\nStore open at ${nearStores[index].opening_time.toString()}',
                                                                     style: TextStyle(
                                                                         color: red_color,
                                                                         fontSize: 15),
@@ -995,12 +997,13 @@ class RestaurantState extends State<Restaurant> {
                                                                     : false,
                                                                 child: Container(
                                                                   margin: EdgeInsets.all(8),
-                                                                  height: 20,
+                                                                  height: 80,
                                                                   width: MediaQuery.of(context)
                                                                       .size
                                                                       .width -
                                                                       10,
-                                                                  alignment: Alignment.center,
+                                                                  padding: EdgeInsets.all(8),
+                                                                  alignment: Alignment.centerLeft,
                                                                   color: kCardBackgroundColor,
                                                                   child: Text(
                                                                     'Store Out of Delivery Range',
@@ -1058,6 +1061,17 @@ class RestaurantState extends State<Restaurant> {
                                         )
                                       ],
                                     ),
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.all(12),
+                                    alignment: Alignment.bottomCenter,
+                                    child:    Text(
+                                      message.toString(),
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(fontSize: 12),
+                                    )
+                                    ,
                                   )
                                 ],
 

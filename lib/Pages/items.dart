@@ -101,6 +101,7 @@ class _ItemsPageState extends State<ItemsPage>
 
   bool isFetchList = false;
   bool isSearchOpen = false;
+  String message = "";
 
   _ItemsPageState(this.pageTitle, this.vendor_id, this.category_name,
       this.category_id);
@@ -1079,8 +1080,8 @@ class _ItemsPageState extends State<ItemsPage>
                       )
                   )
               )
-              )
-          ]
+              ),
+            ]
         ),
       ),
 
@@ -1299,7 +1300,13 @@ class _ItemsPageState extends State<ItemsPage>
       //     duration: Toast.LENGTH_SHORT);
     }
   }
+  Future<void> getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
 
+      message = prefs.getString("message")!;
+    });
+  }
   void setList(List<ProductWithVarient> tagObjs) {
     for (int i = 0; i < tagObjs.length; i++) {
       if (tagObjs[i].data.length > 0) {

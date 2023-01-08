@@ -31,6 +31,7 @@ class WalletState extends State<Wallet> {
   @override
   void initState() {
     super.initState();
+    getData();
     getWalletAmount();
     getWalletHistory();
   }
@@ -98,6 +99,13 @@ class WalletState extends State<Wallet> {
     });
   }
 
+  String message = '';
+  void getData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      message = pref.getString("message")!;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -251,6 +259,18 @@ class WalletState extends State<Wallet> {
                         );
                       },
                       itemCount: history.length),
+
+                  Container(
+                    margin: EdgeInsets.all(12),
+                    alignment: Alignment.bottomCenter,
+                    child:    Text(
+                      message.toString(),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12),
+                    )
+                    ,
+                  )
                 ],
               ),
             )
@@ -272,6 +292,17 @@ class WalletState extends State<Wallet> {
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: kMainTextColor),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(12),
+                    alignment: Alignment.bottomCenter,
+                    child:    Text(
+                      message.toString(),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12),
+                    )
+                    ,
                   )
                 ],
               ),

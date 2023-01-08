@@ -6,6 +6,7 @@ var checksubs = baseUrl + "checksubs";
 var subsstore = baseUrl + "subsstore";
 var deleteaccount = baseUrl + "deleteaccount";
 var ordercharges = baseUrl + "ordercharges";
+var servicecharges = baseUrl + "servicecharges";
 
 var top_msg_banner = baseUrl + "top_message_banner";
 var closed_banner = baseUrl + "closed_banner";

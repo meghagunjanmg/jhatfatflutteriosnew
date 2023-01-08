@@ -30,6 +30,7 @@ class OrderPageState extends State<OrderPage> {
   List<TodayOrderParcel> onParcelGoingOrders = [];
 
   List<String> VendorName=[];
+  String message = "";
 
   var userId;
   String elseText = 'No ongoing order ...';
@@ -48,7 +49,15 @@ class OrderPageState extends State<OrderPage> {
   @override
   void initState() {
     super.initState();
+    getData();
     getAllThreeData();
+  }
+  void getData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState((){
+      message = pref.getString("message")!;
+    });
+
   }
 
   getOnGointOrders() async {
@@ -1781,6 +1790,21 @@ class OrderPageState extends State<OrderPage> {
                 ),
               ),
             ),
+
+
+
+            Container(
+              margin: EdgeInsets.all(12),
+              alignment: Alignment.bottomCenter,
+              child:    Text(
+                message.toString(),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12),
+              )
+              ,
+            )
+
           ],
         ),
       ),

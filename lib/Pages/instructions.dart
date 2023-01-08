@@ -19,11 +19,13 @@ class _instructionsState extends State<instructions> {
   List<instructionbean> instructio = [];
   List<RestaurantCartItem> cartListII = [];
   String restins='';
+  String message = '';
 
 
   @override
   void initState() {
     super.initState();
+    getData();
     getResCartItem();
     getCartItem();
     clear();
@@ -62,52 +64,70 @@ class _instructionsState extends State<instructions> {
         ],
     ),
         body:
-            Container(
-                width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.all(8),
-              child:
-        (cartListI.length>0)?
-          ListView.builder(
-            itemCount: cartListI.length,
-            itemBuilder: (context, index) {
-              return Container(
-                width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.all(8),
-                    child: ListTile(
-                      title: Text('${cartListI[index].store_name}'),
-                      subtitle:TextField(
-                        onSubmitted: (newText) {
-                          addInstruction(cartListI[index].store_name,newText);
-                        },
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          hoverColor: kMainColor,
-                          labelText: 'Instruction',
-                          isDense: true, // Added this
-                          contentPadding: EdgeInsets.all(8),  // Added this
-                        ),
-                      ),
-                    ),
-              );
-            },
-          )
-        :
-        Container(
-              width: MediaQuery.of(context).size.width,
-              margin: EdgeInsets.all(8),
-        child:
-        TextField(
-          onSubmitted: (newText) {
-            addInstruction2(newText);
-          },
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            hoverColor: kMainColor,
-            labelText: 'Instruction',
-            isDense: true, // Added this
-            contentPadding: EdgeInsets.all(8),  // Added this
-          ),
-        )))
+            Column(
+              children: [
+                Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height - 200,
+                    margin: EdgeInsets.all(8),
+                    child:
+                    (cartListI.length>0)?
+                    ListView.builder(
+                      itemCount: cartListI.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          width: MediaQuery.of(context).size.width,
+                          margin: EdgeInsets.all(8),
+                          child: ListTile(
+                            title: Text('${cartListI[index].store_name}'),
+                            subtitle:TextField(
+                              onSubmitted: (newText) {
+                                addInstruction(cartListI[index].store_name,newText);
+                              },
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                hoverColor: kMainColor,
+                                labelText: 'Instruction',
+                                isDense: true, // Added this
+                                contentPadding: EdgeInsets.all(8),  // Added this
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                        :
+                    Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: EdgeInsets.all(8),
+                        child:
+                        TextField(
+                          onSubmitted: (newText) {
+                            addInstruction2(newText);
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            hoverColor: kMainColor,
+                            labelText: 'Instruction',
+                            isDense: true, // Added this
+                            contentPadding: EdgeInsets.all(8),  // Added this
+                          ),
+                        ))),
+
+                Container(
+                  margin: EdgeInsets.all(12),
+                  alignment: Alignment.bottomCenter,
+                  child:    Text(
+                    message.toString(),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12),
+                  )
+                  ,
+                )
+              ],
+            )
+
       );
   }
 
@@ -178,6 +198,13 @@ class _instructionsState extends State<instructions> {
     pref.remove("instructions");
     pref.remove("r_instructions");
 
+  }
+
+  Future<void> getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState((){
+      message = prefs.getString("message")!;
+    });
   }
 
 }
