@@ -16,6 +16,7 @@ import 'package:jhatfat/bean/subcategorylist.dart';
 import 'package:jhatfat/databasehelper/dbhelper.dart';
 import 'package:jhatfat/singleproductpage/singleproductpage.dart';
 
+import '../bean/cartitem.dart';
 import '../bean/resturantbean/restaurantcartitem.dart';
 
 class ItemsPage extends StatefulWidget {
@@ -37,6 +38,7 @@ class _ItemsPageState extends State<ItemsPage>
     with SingleTickerProviderStateMixin {
   int itemCount = 0;
   int restrocart = 0;
+  List<CartItem> cartListI = [];
 
   List<Tab> tabs = <Tab>[];
 
@@ -46,6 +48,10 @@ class _ItemsPageState extends State<ItemsPage>
   dynamic category_id;
 
   dynamic currency = '';
+
+  List<CartItem> tagObjs=[];
+  List<int> vendors=[];
+
 
   List<SubCategoryList> subCategoryListApp = [];
   List<SubCategoryList> subCategoryListDemo = [
@@ -102,6 +108,7 @@ class _ItemsPageState extends State<ItemsPage>
   bool isFetchList = false;
   bool isSearchOpen = false;
   String message = "";
+  List<CartItem> results = [];
 
   _ItemsPageState(this.pageTitle, this.vendor_id, this.category_name,
       this.category_id);
@@ -1093,66 +1100,67 @@ class _ItemsPageState extends State<ItemsPage>
       quantity, itemCount,
       varient_image, varient_id, vendor) async {
     DatabaseHelper db = DatabaseHelper.instance;
+    Future<int?> existing = db.getcount(int.parse('${varient_id}'));
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? storename = prefs.getString('store_name');
-    db.getcount(varient_id).then((value) {
-      print('value d - $value');
+    String? store_name = prefs.getString('store_name');
+
+    existing.then((value) {
       var vae = {
         DatabaseHelper.productName: product_name,
-        DatabaseHelper.storeName: storename,
+        DatabaseHelper.storeName: store_name,
         DatabaseHelper.vendor_id: vendor,
         DatabaseHelper.price: (price * itemCount),
         DatabaseHelper.unit: unit,
         DatabaseHelper.quantitiy: quantity,
         DatabaseHelper.addQnty: itemCount,
         DatabaseHelper.productImage: varient_image,
-        DatabaseHelper.is_id: is_id,
         DatabaseHelper.is_pres: is_pres,
+        DatabaseHelper.is_id: is_id,
         DatabaseHelper.isBasket: isBasket,
         DatabaseHelper.addedBasket: 0,
-        DatabaseHelper.varientId: varient_id
+        DatabaseHelper.varientId: int.parse('${varient_id}')
       };
-      bool allow = (prefs.getString("allowmultishop").toString()!="1") ;
-      if (value == 0) {
-        if(allow) {
-          db.getVendorcount()
-              .then((value) {
-                print("VENDORCOUNT"+value.toString());
-            if (value != null && value < 3) {
-              db.insert(vae);
-              getCartCount();
-            }
-            else {
-              showMyDialog2(context);
-              setList(productVarientList);
-            }
-          }
-          );
-        }
-        else{
-          db.insert(vae);
-          getCartCount();
-        }
-      }
 
-      else {
-        if (itemCount == 0) {
-          db.delete(int.parse('${varient_id}'));
-          getCartCount();
-        } else {
-          db.updateData(vae, int.parse('${varient_id}')).then((vay) {
-            print('vay - $vay');
-            getCatC();
+    bool allow = (prefs.getString("allowmultishop").toString()!="1") ;
+    if (value == 0) {
+      if(allow) {
+        db.getVendorcount()
+            .then((value) {
+          print("VENDORCOUNT"+value.toString());
+          if (value != null && value < 3) {
+            db.insert(vae);
             getCartCount();
-          });
+          }
+          else {
+            db.delete(int.parse('${varient_id}'));
+            showMyDialog2(context);
+            setList(productVarientList);
+          }
         }
+        );
       }
-    }).catchError((e) {
-      print(e);
-    });
+      else{
+        db.insert(vae);
+        getCartCount();
+      }
+    }
+
+    else {
+      if (itemCount == 0) {
+        db.delete(int.parse('${varient_id}'));
+        getCartCount();
+      } else {
+        db.updateData(vae, int.parse('${varient_id}')).then((vay) {
+          print('vay - $vay');
+          getCartCount();
+        });
+      }
+    }
+  }).catchError((e) {
+  print(e);
+  });
 
   }
-
 
   void hitServices() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();

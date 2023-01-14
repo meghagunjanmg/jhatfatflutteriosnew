@@ -21,14 +21,15 @@ class PaymentRestPage extends StatefulWidget {
   final dynamic vendor_ids;
   final dynamic order_id;
   final dynamic cart_id;
+  final dynamic maxincash;
   final double totalAmount;
   final List<PaymentVia> tagObjs;
 
-  PaymentRestPage(this.vendor_ids, this.order_id, this.cart_id, this.totalAmount, this.tagObjs);
+  PaymentRestPage(this.vendor_ids, this.order_id, this.cart_id, this.totalAmount, this.tagObjs, this.maxincash);
 
   @override
   State<StatefulWidget> createState() {
-    return PaymentRestPageState(order_id, cart_id, totalAmount,tagObjs);
+    return PaymentRestPageState(order_id, cart_id, totalAmount,tagObjs,maxincash);
   }
 }
 
@@ -46,6 +47,7 @@ class PaymentRestPageState extends State<PaymentRestPage> {
   String promocode = '';
   late final dynamic order_id;
   late final dynamic cart_id;
+  bool wallet=false;
 
   bool razor = false;
   bool paystack = false;
@@ -79,7 +81,9 @@ class PaymentRestPageState extends State<PaymentRestPage> {
 
   List<CouponList> couponL = [];
 
-  PaymentRestPageState(this.order_id,this.cart_id,this.totalAmount, this.paymentVia);
+  dynamic maxincash;
+
+  PaymentRestPageState(this.order_id,this.cart_id,this.totalAmount, this.paymentVia, this.maxincash);
 
   @override
   void initState() {
@@ -87,8 +91,16 @@ class PaymentRestPageState extends State<PaymentRestPage> {
     super.initState();
     getCouponList();
     getWalletAmount();
-  }
+    getData();
 
+  }
+  String message = '';
+  void getData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      message = pref.getString("message")!;
+    });
+  }
 
   void getWalletAmount() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -104,30 +116,31 @@ class PaymentRestPageState extends State<PaymentRestPage> {
     client.post(myUri, body: {
       'user_id': '${userId}',
     }).then((value) {
-      print('${value.body}');
       if (value.statusCode == 200 && jsonDecode(value.body)['status'] == "1") {
         var jsonData = jsonDecode(value.body);
         var dataList = jsonData['data'] as List;
         setState(() {
           walletAmount = double.parse('${dataList[0]['wallet_credits']}');
-          if(totalAmount>walletAmount){
-            if(walletAmount>0.0){
+          if (totalAmount > walletAmount) {
+            if (walletAmount > 0.0) {
               iswallet = true;
-            }else{
+            } else {
               iswallet = false;
             }
-            totalAmount = totalAmount-walletAmount;
-          }else if(totalAmount<walletAmount){
-            if(walletAmount>0.0){
+            totalAmount = totalAmount;
+            walletUsedAmount = walletAmount;
+          } else if (totalAmount < walletAmount) {
+            if (walletAmount > 0.0) {
               iswallet = true;
-            }else{
+            } else {
               iswallet = false;
             }
-            totalAmount = 0.0;
-          }else{
+            newtotalAmount = totalAmount;
+            walletUsedAmount = newtotalAmount;
+          } else {
             iswallet = false;
+            walletUsedAmount = 0.0;
           }
-
         });
       }
       setState(() {
@@ -205,6 +218,7 @@ class PaymentRestPageState extends State<PaymentRestPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(maxincash.toString());
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(64.0),
@@ -224,7 +238,7 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                 height: 5.0,
               ),
               Text(
-                'Amount to Pay $currency $totalAmount',
+                'Amount to Pay $currency $newtotalAmount',
                 style: Theme.of(context)
                     .textTheme
                     .headline6!
@@ -253,7 +267,6 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                   children: <Widget>[
                     Visibility(
                       visible: (iswallet || isCoupon) ? true : false,
-                      //(iswallet||isCoupon)?true:false
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -277,39 +290,58 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                                 vertical: 10.0, horizontal: 20.0),
                             child: Column(
                               children: [
-                                Visibility(
-                                  visible: iswallet, //iswallet
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Image.asset(
-                                            'images/payment/wallet.png',
-                                            height: 20.3,
-                                          ),
-                                          SizedBox(
-                                            width: 25,
-                                          ),
-                                          Text(
-                                            'Wallet Amount',
-                                            style: TextStyle(fontSize: 14),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        '${currency} ${walletAmount}',
-                                        style: TextStyle(fontSize: 15),
-                                      ),
-                                    ],
-                                  ),
+                                Row(
+                                    children:[
+                                      Checkbox(
+                                          value: wallet,
+                                          onChanged: (val) {
+                                            if (val==true) {
+                                              setState(() {
+                                                wallet = true;
+                                                newtotalAmount = totalAmount - walletUsedAmount;
+                                              });
+                                            } else {
+                                              setState(() {
+                                                wallet = false;
+                                                newtotalAmount = totalAmount;
+                                              });
+                                            }
+                                          }),
+
+                                      Text('Use Wallet (Wallet Amount: ${walletAmount})'),
+                                    ]
                                 ),
                                 SizedBox(
                                   height: 5,
                                 ),
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Image.asset(
+                                          'images/payment/amount.png',
+                                          height: 20.3,
+                                        ),
+                                        SizedBox(
+                                          width: 25,
+                                        ),
+                                        Text(
+                                          'Order Amount',
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      '${currency} ${totalAmount}',
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                  ],
+                                ),
+
                                 Visibility(
-                                  visible: iswallet, //iswallet
+                                  visible: wallet, //iswallet
                                   child: Row(
                                     mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -336,6 +368,8 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                                     ],
                                   ),
                                 ),
+
+
                                 SizedBox(
                                   height: 5,
                                 ),
@@ -367,6 +401,7 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                                     ],
                                   ),
                                 ),
+
                                 SizedBox(
                                   height: 5,
                                 ),
@@ -384,7 +419,7 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                                           width: 25,
                                         ),
                                         Text(
-                                          'Order Amount',
+                                          'Amount to be paid ',
                                           style: TextStyle(fontSize: 15),
                                         ),
                                       ],
@@ -406,34 +441,39 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 16.0),
-                            color: kCardBackgroundColor,
-                            child: Text(
-                              'CASH',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .caption!
-                                  .copyWith(
-                                  color: kDisabledColor,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.67),
-                            ),
-                          ),
-                          BuildListTile(
-                              image: 'images/payment/amount.png',
-                              text: 'Cash on Delivery',
-                              onTap: () async{
-                                setState(() {
-                                  setProgressText =
-                                  'Proceeding to placed order please wait!....';
-                                  showDialogBox = true;
-                                });
-                                placedOrder("success", "COD");
-                              }
-//                    Navigator.popAndPushNamed(context, PageRoutes.orderPlaced),
-                          ),
+                          Visibility(
+                            visible: (newtotalAmount < maxincash) ? true : false,
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children:[
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 8.0, horizontal: 16.0),
+                                    color: kCardBackgroundColor,
+                                    child: Text(
+                                      'CASH',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .caption!
+                                          .copyWith(
+                                          color: kDisabledColor,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.67),
+                                    ),
+                                  ),
+                                  BuildListTile(
+                                      image: 'images/payment/amount.png',
+                                      text: 'Cash on Delivery',
+                                      onTap: () async{
+                                        setState(() {
+                                          setProgressText =
+                                          'Proceeding to placed order please wait!....';
+                                          showDialogBox = true;
+                                        });
+                                        placedOrder("success", "COD");
+                                      }),
+                                ]),),
+
                           (totalAmount > 0.0 &&
                               paymentVia != null &&
                               paymentVia.length > 0)
@@ -478,7 +518,7 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                                           "Razor Pay") {
                                         openCheckout(
                                             "${paymentVia[index].payment_key}",
-                                            totalAmount * 100);
+                                            newtotalAmount * 100);
                                       } else if (paymentVia[index]
                                           .payment_mode ==
                                           "Paystack") {
@@ -494,406 +534,23 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                                     },
                                   );
                                 },
-                                // separatorBuilder: (context, index) {
-                                //   return Divider(
-                                //     color: Colors.transparent,
-                                //     thickness: 0.1,
-                                //   );
-                                // },
                                 itemCount: paymentVia.length)
                                 : Container(),
                           ),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 16.0),
-                            color: kCardBackgroundColor,
-                            child: Text(
-                              'Promo Code',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .caption!
-                                  .copyWith(
-                                  color: kDisabledColor,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.67),
-                            ),
-                          ),
-                          Divider(
-                            color: kCardBackgroundColor,
-                            thickness: 6.7,
-                          ),
-                          Container(
-                            margin: EdgeInsets.symmetric(horizontal: 20),
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Container(
-                                        width: MediaQuery.of(context)
-                                            .size
-                                            .width *
-                                            0.55,
-                                        height: 45,
-                                        alignment: Alignment.center,
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 2.0),
-                                        child: TextFormField(
-                                          textAlign: TextAlign.center,
-                                          decoration: InputDecoration(
-                                            hintText:
-                                            "Enter Your promo code",
-                                            fillColor: Colors.white,
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(
-                                                  20.0),
-                                              borderSide: BorderSide(
-                                                  color: kMainColor,
-                                                  width: 1),
-                                            ),
-                                            focusedBorder:
-                                            OutlineInputBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(
-                                                  20.0),
-                                              borderSide: BorderSide(
-                                                  color: kMainColor,
-                                                  width: 1),
-                                            ),
-                                            enabledBorder:
-                                            OutlineInputBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(
-                                                  20.0),
-                                              borderSide: BorderSide(
-                                                  color: kMainColor,
-                                                  width: 1),
-                                            ),
-                                          ),
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 13),
-                                          cursorColor: kMainColor,
-                                          showCursor: false,
-                                          keyboardType: TextInputType.text,
-                                          onChanged: (val) {
-                                            setState(() => promocode = val);
-                                          },
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            if (totalAmount != 0.0) {
-                                              visiblity = !visiblity;
-                                              setProgressText =
-                                              'Applying coupon please wait!....';
-                                              showDialogBox = true;
-                                              appCoupon(promocode);
-                                            } else {
-                                              Toast.show(
-                                                  'coupon code not applicable!', duration: Toast.lengthShort, gravity:  Toast.bottom);
-                                            }
-                                          });
-                                        },
-                                        child: Container(
-                                          alignment: Alignment.center,
-                                          width: MediaQuery.of(context)
-                                              .size
-                                              .width *
-                                              0.28,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                              BorderRadius.circular(40),
-                                              color: kMainColor),
-                                          child: Text(
-                                            'Apply',
-                                            textAlign: TextAlign.start,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w300,
-                                                fontSize: 15,
-                                                color: kWhiteColor),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Divider(
-                            color: kCardBackgroundColor,
-                            thickness: 6.7,
-                          ),
-                          // Container(
-                          //   margin: EdgeInsets.symmetric(horizontal: 20),
-                          //   alignment: Alignment.topCenter,
-                          //   child: Column(
-                          //     children: <Widget>[
-                          //       // Container(
-                          //       //   height: 52,
-                          //       //   child: Row(
-                          //       //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //       //     children: <Widget>[
-                          //       //       Text(
-                          //       //         'Promo Code',
-                          //       //         textAlign: TextAlign.start,
-                          //       //         style: TextStyle(
-                          //       //             fontWeight: FontWeight.w600,
-                          //       //             fontSize: 18,
-                          //       //             color: kMainTextColor),
-                          //       //       ),
-                          //       //       InkWell(
-                          //       //         onTap: () {
-                          //       //           setState(() {
-                          //       //             visiblity = !visiblity;
-                          //       //           });
-                          //       //         },
-                          //       //         child: Icon(visiblity
-                          //       //             ? Icons.keyboard_arrow_down
-                          //       //             : Icons.keyboard_arrow_right),
-                          //       //       )
-                          //       //     ],
-                          //       //   ),
-                          //       // ),
-                          //       // Visibility(
-                          //       //   visible: visiblity,
-                          //       //   child: Column(
-                          //       //     children: <Widget>[
-                          //       //       Divider(
-                          //       //         color: kCardBackgroundColor,
-                          //       //         thickness: 6.7,
-                          //       //       ),
-                          //       //       Container(
-                          //       //         width: MediaQuery
-                          //       //             .of(context)
-                          //       //             .size
-                          //       //             .width,
-                          //       //         child: Row(
-                          //       //           mainAxisAlignment:
-                          //       //           MainAxisAlignment.spaceBetween,
-                          //       //           children: <Widget>[
-                          //       //             Container(
-                          //       //               width:
-                          //       //               MediaQuery
-                          //       //                   .of(context)
-                          //       //                   .size
-                          //       //                   .width *
-                          //       //                   0.55,
-                          //       //               height: 45,
-                          //       //               alignment: Alignment.centerLeft,
-                          //       //               margin: EdgeInsets.only(
-                          //       //                   left: 5,
-                          //       //                   right: 5,
-                          //       //                   top: 5,
-                          //       //                   bottom: 5),
-                          //       //               padding:
-                          //       //               EdgeInsets.symmetric(vertical: 2.0),
-                          //       //               child: TextFormField(
-                          //       //                 textAlign: TextAlign.center,
-                          //       //                 decoration: InputDecoration(
-                          //       //                   hintText: "Enter Your promo code",
-                          //       //                   fillColor: Colors.white,
-                          //       //                   border: OutlineInputBorder(
-                          //       //                     borderRadius:
-                          //       //                     BorderRadius.circular(10.0),
-                          //       //                     borderSide: BorderSide(
-                          //       //                         color: kMainColor, width: 1),
-                          //       //                   ),
-                          //       //                   focusedBorder: OutlineInputBorder(
-                          //       //                     borderRadius:
-                          //       //                     BorderRadius.circular(10.0),
-                          //       //                     borderSide: BorderSide(
-                          //       //                         color: kMainColor, width: 1),
-                          //       //                   ),
-                          //       //                   enabledBorder: OutlineInputBorder(
-                          //       //                     borderRadius:
-                          //       //                     BorderRadius.circular(10.0),
-                          //       //                     borderSide: BorderSide(
-                          //       //                         color: kMainColor, width: 1),
-                          //       //                   ),
-                          //       //                 ),
-                          //       //                 style: TextStyle(
-                          //       //                     color: Colors.black,
-                          //       //                     fontSize: 14),
-                          //       //                 cursorColor: kMainColor,
-                          //       //                 showCursor: false,
-                          //       //                 keyboardType: TextInputType.text,
-                          //       //                 onChanged: (val) {
-                          //       //                   setState(() => promocode = val);
-                          //       //                 },
-                          //       //               ),
-                          //       //             ),
-                          //       //             GestureDetector(
-                          //       //               onTap: () {
-                          //       //                 setState(() {
-                          //       //                   visiblity = !visiblity;
-                          //       //                   setProgressText =
-                          //       //                   'Applying coupon please wait!....';
-                          //       //                   showDialogBox = true;
-                          //       //                   appCoupon(promocode);
-                          //       //                 });
-                          //       //               },
-                          //       //               child: Container(
-                          //       //                 alignment: Alignment.center,
-                          //       //                 width: MediaQuery
-                          //       //                     .of(context)
-                          //       //                     .size
-                          //       //                     .width *
-                          //       //                     0.28,
-                          //       //                 height: 40,
-                          //       //                 decoration: BoxDecoration(
-                          //       //                     borderRadius:
-                          //       //                     BorderRadius.circular(40),
-                          //       //                     color: kMainColor),
-                          //       //                 child: Text(
-                          //       //                   'Apply',
-                          //       //                   textAlign: TextAlign.start,
-                          //       //                   style: TextStyle(
-                          //       //                       fontWeight: FontWeight.w300,
-                          //       //                       fontSize: 15,
-                          //       //                       color: kWhiteColor),
-                          //       //                 ),
-                          //       //               ),
-                          //       //             )
-                          //       //           ],
-                          //       //         ),
-                          //       //       )
-                          //       //     ],
-                          //       //   ),
-                          //       // ),
-                          //
-                          //     ],
-                          //   ),
-                          // ),
-                          // Container(
-                          //   padding:
-                          //   EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                          //   color: kCardBackgroundColor,
-                          //   child: Text(
-                          //     'Promo Code List',
-                          //     style: Theme
-                          //         .of(context)
-                          //         .textTheme
-                          //         .caption
-                          //         .copyWith(
-                          //         color: kDisabledColor,
-                          //         fontWeight: FontWeight.bold,
-                          //         letterSpacing: 0.67),
-                          //   ),
-                          // ),
-                          // Divider(
-                          //   color: kCardBackgroundColor,
-                          //   thickness: 6.7,
-                          // ),
-                          Visibility(
-                            visible: (couponL != null && couponL.length > 0)
-                                ? true
-                                : false,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              child: (couponL != null && couponL.length > 0)
-                                  ? ListView.builder(
-                                  primary: false,
-                                  shrinkWrap: true,
-                                  itemCount: couponL.length,
-                                  itemBuilder: (context, t) {
-                                    return Column(
-                                      children: [
-                                        Divider(
-                                          color: kCardBackgroundColor,
-                                          thickness: 2.3,
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment
-                                              .spaceBetween,
-                                          children: [
-                                            Expanded(
-                                                child: Text(
-                                                    '${couponL[t].coupon_code}\n${couponL[t].coupon_description}')),
-                                            Radio(
-                                                value: t,
-                                                groupValue: radioId,
-                                                toggleable: true,
-                                                onChanged: (val) {
-                                                  print('${val}');
-                                                  print(
-                                                      '${radioId} - ${t}');
-                                                  if (radioId != t ||
-                                                      radioId == -1) {
-                                                    setState(() {
-                                                      if (totalAmount !=
-                                                          0.0) {
-                                                        radioId = t;
-                                                        print(
-                                                            '${radioId} - ${t}');
-                                                        setProgressText =
-                                                        'Applying coupon please wait!....';
-                                                        showDialogBox =
-                                                        true;
-                                                        appCoupon(couponL[
-                                                        t]
-                                                            .coupon_code);
-                                                      } else {
-                                                        Toast.show(
-                                                            'coupon code not applicable!', duration: Toast.lengthShort, gravity:  Toast.bottom);
-                                                      }
-                                                    });
-                                                  } else {
-                                                    setState(() {
-                                                      radioId = -1;
-                                                      showDialogBox =
-                                                      true;
-                                                      appCoupon(couponL[
-                                                      t]
-                                                          .coupon_code);
-                                                    });
-                                                  }
-                                                })
-                                          ],
-                                        ),
-                                        Divider(
-                                          color: kCardBackgroundColor,
-                                          thickness: 2.3,
-                                        ),
-                                      ],
-                                    );
-                                  })
-                                  : Container(),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 100,
-                          )
+
                         ],
                       ),
                     ),
+
                     Visibility(
-                        visible: (totalAmount > 0.0) ? false : true,
+                        visible: (wallet && newtotalAmount==0) ? true : false,
                         child: Container(
-                          height: 250,
                           alignment: Alignment.bottomCenter,
                           child: SizedBox(
                             height: 40,
                             width: 150,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: kMainColor,
-                                  foregroundColor : kMainColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                  ),
-                                  primary: Colors.purple,
-                                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                                  textStyle:TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400)),
-
+                            child:
+                            ElevatedButton(
                               onPressed: () {
                                 if (!showDialogBox) {
                                   setState(() {
@@ -908,10 +565,22 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                                     color: kWhiteColor,
                                     fontWeight: FontWeight.w400),
                               ),
-
                             ),
                           ),
-                        ))
+                        )),
+
+                    Container(
+                      margin: EdgeInsets.all(12),
+                      alignment: Alignment.bottomCenter,
+                      child:    Text(
+                        message.toString(),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12),
+                      )
+                      ,
+                    ),
+
                   ],
                 ),
               ),
@@ -948,8 +617,7 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                                         labelText: 'Card number',
                                       ),
                                       onChanged: (String value) =>
-                                    _cardNumber = value,
-                                      //onSaved: (String value!) =>_cardNumber = value,
+                                      _cardNumber = value,
                                     ),
                                     _verticalSizeBox,
                                     Row(
@@ -985,7 +653,7 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                                             ),
                                             onChanged: (String value) =>
                                             _expiryMonth =
-                                                int.tryParse(value)!,
+                                            int.tryParse(value)!,
                                           ),
                                         ),
                                         _horizontalSizeBox,
@@ -999,8 +667,9 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                                               const UnderlineInputBorder(),
                                               labelText: 'Expiry Year',
                                             ),
-                                            onChanged:(String value) =>
-                                            _expiryYear = int.tryParse(value)!,
+                                            onChanged: (String value) =>
+                                            _expiryYear =
+                                            int.tryParse(value)!,
                                           ),
                                         )
                                       ],
@@ -1015,16 +684,6 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                                           : new CircularProgressIndicator(),
                                     )
                                         : ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: kMainColor,
-                                          foregroundColor : kMainColor,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(30.0),
-                                          ),
-                                          primary: Colors.purple,
-                                          padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                                          textStyle:TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400)),
-
                                       child: Text(
                                         'Proceed to payment',
                                         style: TextStyle(
@@ -1033,6 +692,7 @@ class PaymentRestPageState extends State<PaymentRestPage> {
                                             fontWeight:
                                             FontWeight.w400),
                                       ),
+
                                       onPressed: () {
                                         setState(() {
                                           _inProgress = true;
@@ -1071,6 +731,9 @@ class PaymentRestPageState extends State<PaymentRestPage> {
           )),
     );
   }
+
+
+
 
   void placedOrder(paymentStatus, paymentMethod) {
     var url = orderplaced;
@@ -1128,9 +791,6 @@ class PaymentRestPageState extends State<PaymentRestPage> {
       setState(() {
         showDialogBox = false;
       });
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return OrderPlaced(payment_method, payment_status, order_id, rem_price,currency,"2");
-      }));
     });
   }
 

@@ -91,7 +91,6 @@ class _OtpVerifyState extends State<OtpVerify> {
     contact = pref.getString("user_phone")!;
 
     print(contact);
-
     generateOtp('+91$contact');
   }
   @override

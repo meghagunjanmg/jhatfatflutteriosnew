@@ -5,17 +5,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/places.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:toast/toast.dart';
 import 'package:jhatfat/Components/entry_field.dart';
 import 'package:jhatfat/Themes/colors.dart';
 import 'package:jhatfat/baseurlp/baseurl.dart';
 import 'package:jhatfat/bean/address.dart';
 
+import '../../../../Components/custom_appbar.dart';
 import '../../../../Themes/constantfile.dart';
 
 class EditAddresspage extends StatefulWidget {
@@ -106,17 +112,197 @@ class EditAddresspageState extends State<EditAddresspage> {
 
     getCityList();
   }
+  Future<void> _goToTheLake(lat, lng) async {
+    final CameraPosition _kLake = CameraPosition(
+        target: LatLng(lat, lng),
+        zoom: 14.151926040649414);
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
+
+  }
+
+  void getPlaces(context) async {
+    // PlacesAutocomplete.show(
+    //   context: context,
+    //   apiKey: apiKey,
+    //   mode: Mode.fullscreen,
+    //   onError: (response) {
+    //     print(response.predictions);
+    //   },
+    //   language: "en",
+    //     components: [new Component(Component.country, "in")]
+    // ).then((value) {
+    //   //displayPrediction(value);
+    // }).catchError((e) {
+    //   print(e);
+    // });
+
+
+    final Prediction? p = await PlacesAutocomplete.show(
+      context: context,
+      apiKey: apiKey,
+      onError: onError,
+      mode: Mode.overlay, // or Mode.fullscreen
+      language: 'en',
+      components: [Component(Component.country, 'in')],
+    );
+
+    if (p != null) displayPrediction(p);
+  }
+  void onError(PlacesAutocompleteResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(response.errorMessage ?? 'Unknown error'),
+      ),
+    );
+  }
+
+  Future<Null> displayPrediction(Prediction p) async {
+    GoogleMapsPlaces _places = GoogleMapsPlaces(
+      apiKey: apiKey,
+      apiHeaders: await GoogleApiHeaders().getHeaders(),
+    );
+    PlacesDetailsResponse detail =
+    await _places.getDetailsByPlaceId(p.placeId!);
+    final lat = detail.result.geometry!.location.lat;
+    final lng = detail.result.geometry!.location.lng;
+    _getCameraMoveLocation(LatLng(lat, lng));
+    print("${p.description} - $lat/$lng");
+
+    final marker = Marker(
+      markerId: MarkerId('location'),
+      position: LatLng(lat, lng),
+      icon: BitmapDescriptor.defaultMarker,
+    );
+    setState(() {
+      markers[MarkerId('location')] = marker;
+      _goToTheLake(lat, lng);
+    });
+
+  }
+  // Future<Null> displayPrediction(Prediction p) async {
+  //   if (p != null) {
+  //     PlacesDetailsResponse detail =
+  //         await _places.getDetailsByPlaceId(p.placeId!);
+  //     final lat = detail.result.geometry!.location.lat;
+  //     final lng = detail.result.geometry!.location.lng;
+  //     _getCameraMoveLocation(LatLng(lat, lng));
+  //   }
+  // }
+  void _getLocation(context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always) {
+      bool isLocationServiceEnableds =
+      await Geolocator.isLocationServiceEnabled();
+      if (isLocationServiceEnableds) {
+        Position position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+        double lat = position.latitude;
+        double lng = position.longitude;
+
+        setState(() {
+          this.lat = lat;
+          this.lng = lng;
+        });
+        GeoData data = await Geocoder2.getDataFromCoordinates(
+            latitude: lat,
+            longitude: lng,
+            googleMapApiKey:apiKey);
+
+        setState(() {
+          if (data.address.isNotEmpty) {
+            streetController.text = data.address;
+          }
+          if (data.postalCode.isNotEmpty) {
+            pincodeController.text = data.postalCode;
+          }
+          if (data.state.isNotEmpty) {
+            stateController.text = data.state;
+          }
+        });
+      } else {
+        await Geolocator.openLocationSettings().then((value) {
+          if (value) {
+            _getLocation(context);
+          } else {
+            //Toast.show('Location permission is required!', duration: Toast.lengthShort, gravity:  Toast.bottom);
+          }
+        }).catchError((e) {
+          //Toast.show('Location permission is required!',  duration: Toast.lengthShort, gravity:  Toast.bottom);
+        });
+      }
+    } else if (permission == LocationPermission.denied) {
+      LocationPermission permissiond = await Geolocator.requestPermission();
+      if (permissiond == LocationPermission.whileInUse ||
+          permissiond == LocationPermission.always) {
+        _getLocation(context);
+      } else {
+        //Toast.show('Location permission is required!', duration: Toast.lengthShort, gravity:  Toast.bottom);
+      }
+    } else if (permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings().then((value) {
+        _getLocation(context);
+
+      }).catchError((e) {
+        // Toast.show('Location permission is required!', duration: Toast.lengthShort, gravity:  Toast.bottom);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-   return Scaffold(
-      backgroundColor: kCardBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        titleSpacing: 0.0,
-        title: Text(
-          'Edit Address',
-          style: Theme.of(context).textTheme.bodyText1,
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(110.0),
+        child: CustomAppBar(
+          titleWidget: Text(
+            'Add Address',
+            style: TextStyle(fontSize: 16.7, color: black_color),
+          ),
+          actions: [
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.my_location,
+                    color: kMainColor,
+                  ),
+                  iconSize: 30,
+                  onPressed: () {
+                    _getLocation(context);
+                  },
+                ))
+          ],
+          bottom: PreferredSize(
+              child: GestureDetector(
+                onTap: (){
+                  getPlaces(context);
+                },
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  height: 52,
+                  padding: EdgeInsets.all(8),
+                  margin: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                      color: scaffoldBgColor,
+                      borderRadius: BorderRadius.circular(50)),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search,size: 25,),
+                      SizedBox(width: 20),
+                      Text(
+                          'Search Location'
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              preferredSize:
+              Size(MediaQuery.of(context).size.width * 0.85, 52)),
         ),
       ),
       body:
@@ -218,120 +404,121 @@ class EditAddresspageState extends State<EditAddresspage> {
                           height: 15,
                         ),
 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.45,
-                              child:
-                              TextFormField(
-                                controller: houseController,
-                                maxLines: 1,
-                                decoration: InputDecoration(
-                                  hintText:'house No',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide:
-                                    BorderSide(color: Colors.black, width: 1),
-                                  ),
-                                  hintStyle: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: kHintColor,
-                                      fontSize: 16),
-                                ),
-                              ),
-
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.45,
-                              child:
-                              TextFormField(
-                                controller: pincodeController,
-                                maxLines: 1,
-                                decoration: InputDecoration(
-                                  hintText:'Pincode',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide:
-                                    BorderSide(color: Colors.black, width: 1),
-                                  ),
-                                  hintStyle: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: kHintColor,
-                                      fontSize: 16),
-                                ),
-                              ),
-
-                            ),
-                          ],
-                        ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        //   children: [
+                        //     Container(
+                        //       width: MediaQuery.of(context).size.width * 0.45,
+                        //       child:
+                        //       TextFormField(
+                        //         controller: houseController,
+                        //         maxLines: 1,
+                        //         decoration: InputDecoration(
+                        //           hintText:'house No',
+                        //               border: OutlineInputBorder(
+                        //                 borderRadius: BorderRadius.circular(10.0),
+                        //                 borderSide:
+                        //                 BorderSide(color: Colors.black, width: 1),
+                        //               ),
+                        //           hintStyle: TextStyle(
+                        //               fontWeight: FontWeight.w600,
+                        //               color: kHintColor,
+                        //               fontSize: 16),
+                        //         ),
+                        //       ),
+                        //
+                        //     ),
+                        //     Container(
+                        //       width: MediaQuery.of(context).size.width * 0.45,
+                        //       child:
+                        //       TextFormField(
+                        //         controller: pincodeController,
+                        //         maxLines: 1,
+                        //         decoration: InputDecoration(
+                        //           hintText:'Pincode',
+                        //           border: OutlineInputBorder(
+                        //             borderRadius: BorderRadius.circular(10.0),
+                        //             borderSide:
+                        //             BorderSide(color: Colors.black, width: 1),
+                        //           ),
+                        //           hintStyle: TextStyle(
+                        //               fontWeight: FontWeight.w600,
+                        //               color: kHintColor,
+                        //               fontSize: 16),
+                        //         ),
+                        //       ),
+                        //
+                        //     ),
+                        //   ],
+                        // ),
                         SizedBox(
                           height: 15,
                         ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.95,
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            border: Border.all(color: kHintColor, width: 1),
+                          ),
+                          child: DropdownButton<CityList>(
+                            hint: Text(
+                              selectCity,
+                              overflow: TextOverflow.clip,
+                              maxLines: 1,
+                            ),
+                            isExpanded: true,
+                            underline: Container(
+                              height: 0.0,
+                              color: scaffoldBgColor,
+                            ),
+                            items: cityListt.map((value) {
+                              return DropdownMenuItem<CityList>(
+                                value: value,
+                                child: Text(value.city_name,
+                                    overflow: TextOverflow.clip),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectCity = value!.city_name;
+                                selectCityId = value.city_id;
+                                areaList.clear();
+                                selectArea = 'Select near by area';
+                                selectAreaId = '';
+                              });
+                              getAreaList(value!.city_id);
+                              print(value);
+                            },
+                          ),
+                        ),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.45,
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                border: Border.all(color: kHintColor, width: 1),
-                              ),
-                              child: DropdownButton<CityList>(
-                                hint: Text(
-                                  selectCity,
-                                  overflow: TextOverflow.clip,
-                                  maxLines: 1,
-                                ),
-                                isExpanded: true,
-                                underline: Container(
-                                  height: 0.0,
-                                  color: scaffoldBgColor,
-                                ),
-                                items: cityListt.map((value) {
-                                  return DropdownMenuItem<CityList>(
-                                    value: value,
-                                    child: Text(value.city_name,
-                                        overflow: TextOverflow.clip),
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectCity = value!.city_name;
-                                    selectCityId = value.city_id;
-                                    areaList.clear();
-                                    selectArea = 'Select near by area';
-                                    selectAreaId = '';
-                                  });
-                                  getAreaList(value!.city_id);
-                                  print(value);
-                                },
-                              ),
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.45,
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-
-                              child:
-
-                              TextFormField(
-                                controller: stateController,
-                                maxLines: 1,
-                                decoration: InputDecoration(
-                                  hintText:'state',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide:
-                                    BorderSide(color: Colors.black, width: 1),
-                                  ),
-                                  hintStyle: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: kHintColor,
-                                      fontSize: 16),
-                                ),
-                              ),
-                            ),
+                            // Container(
+                            //   width: MediaQuery.of(context).size.width * 0.45,
+                            //   padding: EdgeInsets.symmetric(horizontal: 10),
+                            //
+                            //   child:
+                            //
+                            //   TextFormField(
+                            //     controller: stateController,
+                            //     maxLines: 1,
+                            //     decoration: InputDecoration(
+                            //       hintText:'state',
+                            //       border: OutlineInputBorder(
+                            //         borderRadius: BorderRadius.circular(10.0),
+                            //         borderSide:
+                            //         BorderSide(color: Colors.black, width: 1),
+                            //       ),
+                            //       hintStyle: TextStyle(
+                            //           fontWeight: FontWeight.w600,
+                            //           color: kHintColor,
+                            //           fontSize: 16),
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                         SizedBox(
@@ -414,8 +601,6 @@ class EditAddresspageState extends State<EditAddresspage> {
                     onTap: () {
                       if (addressType != null &&
                           addressType != 'Select address type' &&
-                          houseController.text != null &&
-                          houseController.text != '' &&
                           streetController.text != null &&
                           streetController.text != '' &&
                           pincodeController.text != null &&
@@ -434,7 +619,16 @@ class EditAddresspageState extends State<EditAddresspage> {
                             stateController.text,
                             context);
                       } else {
-                        Toast.show('Enter all details carefully', duration: Toast.lengthShort, gravity:  Toast.bottom);
+
+                        Fluttertoast.showToast(
+                            msg: "Enter all details carefully",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0
+                        );
                       }
                     },
                     child: Container(
@@ -479,7 +673,7 @@ class EditAddresspageState extends State<EditAddresspage> {
     Uri myUri = Uri.parse(url);
 
     http.post(myUri, body: {
-      'vendor_id': '${widget.vendorid}',
+      'vendor_id': '54',
     }).then((value) {
       if (value.statusCode == 200) {
         var jsonData = jsonDecode(value.body);
@@ -610,22 +804,6 @@ class EditAddresspageState extends State<EditAddresspage> {
       state, BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    List<Location> locations = await locationFromAddress(street);
-    setState(() {
-      lat = locations[0].latitude;
-      lng = locations[0].longitude;
-    });
-
-    final marker = Marker(
-      markerId: MarkerId('location'),
-      position: LatLng(lat, lng),
-      icon: BitmapDescriptor.defaultMarker,
-    );
-    setState(() {
-      markers[MarkerId('location')] = marker;
-    });
-
-
     var url = editAddress;
     Uri myUri = Uri.parse(url);
     http.post(myUri, body: {
@@ -679,22 +857,28 @@ class EditAddresspageState extends State<EditAddresspage> {
 void getMapLoc() async {
   _getCameraMoveLocation(LatLng(lat, lng));
 }
+  void _getCameraMoveLocation(LatLng data) async {
+    Timer(Duration(seconds: 1), () async {
+      lat = data.latitude;
+      lng = data.longitude;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
 
-void _getCameraMoveLocation(LatLng data) async {
-  Timer(Duration(seconds: 1), () async {
-    lat = data.latitude;
-    lng = data.longitude;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("lat", data.latitude.toStringAsFixed(8));
-    prefs.setString("lng", data.longitude.toStringAsFixed(8));
-    GeoData data1 = await Geocoder2.getDataFromCoordinates(
-        latitude: lat,
-        longitude: lng,
-        googleMapApiKey: apiKey);
-    setState(() {
-      currentAddress = data1.address;
+      GeoData data1 = await Geocoder2.getDataFromCoordinates(
+          latitude: lat,
+          longitude: lng,
+          googleMapApiKey: apiKey);
+      setState(() {
+        if (data1.address.isNotEmpty) {
+          streetController.text = data1.address;
+        }
+        if (data1.postalCode.isNotEmpty) {
+          pincodeController.text = data1.postalCode;
+        }
+        if (data1.state.isNotEmpty) {
+          stateController.text = data1.state;
+        }
+      });
     });
-  });
-}
+  }
 
 }

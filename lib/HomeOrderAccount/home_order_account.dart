@@ -25,22 +25,24 @@ import 'Home/UI/home2.dart';
 
 class HomeStateless extends StatelessWidget {
   int _currentIndex = 0;
+  int _value = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: HomeOrderAccount(this._currentIndex),
+      body: HomeOrderAccount(this._currentIndex,this._value),
     );
   }
 }
 
 class HomeOrderAccount extends StatefulWidget {
   int _currentIndex = 0;
+  int _value = 0;
 
-  HomeOrderAccount(this._currentIndex);
+  HomeOrderAccount(this._currentIndex,this._value);
 
   @override
-  _HomeOrderAccountState createState() => _HomeOrderAccountState(_currentIndex);
+  _HomeOrderAccountState createState() => _HomeOrderAccountState(_currentIndex,_value);
 }
 
 class _HomeOrderAccountState extends State<HomeOrderAccount> {
@@ -50,12 +52,14 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
   String ClosedImage = '';
   List<BannerDetails> ClosedBannerImage = [];
   Adminsetting? admins;
+  int _value = 0;
 
-  _HomeOrderAccountState(this._currentIndex);
+  _HomeOrderAccountState(this._currentIndex,this._value);
 
   var lat = 0.0;
   var lng = 0.0;
   String? cityName = 'NO LOCATION SELECTED';
+  List<Widget> _children = [];
 
   @override
   void initState() {
@@ -65,6 +69,16 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
     _navigationController =
     new CircularBottomNavigationController(_currentIndex);
     getCurrency();
+
+    _children = [
+    HomePage2(_value),
+    Restaurant("Urbanby Resturant"),
+    ///OrderPage(),
+    ParcelLocation(),
+
+    oneViewCart(),
+    // ViewCart(),
+    ];
   }
 
   void getData() async {
@@ -121,16 +135,6 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
      new TabItem(Icons.shopping_cart, "Cart", Colors.blue, labelStyle: TextStyle(fontWeight: FontWeight.bold,fontSize: 10)),
   ]);
 
-  final List<Widget> _children = [
-     HomePage2(),
-     Restaurant("Urbanby Resturant"),
-     ///OrderPage(),
-     ParcelLocation(),
-
-        oneViewCart(),
-    // ViewCart(),
-
-  ];
 
   void onTapped(int index) {
     setState(() {
@@ -146,7 +150,8 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
             if(_currentIndex!=0) {
               Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => HomeOrderAccount(0)),
+              MaterialPageRoute(builder: (context) => HomeOrderAccount(0,1)),
+
                   (Route<dynamic> route) => false,
             );
             }else{
@@ -188,7 +193,7 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
             Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => HomeOrderAccount(3)),
+                    builder: (context) => HomeOrderAccount(3,1)),
                     (Route<dynamic> route) => false);
           }
         },

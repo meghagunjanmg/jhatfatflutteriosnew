@@ -56,7 +56,7 @@ class OrderPlaced extends StatelessWidget {
       onWillPop: () async {
         Navigator.pushAndRemoveUntil(context,
             MaterialPageRoute(builder: (context) {
-              return HomeOrderAccount(0);
+              return HomeOrderAccount(0,1);
             }), (Route<dynamic> route) => true);
         return true; //
       },
@@ -132,7 +132,7 @@ class OrderPlaced extends StatelessWidget {
                     onPressed: () {
                       Navigator.pushAndRemoveUntil(context,
                           MaterialPageRoute(builder: (context) {
-                            return HomeOrderAccount(0);
+                            return HomeOrderAccount(0,1);
                           }), (Route<dynamic> route) => false);},
 
                     child: Text("Go To Home")
@@ -153,6 +153,7 @@ class OrderPlaced extends StatelessWidget {
       Uri myUri = Uri.parse(url);
       http.post(myUri, body: {'user_id': '$userId', 'cart_id': '$orderid'})
           .then((value) {
+            print("Parceldetails:::"+value.body.toString());
         if (value.statusCode == 200 && value.body != null) {
           {
             var tagObjsJson = jsonDecode(value.body) as List;

@@ -1,14 +1,21 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'package:jhatfat/Themes/colors.dart';
 import 'package:jhatfat/baseurlp/baseurl.dart';
 import 'package:jhatfat/bean/rewardvalue.dart';
+
+import '../../../bean/couponlist.dart';
+import '../../../bean/paymentstatus.dart';
+import '../../../bean/subscriptionlist.dart';
 
 class Wallet extends StatefulWidget {
   @override
@@ -27,6 +34,40 @@ class WalletState extends State<Wallet> {
   dynamic currency = '';
   List<WalletHistory> history = [];
   bool isFetchStore = false;
+  TextEditingController _textFieldController = TextEditingController();
+  Razorpay _razorpay = new Razorpay();
+  var publicKey = '';
+  var razorPayKey = '';
+  double totalAmount = 0.0;
+  double newtotalAmount = 0.0;
+  List<PaymentVia> paymentVia = [];
+
+  bool visiblity = false;
+  String promocode = '';
+
+  bool razor = false;
+  bool paystack = false;
+
+  var showDialogBox = false;
+
+  int radioId = -1;
+
+  var setProgressText = 'Proceeding to placed order please wait!....';
+
+  var showPaymentDialog = false;
+
+  double walletUsedAmount = 0.0;
+  bool isFetch = false;
+
+  bool iswallet = false;
+  bool isCoupon = false;
+
+  double coupAmount = 0.0;
+
+
+  List<CouponList> couponL = [];
+  List<PaymentVia> tagObjs =[];
+  List<subscriptionlist> planlist=[];
 
   @override
   void initState() {
@@ -34,6 +75,7 @@ class WalletState extends State<Wallet> {
     getData();
     getWalletAmount();
     getWalletHistory();
+    getVendorPayment();
   }
 
   void getWalletAmount() async {
@@ -88,14 +130,14 @@ class WalletState extends State<Wallet> {
             history = tagObjs;
           });
         } else {
-          Toast.show(jsonData['message'], duration: Toast.lengthShort, gravity:  Toast.bottom);
+          //Toast.show(jsonData['message'], duration: Toast.lengthShort, gravity:  Toast.bottom);
 
         }
       } else {
-        Toast.show('No history found!',  duration: Toast.lengthShort, gravity:  Toast.bottom);
+        //Toast.show('No history found!',  duration: Toast.lengthShort, gravity:  Toast.bottom);
       }
     }).catchError((e) {
-      Toast.show('No history found!',  duration: Toast.lengthShort, gravity:  Toast.bottom);
+      //Toast.show('No history found!',  duration: Toast.lengthShort, gravity:  Toast.bottom);
     });
   }
 
@@ -106,6 +148,88 @@ class WalletState extends State<Wallet> {
       message = pref.getString("message")!;
     });
   }
+  void getVendorPayment() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      currency = preferences.getString('curency');
+    });
+    var url = paymentvia;
+    var client = http.Client();
+    Uri myUri = Uri.parse(url);
+
+    client.post(myUri).then((value) {
+      print('${value.statusCode} - ${value.body}');
+      if (value.statusCode == 200) {
+        var jsonData = jsonDecode(value.body);
+        if (jsonData['status'] == "1") {
+          var tagObjsJson = jsonDecode(value.body)['data'] as List;
+
+          setState((){
+            tagObjs = tagObjsJson
+                .map((tagJson) => PaymentVia.fromJson(tagJson))
+                .toList();
+
+          });
+
+        }
+      }
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
+
+  void razorPay(keyRazorPay, amount) async {
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+
+    Timer(Duration(seconds: 2), () async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var options = {
+        'key': '${keyRazorPay}',
+        'amount': amount * 100,
+        'name': '${prefs.getString('user_name')}',
+        'description': 'Subscription',
+        'prefill': {
+          'contact': '${prefs.getString('user_phone')}',
+          'email': '${prefs.getString('user_email')}'
+        },
+        'external': {
+          'wallets': ['paytm']
+        }
+      };
+
+      try {
+        _razorpay.open(options);
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    });
+  }
+
+
+  void openCheckout(keyRazorPay, amount) async {
+    razorPay(keyRazorPay, amount);
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    CallAPI();
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+
+    Fluttertoast.showToast(
+        msg: "ERROR: " + response.message.toString());
+
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    Fluttertoast.showToast(
+        msg: "ERROR: " + response.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,6 +239,35 @@ class WalletState extends State<Wallet> {
         child: AppBar(
           automaticallyImplyLeading: true,
           backgroundColor: kWhiteColor,
+          actions: [
+            TextButton(onPressed:(){
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text('Add Money To Wallet'),
+                      content: TextField(
+                        controller: _textFieldController,
+                        decoration: InputDecoration(hintText: "Enter Amount"),
+                      ),
+                      actions: [
+                        new TextButton(
+                          child: new Text('Add Money'),
+                          onPressed: () {
+                            openCheckout(tagObjs[0].payment_key,int.parse(_textFieldController.text.toString()));
+                            Navigator.of(context).pop();
+                          },
+                        )
+                      ],
+                    );
+                  }
+              );
+            }, child: Text("Add Money",
+                style: Theme.of(context)
+                .textTheme
+                .bodyText1!
+                .copyWith(color: kMainColor)))
+          ],
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -308,5 +461,31 @@ class WalletState extends State<Wallet> {
               ),
             ),
     );
+  }
+
+  Future<void> CallAPI() async {
+    var url = addwallet;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    int? userId = pref.getInt('user_id');
+
+    Uri myUri = Uri.parse(url);
+    http.post(myUri, body: {
+      'user_id': userId.toString(),
+      'addwallet': _textFieldController.text.toString(),
+    }).then((value) {
+      var jsonData = jsonDecode(value.body);
+      if (jsonData['status'] == "1") {
+        getWalletAmount();
+        setState(() {
+          setState(() {
+            _textFieldController.clear();
+          });
+        });
+      }
+      else{
+        setState(() {
+        });
+      }
+    });
   }
 }

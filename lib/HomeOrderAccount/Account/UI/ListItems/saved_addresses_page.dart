@@ -67,7 +67,6 @@ class _SavedAddressesState extends State<SavedAddresses> {
   Future<void> getData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-
       message = prefs.getString("message")!;
     });
   }
@@ -76,18 +75,7 @@ class _SavedAddressesState extends State<SavedAddresses> {
   void initState() {
     super.initState();
     getData();
-//    _addressBloc = BlocProvider.of<AddressBloc>(context);
-//    _addressBloc.add(FetchAddressesEvent());
-    if (widget.vendorId != null &&
-        widget.vendorId.toString().length > 0 &&
-        widget.vendorId != "") {
-      getVendorAddress(context);
-    } else {
-      setState(() {
-        isFetchAdd = true;
-      });
       getAddress(context);
-    }
     // getAddress2();
     // getAddress3();
   }
@@ -99,70 +87,63 @@ class _SavedAddressesState extends State<SavedAddresses> {
     }
   }
 
-  void getVendorAddress(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      isVendor_list = true;
-      isFetchAdd = true;
-      currency = prefs.getString('curency');
-    });
-    int? userId = prefs.getInt('user_id');
-    String? vendorId = prefs.getString('vendor_id');
-    print('${vendorId} - ${userId}');
-    var url = address_selection;
-    Uri myUri = Uri.parse(url);
-    http.post(myUri, body: {
-      'user_id': '${userId}',
-      'vendor_id': '${vendorId}'
-    }).then((value) {
-      print('${value.statusCode} ${value.body}');
-      if (value.statusCode == 200) {
-        var jsonData = json.decode(value.body);
-        if (jsonData['status'] == "1" &&
-            jsonData['data'] != null &&
-            jsonData['data'] != 'null') {
-          var jsonD2 = jsonData['data'] as List;
-          print('${jsonD2.toString()}');
-          if (jsonD2 != null) {
-            List<ShowAddressNew> tagObjs =
-            jsonD2.map((e) => ShowAddressNew.fromJson(e)).toList();
-            setState(() {
-              isVendor_list = false;
-              addressDelivery = List.from(tagObjs);
-            });
-          } else {
-            setState(() {
-              isVendor_list = false;
-              addressDelivery.clear();
-            });
-          }
-          getAddress(context);
-        } else {
-          setState(() {
-            isVendor_list = false;
-          });
-          getAddress(context);
-          // Toast.show("Address not found!", context,
-          //     duration: Toast.LENGTH_SHORT);
-        }
-        // setState(() {
-        //   isCartFetch = false;
-        // });
-      } else {
-        setState(() {
-          isVendor_list = false;
-        });
-        getAddress(context);
-        // Toast.show('No Address found!',  duration: Toast.lengthShort, gravity:  Toast.bottom);
-      }
-    }).catchError((e) {
-      setState(() {
-        isVendor_list = false;
-      });
-      getAddress(context);
-      print(e);
-    });
-  }
+  // void getVendorAddress(BuildContext context) async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     isFetchAdd = true;
+  //     currency = prefs.getString('curency');
+  //   });
+  //   int? userId = prefs.getInt('user_id');
+  //   String? vendorId = prefs.getString('vendor_id');
+  //   print('${vendorId} - ${userId}');
+  //   var url = address_selection;
+  //   Uri myUri = Uri.parse(url);
+  //   http.post(myUri, body: {
+  //     'user_id': '${userId}',
+  //   }).then((value) {
+  //     print('${value.statusCode} ${value.body}');
+  //     if (value.statusCode == 200) {
+  //       var jsonData = json.decode(value.body);
+  //       if (jsonData['status'] == "1" &&
+  //           jsonData['data'] != null &&
+  //           jsonData['data'] != 'null') {
+  //         var jsonD2 = jsonData['data'] as List;
+  //         print('${jsonD2.toString()}');
+  //         if (jsonD2 != null) {
+  //           List<ShowAddressNew> tagObjs =
+  //           jsonD2.map((e) => ShowAddressNew.fromJson(e)).toList();
+  //           setState(() {
+  //             addressDelivery = List.from(tagObjs);
+  //           });
+  //         } else {
+  //           setState(() {
+  //             addressDelivery.clear();
+  //           });
+  //         }
+  //         getAddress(context);
+  //       } else {
+  //         setState(() {
+  //         });
+  //         getAddress(context);
+  //         // Toast.show("Address not found!", context,
+  //         //     duration: Toast.LENGTH_SHORT);
+  //       }
+  //       // setState(() {
+  //       //   isCartFetch = false;
+  //       // });
+  //     } else {
+  //       setState(() {
+  //       });
+  //       getAddress(context);
+  //       // Toast.show('No Address found!',  duration: Toast.lengthShort, gravity:  Toast.bottom);
+  //     }
+  //   }).catchError((e) {
+  //     setState(() {
+  //     });
+  //     getAddress(context);
+  //     print(e);
+  //   });
+  // }
 
   void getAddress(context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -346,16 +327,7 @@ class _SavedAddressesState extends State<SavedAddresses> {
                                                               index]
                                                                   .type:'Other',);
                                                           })).then((value) {
-                                                    if (widget.vendorId != null &&
-                                                        widget.vendorId.toString().length > 0 &&
-                                                        widget.vendorId != "") {
-                                                      getVendorAddress(context);
-                                                    } else {
-                                                      setState(() {
-                                                        isFetchAdd = true;
-                                                      });
                                                       getAddress(context);
-                                                    }
                                                   });
                                                 }),
                                             Radio(
@@ -448,15 +420,7 @@ class _SavedAddressesState extends State<SavedAddresses> {
                                             child: Column(
                                               children: [
                                                 Visibility(
-                                                  visible: (widget.vendorId !=
-                                                      null &&
-                                                      widget.vendorId
-                                                          .toString()
-                                                          .length >
-                                                          0 &&
-                                                      widget.vendorId != "")
-                                                      ? true
-                                                      : false,
+                                                  visible: true,
                                                   child: IconButton(
                                                       icon: Icon(Icons.edit),
                                                       iconSize: 24.0,
@@ -495,16 +459,7 @@ class _SavedAddressesState extends State<SavedAddresses> {
                                                                       index].type!=null)?showAddressList[
                                                                       index].type:'Other');
                                                                 })).then((value) {
-                                                          if (widget.vendorId != null &&
-                                                              widget.vendorId.toString().length > 0 &&
-                                                              widget.vendorId != "") {
-                                                            getVendorAddress(context);
-                                                          } else {
-                                                            setState(() {
-                                                              isFetchAdd = true;
-                                                            });
                                                             getAddress(context);
-                                                          }
                                                         });
                                                       }),
                                                 ),
@@ -629,11 +584,7 @@ class _SavedAddressesState extends State<SavedAddresses> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Visibility(
-              visible: (widget.vendorId != null &&
-                  widget.vendorId.toString().length > 0 &&
-                  widget.vendorId != "")
-                  ? true
-                  : false,
+              visible: true,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
@@ -649,16 +600,7 @@ class _SavedAddressesState extends State<SavedAddresses> {
                       .push(MaterialPageRoute(builder: (context) {
                     return AddAddressPage(widget.vendorId);
                   })).then((value) {
-                    if (widget.vendorId != null &&
-                        widget.vendorId.toString().length > 0 &&
-                        widget.vendorId != "") {
-                      getVendorAddress(context);
-                    } else {
-                      setState(() {
-                        isFetchAdd = true;
-                      });
                       getAddress(context);
-                    }
                   });
                 }, child: Text("Add New",style: TextStyle(
                   color: Colors.white,
@@ -696,9 +638,7 @@ class _SavedAddressesState extends State<SavedAddresses> {
         var jsonData = jsonDecode(value.body);
         if (jsonData['status'] == "1") {
           // Toast.show(jsonData['message'],  duration: Toast.lengthShort, gravity:  Toast.bottom);
-          if (vendorId != null && vendorId != "") {
             Navigator.pop(context);
-          }
         } else {
           // Toast.show(jsonData['message'],  duration: Toast.lengthShort, gravity:  Toast.bottom);
         }

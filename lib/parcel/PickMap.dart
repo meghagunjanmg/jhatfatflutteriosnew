@@ -58,6 +58,7 @@ class SetLocationState extends State<SetLocationss> {
     );
   }
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  var streetController = TextEditingController();
 
   bool isCard = false;
   Completer<GoogleMapController> _controller = Completer();
@@ -383,6 +384,29 @@ class SetLocationState extends State<SetLocationss> {
               ],
             ),
           ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+            child:
+            TextFormField(
+              controller: streetController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText:'Address (optional)',
+                contentPadding:
+                EdgeInsets.only(left: 20, top: 20, bottom: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                  BorderSide(color: Colors.black, width: 1),
+                ),
+                hintStyle: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: kHintColor,
+                    fontSize: 16),
+              ),
+            ),
+
+          ),
 
           (button)?
           ElevatedButton(
@@ -430,7 +454,7 @@ class SetLocationState extends State<SetLocationss> {
 
   void setData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("pickupLocation",'${currentAddress}');
+    prefs.setString("pickupLocation",'${currentAddress.toString()} '+' ${streetController.text.toString()}');
     prefs.setString("plt",'${lat}');
     prefs.setString("pln",'${lng}');
     print('setdata');

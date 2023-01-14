@@ -66,6 +66,7 @@ class SetLocationState extends State<SetLocations> {
   bool button = false;
 
   var currentAddress = '';
+  var streetController = TextEditingController();
 
   Future<void> _goToTheLake(lat, lng) async {
     final CameraPosition _kLake = CameraPosition(
@@ -383,6 +384,30 @@ class SetLocationState extends State<SetLocations> {
               ],
             ),
           ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+            child:
+            TextFormField(
+              controller: streetController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText:'Address (optional)',
+                contentPadding:
+                EdgeInsets.only(left: 20, top: 20, bottom: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide:
+                  BorderSide(color: Colors.black, width: 1),
+                ),
+                hintStyle: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: kHintColor,
+                    fontSize: 16),
+              ),
+            ),
+
+          ),
+
           (button)?
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -428,7 +453,7 @@ class SetLocationState extends State<SetLocations> {
   }
   void setData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("dropLocation",'${currentAddress}');
+    prefs.setString("dropLocation",'${currentAddress.toString()} '+' ${streetController.text.toString()}');
     prefs.setString("dlt",'${lat}');
     prefs.setString("dln",'${lng}');
   }

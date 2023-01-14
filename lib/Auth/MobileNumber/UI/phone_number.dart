@@ -102,164 +102,130 @@ int numberLimit = 10;
         onWillPop: (){
           return _handlePopBack();
         },
-        child: SingleChildScrollView(
+        child:
+        SingleChildScrollView(
           child: Container(
               height: MediaQuery.of(context).size.height,
-              child: Stack(
-                children: [
-                  Positioned(
-                    width: MediaQuery.of(context).size.width,
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          const SizedBox(
-                            height: 50,
-                          ),
-                          Image.asset(
-                            "images/logos/logo_user.png", //gomarketdelivery logo
-                            height: 130.0,
-                            width: 99.7,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, bottom: 5),
-                            child: Text(
-                              '${appname}',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: kMainTextColor,
-                                  fontSize: 30.0,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          //text on page
-                          Text(AppLocalizations.of(context)!.bodyText1.toString(),
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodyText1),
-                          Text(
-                            AppLocalizations.of(context)!.bodyText2.toString(),
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText1
-                                ?.copyWith(fontWeight: FontWeight.normal),
-                          ),
-                          SizedBox(height: 10.0),
-                          Visibility(
-                              visible: showDialogBox,
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: CircularProgressIndicator(),
-                              )),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 52.0,
-                    width: MediaQuery.of(context).size.width,
-                    child: Image.asset(
-                      "images/logos/Delivery.gif",
-                      width: MediaQuery.of(context).size.width, //footer image
-                    ),
-                  ),
-                  PositionedDirectional(
-                      bottom: 0.0,
-                      width: MediaQuery.of(context).size.width,
-                      height: 52,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            // CountryCodePicker(
-                            //   onChanged: (value) {
-                            //     isoCode = value.code;
-                            //   },
-                            //   builder: (value) => buildButton(value),
-                            //   initialSelection: '+91',
-                            //   textStyle: Theme.of(context).textTheme.caption,
-                            //   showFlag: false,
-                            //   showFlagDialog: true,
-                            //   favorite: ['+91', 'IN'],
-                            // ),
-                            Text('${isoCode}'),
-                            SizedBox(
-                              width: 5.0,
-                            ),
-                            //takes phone number as input
-                            Expanded(
-                              flex: 1,
-                              child: Container(
-                                height: 52,
-                                alignment: Alignment.center,
-                                child:
-                                TextFormField(
-                                  controller: _controller,
-                                  keyboardType: TextInputType.number,
-                                  readOnly: false,
-                                  textAlign: TextAlign.left,
-                                  enabled: !showDialogBox,
-                                  decoration: InputDecoration(
-                                    hintText:
-                                        AppLocalizations.of(context)!.mobileText.toString(),
-                                    border: InputBorder.none,
-                                    counter: Offstage(),
-                                    contentPadding: EdgeInsets.only(left: 30),
-                                    hintStyle: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: kHintColor,
-                                        fontSize: 16),
-                                  ),
-                                  maxLength: numberLimit,
-                                ),
-                              ),
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: kMainColor,
-                                  foregroundColor : kMainColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                  ),
-                                  primary: Colors.purple,
-                                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                                  textStyle:TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400)),
-
-                              onPressed: () {
-                                if(!showDialogBox){
-                                  SystemChannels.textInput.invokeMethod('TextInput.hide');
-                                  setState(() {
-                                    showDialogBox = true;
-                                  });
-                                  if (_controller.text.length < 10) {
-                                    setState(() {
-                                      showDialogBox = false;
-                                    });
-                                    Toast.show("Enter Valid mobile number!", duration: Toast.lengthShort, gravity:  Toast.bottom);
-                                  } else {
-                                            store(_controller.text);
-                                    hitService(isoCode, _controller.text, context);
-                                  }
-                                }
-                              },
-                                child:
-                                Text(
-                                  AppLocalizations.of(context)!.continueText.toString(),
-                                  style: TextStyle(
-                                      color: kWhiteColor,
-                                      overflow: TextOverflow.visible,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                            ),
-                          ],
-                        ),
+              child:
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+            Image.asset(
+              "images/logos/logo_user.png", //gomarketdelivery logo
+              height: 200,
+              width: 200,
+            ),
+                  //text on page
+                  Text(AppLocalizations.of(context)!.bodyText1.toString()+"\n"+AppLocalizations.of(context)!.bodyText2.toString() ,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          ?.copyWith(fontWeight: FontWeight.bold),),
+                  SizedBox(height: 10.0),
+                  Visibility(
+                      visible: showDialogBox,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: CircularProgressIndicator(),
                       )),
-                ],
-              )),
+    Container(
+    padding: EdgeInsets.symmetric(horizontal: 10),
+    child: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: <Widget>[
+    // CountryCodePicker(
+    //   onChanged: (value) {
+    //     isoCode = value.code;
+    //   },
+    //   builder: (value) => buildButton(value),
+    //   initialSelection: '+91',
+    //   textStyle: Theme.of(context).textTheme.caption,
+    //   showFlag: false,
+    //   showFlagDialog: true,
+    //   favorite: ['+91', 'IN'],
+    // ),
+    Text('${isoCode}'),
+    SizedBox(
+    width: 5.0,
+    ),
+    //takes phone number as input
+    Expanded(
+    flex: 1,
+    child: Container(
+    height: 52,
+    alignment: Alignment.center,
+    child:
+    TextFormField(
+    controller: _controller,
+    keyboardType: TextInputType.number,
+    readOnly: false,
+    textAlign: TextAlign.left,
+    enabled: !showDialogBox,
+    decoration: InputDecoration(
+    hintText:
+    AppLocalizations.of(context)!.mobileText.toString(),
+    border: InputBorder.none,
+    counter: Offstage(),
+    contentPadding: EdgeInsets.only(left: 30),
+    hintStyle: TextStyle(
+    fontWeight: FontWeight.w600,
+    color: kHintColor,
+    fontSize: 16),
+    ),
+    maxLength: numberLimit,
+    ),
+    ),
+    ),
+    ])
+    ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: kMainColor,
+                        foregroundColor : kMainColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        primary: Colors.purple,
+                        padding: EdgeInsets.all(12),
+                        textStyle:TextStyle(color: kWhiteColor, fontWeight: FontWeight.w400)),
+
+                    onPressed: () {
+                      if(!showDialogBox){
+                        SystemChannels.textInput.invokeMethod('TextInput.hide');
+                        setState(() {
+                          showDialogBox = true;
+                        });
+                        if (_controller.text.length < 10) {
+                          setState(() {
+                            showDialogBox = false;
+                          });
+                          Toast.show("Enter Valid mobile number!", duration: Toast.lengthShort, gravity:  Toast.bottom);
+                        } else {
+                          store(_controller.text);
+                          hitService(isoCode, _controller.text, context);
+                        }
+                      }
+                    },
+                    child:
+                    Text(
+                      AppLocalizations.of(context)!.continueText.toString(),
+                      style: TextStyle(
+                          color: kWhiteColor,
+                          overflow: TextOverflow.visible,
+                          fontWeight: FontWeight.w400),
+                    ),
+                  ),
+
+                  Image.asset(
+                    "images/logos/Delivery.gif",
+                    width: MediaQuery.of(context).size.width,
+                  ),
+          ])
+          ),
         ),
       ),
     );

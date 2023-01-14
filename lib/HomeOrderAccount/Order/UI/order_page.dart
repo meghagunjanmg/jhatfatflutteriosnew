@@ -605,7 +605,7 @@ class OrderPageState extends State<OrderPage> {
     Uri myUri = Uri.parse(url);
 
     http.post(myUri, body: {'user_id': '$userId'}).then((value) {
-      print('${value.body}');
+      print("Parceldetails:::"+'${value.body}');
       if (value.statusCode == 200 && value.body != null) {
         if (value.body.contains("[{\"order_details\":\"no orders found\"}]") ||
             value.body.contains("{\"data\":[]}") ||
@@ -652,6 +652,7 @@ class OrderPageState extends State<OrderPage> {
     var url = parcel_user_cancel_order;
     Uri myUri = Uri.parse(url);
 
+
     http.post(myUri, body: {'user_id': '$userId'}).then((value) {
       print('${value.body}');
       if (value.statusCode == 200 && value.body != null) {
@@ -661,6 +662,7 @@ class OrderPageState extends State<OrderPage> {
           setState(() {
             onParcelGoingOrders.clear();
           });
+
         } else {
           var tagObjsJson = jsonDecode(value.body) as List;
           List<TodayOrderParcel> tagObjs = tagObjsJson
@@ -748,10 +750,10 @@ class OrderPageState extends State<OrderPage> {
       isFetch = true;
       countFetch = 0;
     });
+    getOnParcelGointOrders();
     getOnGointOrders();
     getOnRestGointOrders();
-    getOnPharmaGointOrders();
-    getOnParcelGointOrders();
+    ///getOnPharmaGointOrders();
   }
 
   void getCancelledHistory() async {
@@ -761,7 +763,7 @@ class OrderPageState extends State<OrderPage> {
     });
     getCanceledOreders();
     getRestCanceledOreders();
-    getPharmaCanceledOreders();
+    ////getPharmaCanceledOreders();
     getParcelCanceledOreders();
   }
 
@@ -772,7 +774,7 @@ class OrderPageState extends State<OrderPage> {
     });
     getCompletedOrders();
     getParcelCompletedOrders();
-    getPharmaCompletedOrders();
+    ///getPharmaCompletedOrders();
     getRestCompletedOrders();
   }
 
@@ -1741,7 +1743,7 @@ class OrderPageState extends State<OrderPage> {
                                     // clearCart();
                                     Navigator.pushAndRemoveUntil(context,
                                         MaterialPageRoute(builder: (context) {
-                                      return HomeOrderAccount(0);
+                                      return HomeOrderAccount(0,1);
                                     }), (Route<dynamic> route) => false);
                                   },
                                   child: Text(
@@ -1790,9 +1792,6 @@ class OrderPageState extends State<OrderPage> {
                 ),
               ),
             ),
-
-
-
             Container(
               margin: EdgeInsets.all(12),
               alignment: Alignment.bottomCenter,

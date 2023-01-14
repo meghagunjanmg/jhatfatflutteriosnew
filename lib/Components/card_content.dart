@@ -118,7 +118,7 @@ class CardContent extends StatelessWidget {
         prefs.setString("ui_type", '${ui_type}');
         Navigator.pushAndRemoveUntil(context,
             MaterialPageRoute(builder: (context) {
-              return HomeOrderAccount(2);
+              return HomeOrderAccount(2,1);
             }), (Route<dynamic> route) => true);
       }
   }

@@ -206,7 +206,7 @@ class AddressTile2 extends StatelessWidget {
         child: CustomAppBar(
           leading: GestureDetector(
             onTap: () {
-              Navigator.push(context,MaterialPageRoute(builder: (context) => new HomeOrderAccount(0)));
+              Navigator.push(context,MaterialPageRoute(builder: (context) => new HomeOrderAccount(0,1)));
               /* Write listener code here */ },
             child: Icon(
               Icons.arrow_back,  // add custom icons also
@@ -228,15 +228,7 @@ class AddressTile2 extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: EdgeInsets.only(left: 18.0,right: 18.0,bottom: 18.0),
-          child: Text(          "Pickup Address: "+ '${pickup}',
-            textDirection: TextDirection.ltr,
-            textAlign: TextAlign.start,
-            style:
-            TextStyle(color: Colors.black, fontSize: 14),
-          ),
-        ),
+
 
         Padding(
           padding:  EdgeInsets.only(left: 18.0,right: 18.0),
@@ -244,8 +236,7 @@ class AddressTile2 extends StatelessWidget {
         ),
         Padding(
           padding: EdgeInsets.only(left: 18.0,right: 18.0,bottom: 18.0),
-          child: Text(
-            "Drop Address: "+ '${drop}',
+          child: Text(          "Pickup Address: "+ '${pickup}',
             textDirection: TextDirection.ltr,
             textAlign: TextAlign.start,
             style:
@@ -256,6 +247,16 @@ class AddressTile2 extends StatelessWidget {
         padding:  EdgeInsets.only(left: 18.0,right: 18.0),
         child: AddressTile2(),
       ),
+        Padding(
+          padding: EdgeInsets.only(left: 18.0,right: 18.0,bottom: 18.0),
+          child: Text(
+            "Drop Address: "+ '${drop}',
+            textDirection: TextDirection.ltr,
+            textAlign: TextAlign.start,
+            style:
+            TextStyle(color: Colors.black, fontSize: 14),
+          ),
+        ),
 
         Padding(
           padding: EdgeInsets.all(18.0),

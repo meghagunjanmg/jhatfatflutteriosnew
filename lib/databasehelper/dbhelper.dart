@@ -358,18 +358,26 @@ class DatabaseHelper {
         .rawQuery("SELECT COUNT(*) FROM $addontable WHERE $addonid=$id"));
     return count;
   }
+
   Future<int?> getCountVendor() async {
     Database db = await instance.database;
     int? count = Sqflite.firstIntValue(await db
         .rawQuery("SELECT COUNT(DISTINCT $varientId) FROM $table"));
     return count;
   }
+
   Future<int?> getVendorcount() async {
-    Database db = await instance.database;
-    int? count = Sqflite.firstIntValue(await db
-        .rawQuery("SELECT COUNT(DISTINCT $vendor_id) FROM $table"));
-    return count;
+    // Database db = await instance.database;
+    // int? count = Sqflite.firstIntValue(await db.rawQuery("SELECT COUNT(DISTINCT $vendor_id) FROM $table"));
+    // return count;
+      var dbClient = await instance.database;
+
+      var result = await dbClient.rawQuery("SELECT COUNT(DISTINCT $vendor_id) FROM $table");
+
+      return Sqflite.firstIntValue(result);
   }
+
+
   Future<int?> queryRowCount() async {
     Database db = await instance.database;
     int? counttable1 =

@@ -85,6 +85,7 @@ class _oneViewCartState extends State<oneViewCart> {
   int surge_charges = 0;
   int night_charges = 0;
   int conv_charges = 0;
+  int maxincash = 0;
 
 
   int radioId = -1;
@@ -184,7 +185,7 @@ class _oneViewCartState extends State<oneViewCart> {
         isCartFetch = true;
       });
       for (int i = 0; i < cartListII.length; i++) {
-        print('${cartListII[i].varient_id}');
+        print("RESTCART: "+'${cartListII[i].varient_id}');
         db
             .getAddOnListWithPrice(int.parse('${cartListII[i].varient_id}'))
             .then((values) {
@@ -199,6 +200,8 @@ class _oneViewCartState extends State<oneViewCart> {
         isCartFetch = false;
       });
     });
+
+    getCatC();
   }
 
   void prepareData(firstDate) {
@@ -244,6 +247,7 @@ class _oneViewCartState extends State<oneViewCart> {
       }
     });
 
+
     print("CART: "+cartListI.toString());
   }
 
@@ -255,13 +259,11 @@ class _oneViewCartState extends State<oneViewCart> {
       currency = prefs.getString('curency')!;
     });
     int? userId = prefs.getInt('user_id');
-    String? vendorId = prefs.getString('vendor_id');
     var url = address_selection;
     Uri myUri = Uri.parse(url);
 
     http.post(myUri, body: {
       'user_id': '${userId}',
-      'vendor_id': '${vendorId}'
     }).then((value) {
       if (value.statusCode == 200) {
         var jsonData = json.decode(value.body);
@@ -306,7 +308,7 @@ class _oneViewCartState extends State<oneViewCart> {
       var vae = {
         DatabaseHelper.productId: product_id,
         DatabaseHelper.productName: product_name,
-        DatabaseHelper.price: price_d,
+        DatabaseHelper.price: price,
         DatabaseHelper.unit: unit,
         DatabaseHelper.quantitiy: quantity,
         DatabaseHelper.addQnty: itemCount,
@@ -315,6 +317,8 @@ class _oneViewCartState extends State<oneViewCart> {
 
       if (value == 0) {
         db.insertRaturantOrder(vae);
+        getResCartItem();
+        getCatC();
       }
       else {
         if (itemCount==0) {
@@ -322,20 +326,22 @@ class _oneViewCartState extends State<oneViewCart> {
             db.deleteAddOn(varient_id);
           });
           getResCartItem();
+          getCatC();
+        }
 
-        } else {
+        else {
           db.updateRestProductData(vae, varient_id);
+          getResCartItem();
+          getCatC();
         }
       }
       if (itemCount == 0) {
         getResCartItem();
+        getCatC();
       }
     });
 
-
     getCatC();
-
-
     getCouponList();
 
   }
@@ -654,6 +660,8 @@ class _oneViewCartState extends State<oneViewCart> {
     });
   }
   void getCatC() async {
+
+
     if (cartListI.isNotEmpty) {
       DatabaseHelper db = DatabaseHelper.instance;
       db.calculateTotal().then((value) {
@@ -674,24 +682,18 @@ class _oneViewCartState extends State<oneViewCart> {
         db.calculateTotalRestAdon().then((valued) {
           var tagObjsJson = value as List;
           var tagObjsJsond = valued as List;
+
+          print("RESTCARTCAL:: "+tagObjsJson.toString());
+
           setState(() {
             dynamic totalAmount_1 = tagObjsJson[0]['Total'];
             dynamic totalAmount_2 = tagObjsJsond[0]['Total'];
-
-            if (value.isEmpty) {
-              if (valued.isEmpty) {}
-              else {
-                totalAmount = totalAmount_1 + totalAmount_2;
-              }
-            } else {
-                totalAmount = totalAmount_1;
-            }
+            if(value.isEmpty){} else totalAmount = totalAmount_1;
+              if(valued.isEmpty){} else totalAmount = totalAmount+totalAmount_2;
           });
         });
       });
     }
-
-
 
     if(radioId!=-1){
       if(couponL[radioId].type=='percentage') {
@@ -717,6 +719,8 @@ class _oneViewCartState extends State<oneViewCart> {
     getCatC();
     ordercharg();
     servicecharge();
+    getAddress(context);
+
 
   }
   _showDialog() async{
@@ -757,7 +761,11 @@ class _oneViewCartState extends State<oneViewCart> {
   }
   @override
   Widget build(BuildContext context) {
+
+
     getCatC();
+
+
     var size = MediaQuery
         .of(context)
         .size;
@@ -1049,6 +1057,117 @@ class _oneViewCartState extends State<oneViewCart> {
                         Container()
                             :
                         Container(),
+                        Container(
+                          height: 15.0,
+                          color: kCardBackgroundColor,
+                        ),
+                        ExpansionTile(
+                          title: Text('Promo Code'),
+                          children: [
+                            Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: <Widget>[
+                                      Visibility(
+                                        visible: (couponL != null && couponL.length > 0)
+                                            ? true
+                                            : false,
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(horizontal: 20),
+                                          child: (couponL != null && couponL.length > 0)
+                                              ? ListView.builder(
+                                              primary: false,
+                                              shrinkWrap: true,
+                                              itemCount: couponL.length,
+                                              itemBuilder: (context, t) {
+                                                return Column(
+                                                  children: [
+                                                    Divider(
+                                                      color: kCardBackgroundColor,
+                                                      thickness: 2.3,
+                                                    ),
+
+                                                    (couponL[t].cart_value<=totalAmount)?
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                      children: [
+                                                        Expanded(
+                                                            child: Text(
+                                                                '${couponL[t].coupon_code}\n${couponL[t].coupon_description}\nmin cart value: ${couponL[t].cart_value}')),
+                                                        Radio(
+                                                            value: t,
+                                                            groupValue: radioId,
+                                                            toggleable: true,
+                                                            onChanged: (val) {
+                                                              print('${val}');
+                                                              print(
+                                                                  '${radioId} - ${t}');
+                                                              if (radioId != t ||
+                                                                  radioId == -1) {
+                                                                setState(() {
+                                                                  if (totalAmount !=
+                                                                      0.0) {
+                                                                    radioId = t;
+                                                                    print(
+                                                                        '${radioId} - ${t}');
+
+                                                                    selectedcoupon = couponL[t];
+                                                                    // setProgressText =
+                                                                    // 'Applying coupon please wait!....';
+                                                                    //showDialogBox =true;
+                                                                    //appCoupon(couponL[t].coupon_code);
+                                                                  } else {
+                                                                  }
+                                                                });
+                                                              } else {
+                                                                setState(() {
+                                                                  radioId = -1;
+                                                                  selectedcoupon=null;
+                                                                  couponAmount = 0.0;
+                                                                  // showDialogBox =
+                                                                  // true;
+                                                                  //appCoupon(couponL[t].coupon_code);
+                                                                });
+                                                              }
+                                                            })
+                                                      ],
+                                                    )
+                                                        :
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                      children: [
+                                                        Expanded(
+                                                            child: Text(
+                                                              '${couponL[t].coupon_code}\n${couponL[t].coupon_description}\nmin cart value: ${couponL[t].cart_value}',
+                                                              style: TextStyle(color: Colors.red),
+                                                            )),
+                                                      ],
+                                                    ),
+
+                                                    Divider(
+                                                      color: kCardBackgroundColor,
+                                                      thickness: 2.3,
+                                                    ),
+                                                  ],
+                                                );
+                                              })
+                                              : Container(),
+                                        ),
+                                      ),
+
+                                      (couponL != null && couponL.length > 0)?
+                                          Text(""):Text("No Coupon available"),
+                                      SizedBox(
+                                        height: 100,
+                                      ),
+                                    ])),
+                          ],
+                        ),
 
                         Divider(
                           color: kCardBackgroundColor,
@@ -1272,114 +1391,7 @@ class _oneViewCartState extends State<oneViewCart> {
                                 ),
                               ]),
                         ),
-                        Container(
-                          height: 15.0,
-                          color: kCardBackgroundColor,
-                        ),
-                        ExpansionTile(
-                          title: Text('Promo Code'),
-                          children: [
-                            Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: <Widget>[
-                                      Visibility(
-                                        visible: (couponL != null && couponL.length > 0)
-                                            ? true
-                                            : false,
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(horizontal: 20),
-                                          child: (couponL != null && couponL.length > 0)
-                                              ? ListView.builder(
-                                              primary: false,
-                                              shrinkWrap: true,
-                                              itemCount: couponL.length,
-                                              itemBuilder: (context, t) {
-                                                return Column(
-                                                  children: [
-                                                    Divider(
-                                                      color: kCardBackgroundColor,
-                                                      thickness: 2.3,
-                                                    ),
 
-                                                    (couponL[t].cart_value<=totalAmount)?
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                      children: [
-                                                        Expanded(
-                                                            child: Text(
-                                                                '${couponL[t].coupon_code}\n${couponL[t].coupon_description}\nmin cart value: ${couponL[t].cart_value}')),
-                                                        Radio(
-                                                            value: t,
-                                                            groupValue: radioId,
-                                                            toggleable: true,
-                                                            onChanged: (val) {
-                                                              print('${val}');
-                                                              print(
-                                                                  '${radioId} - ${t}');
-                                                              if (radioId != t ||
-                                                                  radioId == -1) {
-                                                                setState(() {
-                                                                  if (totalAmount !=
-                                                                      0.0) {
-                                                                    radioId = t;
-                                                                    print(
-                                                                        '${radioId} - ${t}');
-
-                                                                    selectedcoupon = couponL[t];
-                                                                    // setProgressText =
-                                                                    // 'Applying coupon please wait!....';
-                                                                    //showDialogBox =true;
-                                                                    //appCoupon(couponL[t].coupon_code);
-                                                                  } else {
-                                                                  }
-                                                                });
-                                                              } else {
-                                                                setState(() {
-                                                                  radioId = -1;
-                                                                  selectedcoupon=null;
-                                                                  couponAmount = 0.0;
-                                                                  // showDialogBox =
-                                                                  // true;
-                                                                  //appCoupon(couponL[t].coupon_code);
-                                                                });
-                                                              }
-                                                            })
-                                                      ],
-                                                    )
-                                                        :
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                      children: [
-                                                        Expanded(
-                                                            child: Text(
-                                                                '${couponL[t].coupon_code}\n${couponL[t].coupon_description}\nmin cart value: ${couponL[t].cart_value}',
-                                                            style: TextStyle(color: Colors.red),
-                                                            )),
-                                                      ],
-                                                    ),
-
-                                                    Divider(
-                                                      color: kCardBackgroundColor,
-                                                      thickness: 2.3,
-                                                    ),
-                                                  ],
-                                                );
-                                              })
-                                              : Container(),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 100,
-                                      ),
-                                    ])),
-                          ],
-                        ),
                       ],
                     ),
                   ),
@@ -1420,17 +1432,12 @@ class _oneViewCartState extends State<oneViewCart> {
                                             fontWeight: FontWeight.bold)),
                                     Spacer(),
                                     GestureDetector(
-                                      onTap: () async {
-                                        SharedPreferences prefs =
-                                        await SharedPreferences
-                                            .getInstance();
-                                        String? vendorId =
-                                        prefs.getString('vendor_id');
+                                      onTap: () {
                                         Navigator.of(context).push(
                                             MaterialPageRoute(
                                                 builder: (context) {
                                                   return SavedAddressesPage(
-                                                      vendorId);
+                                                      "");
                                                 })).then((value) {
                                           getAddress(context);
                                         });
@@ -1632,7 +1639,7 @@ class _oneViewCartState extends State<oneViewCart> {
                     // clearCart();
                     Navigator.pushAndRemoveUntil(context,
                         MaterialPageRoute(builder: (context) {
-                          return HomeOrderAccount(0);
+                          return HomeOrderAccount(0,1);
                         }), (Route<dynamic> route) => true);
                   },
                   child: Text(
@@ -1763,6 +1770,8 @@ class _oneViewCartState extends State<oneViewCart> {
     setState(() {
       currency = preferences.getString('curency')!;
     });
+    print("object**"+maxincash.toString());
+
     var url = paymentvia;
     var client = http.Client();
     Uri myUri = Uri.parse(url);
@@ -1782,7 +1791,7 @@ class _oneViewCartState extends State<oneViewCart> {
 
           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
             return PaymentRestPage(vendorId, details.order_id, details.cart_id,
-                double.parse(totalAmount.toString()), tagObjs);
+                double.parse(totalAmount.toString()), tagObjs , maxincash);
           }));
         }
       }
@@ -1946,6 +1955,8 @@ class _oneViewCartState extends State<oneViewCart> {
     setState(() {
       currency = preferences.getString('curency')!;
     });
+
+
     var url = paymentvia;
     var client = http.Client();
     Uri myUri = Uri.parse(url);
@@ -1970,7 +1981,9 @@ class _oneViewCartState extends State<oneViewCart> {
                 details.cart_id,
                 double.parse(totalAmount.toString()),
                 tagObjs,
-                orderArray);
+                orderArray,
+                maxincash
+            );
           }));
         }
       }
@@ -2006,6 +2019,8 @@ class _oneViewCartState extends State<oneViewCart> {
             .then((value) {
           if (value != null && value < 3) {
             db.insert(vae);
+            getCartItem();
+            getCatC();
           }
         }
         );
@@ -2016,22 +2031,25 @@ class _oneViewCartState extends State<oneViewCart> {
           db.delete(varient_id);
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => HomeOrderAccount(3)),
+              MaterialPageRoute(builder: (context) => HomeOrderAccount(3,1)),
                   (Route<dynamic> route) => false,
             );
+          getCartItem();
+          getCatC();
+
         } else {
           db.updateData(vae, int.parse('${varient_id}')).then((vay) {
             print('vay - $vay');
           });
+          getCartItem();
+          getCatC();
         }
       }
     }).catchError((e) {
       print(e);
     });
 
-
     getCatC();
-
     getCouponList();
 
   }
@@ -2570,12 +2588,15 @@ class _oneViewCartState extends State<oneViewCart> {
       'user_id': userId.toString(),
     }).then((value) {
       var jsonData = jsonDecode(value.body);
-      print("SERVICE "+value.body.toString());
+
+      print("SERVICECharege "+value.body.toString());
+
       if (jsonData['status'] == "1") {
         setState(() {
           surge_charges = jsonData['surge_charges'];
           night_charges = jsonData['night_charges'];
           conv_charges = jsonData['conv_charges'];
+          maxincash = jsonData['maxincash'];
         });
       }
       else{
