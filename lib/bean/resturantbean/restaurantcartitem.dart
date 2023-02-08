@@ -8,17 +8,18 @@ class RestaurantCartItem{
   dynamic price;
   dynamic product_name;
   List<AddonCartItem> addon;
+  dynamic vendor_id;
 
   RestaurantCartItem(this.varient_id,this.store_name, this.add_qnty, this.qnty, this.unit,
-      this.price, this.product_name, this.addon);
+      this.price, this.product_name, this.addon,this.vendor_id);
 
   factory RestaurantCartItem.fromJson(dynamic json){
-    return RestaurantCartItem(json['varient_id'], json['store_name'],json['add_qnty'], json['qnty'], json['unit'], json['price'], json['product_name'], []);
+    return RestaurantCartItem(json['varient_id'], json['store_name'],json['add_qnty'], json['qnty'], json['unit'], json['price'], json['product_name'], [],json['vendor_id']);
   }
 
   @override
   String toString() {
-    return '[{\"varient_id\": $varient_id,\"store_name\": $store_name, \"add_qnty\": $add_qnty, \"qnty\": $qnty, \"unit\": $unit, \"price\": $price, \"product_name\": $product_name, \"addon\": $addon}]';
+    return '[{\"varient_id\": $varient_id,\"store_name\": $store_name, \"add_qnty\": $add_qnty, \"qnty\": $qnty, \"unit\": $unit, \"price\": $price, \"product_name\": $product_name, \"addon\": $addon,\"vendor_id\":$vendor_id}]';
   }
 }
 

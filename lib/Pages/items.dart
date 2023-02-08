@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
@@ -108,6 +109,7 @@ class _ItemsPageState extends State<ItemsPage>
   bool isFetchList = false;
   bool isSearchOpen = false;
   String message = "";
+  String curency = "";
   List<CartItem> results = [];
 
   _ItemsPageState(this.pageTitle, this.vendor_id, this.category_name,
@@ -229,12 +231,7 @@ class _ItemsPageState extends State<ItemsPage>
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (isSearchOpen) {
-          setList2();
-          return false;
-        } else {
-          return true;
-        }
+        return true;
       },
       child:
       Stack(
@@ -251,8 +248,9 @@ class _ItemsPageState extends State<ItemsPage>
             child: Stack(
               children: [
                 SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
+
                 CustomAppBar(
                   titleWidget: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -329,33 +327,98 @@ class _ItemsPageState extends State<ItemsPage>
                                   getCartCount();
                                 });
                               }),
-                          Positioned(
-                              right: 5,
-                              top: 2,
-                              child: Visibility(
-                                visible: isCartCount,
-                                child: CircleAvatar(
-                                  minRadius: 4,
-                                  maxRadius: 8,
-                                  backgroundColor: kMainColor,
-                                  child: Text(
-                                    '$cartCount',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 7,
-                                        color: kWhiteColor,
-                                        fontWeight: FontWeight.w200),
-                                  ),
-                                ),
-                              ))
+                          // Positioned(
+                          //     right: 5,
+                          //     top: 2,
+                          //     child: Visibility(
+                          //       visible: isCartCount,
+                          //       child: CircleAvatar(
+                          //         minRadius: 4,
+                          //         maxRadius: 8,
+                          //         backgroundColor: kMainColor,
+                          //         child: Text(
+                          //           '$cartCount',
+                          //           overflow: TextOverflow.ellipsis,
+                          //           style: TextStyle(
+                          //               fontSize: 7,
+                          //               color: kWhiteColor,
+                          //               fontWeight: FontWeight.w200),
+                          //         ),
+                          //       ),
+                          //     ))
                         ],
                       ),
                     ),
                   ],
                   bottom: PreferredSize(
-                    preferredSize: Size.fromHeight(0.0),
+                    preferredSize: Size.fromHeight(10.0),
                     child: Column(
                       children: <Widget>[
+                        Visibility(
+                          visible: (!isSearchOpen) ? false : true,
+                          child: Container(
+                          width: MediaQuery
+                              .of(context)
+                              .size
+                              .width * 0.85,
+                          height: 50,
+                          margin: EdgeInsets.all(10),
+                          padding: EdgeInsets.only(left: 5),
+
+                          child: TypeAheadField(
+                            textFieldConfiguration: TextFieldConfiguration(
+                              autofocus: true,
+                              decoration: InputDecoration(
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                                    borderSide: BorderSide(color: Colors.black)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                                    borderSide: BorderSide(color: Colors.black)),
+                                prefixIcon: Icon(
+                                  Icons.search,
+                                  color: kHintColor,
+                                ),
+                                              suffixIcon: IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    isSearchOpen = !isSearchOpen;
+                                                  });
+                                                }, icon:Icon(Icons.close),
+                                              ),
+                                hintText: 'Search Items...',
+                              ),
+                            ),
+                            suggestionsCallback: (pattern) async {
+                              return await BackendService.getSuggestions(pattern,widget.vendor_id);
+                            },
+                            itemBuilder: (context, ProductWithVarient suggestion) {
+                              return ListTile(
+                                  title: Text('${suggestion.str1}'),
+                                  subtitle: Text('${suggestion.str2}'
+                                  )
+                              );
+                            },
+                            hideOnError: true,
+                            onSuggestionSelected: (ProductWithVarient detail) {if (detail.product_id!=null){
+                              setState(() {
+                                isSearchOpen = false;
+                              });
+                              Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (context) {
+                                    return SingleProductPage(
+                                      detail,
+                                      curency,
+                                    );
+                                  }));
+                            }
+                            },
+                          ),
+                        ),
+                        ),
+
+
                         TabBar(
                           tabs: tabs,
                           isScrollable: (subCategoryListApp != null &&
@@ -376,71 +439,71 @@ class _ItemsPageState extends State<ItemsPage>
                     ),
                   ),
                 ),
-                Visibility(
-                  visible: isSearchOpen,
-                  child: Container(
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
-                    height: 72,
-                    padding: EdgeInsets.only(top: 5.0),
-                    color: kWhiteColor,
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Container(
-                          width: MediaQuery
-                              .of(context)
-                              .size
-                              .width,
-                          height: 52,
-                          padding: EdgeInsets.only(left: 5),
-                          decoration: BoxDecoration(
-                            color: scaffoldBgColor,
-                          ),
-                          child: TextFormField(
-                            controller: searchController,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              prefixIcon: Icon(
-                                Icons.search,
-                                color: kHintColor,
-                              ),
-                              hintText: 'Search category...',
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isSearchOpen = !isSearchOpen;
-                                  });
-                                },
-                                icon: Icon(
-                                  Icons.close,
-                                  color: kHintColor,
-                                ),
-                              ),
-                            ),
-                            cursorColor: kMainColor,
-                            autofocus: false,
-                            onChanged: (value) {
-                              setState(() {
-                                productVarientList = productVarientListSearch
-                                    .where((element) =>
-                                    element.product_name
-                                        .toString()
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()))
-                                    .toList();
-                              });
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                // Visibility(
+                //   visible: isSearchOpen,
+                //   child: Container(
+                //     width: MediaQuery
+                //         .of(context)
+                //         .size
+                //         .width,
+                //     height: 72,
+                //     padding: EdgeInsets.only(top: 5.0),
+                //     color: kWhiteColor,
+                //     child: Column(
+                //       children: [
+                //         SizedBox(
+                //           height: 15,
+                //         ),
+                //         Container(
+                //           width: MediaQuery
+                //               .of(context)
+                //               .size
+                //               .width,
+                //           height: 52,
+                //           padding: EdgeInsets.only(left: 5),
+                //           decoration: BoxDecoration(
+                //             color: scaffoldBgColor,
+                //           ),
+                //           child: TextFormField(
+                //             controller: searchController,
+                //             decoration: InputDecoration(
+                //               border: InputBorder.none,
+                //               prefixIcon: Icon(
+                //                 Icons.search,
+                //                 color: kHintColor,
+                //               ),
+                //               hintText: 'Search category...',
+                //               suffixIcon: IconButton(
+                //                 onPressed: () {
+                //                   setState(() {
+                //                     isSearchOpen = !isSearchOpen;
+                //                   });
+                //                 },
+                //                 icon: Icon(
+                //                   Icons.close,
+                //                   color: kHintColor,
+                //                 ),
+                //               ),
+                //             ),
+                //             cursorColor: kMainColor,
+                //             autofocus: false,
+                //             onChanged: (value) {
+                //               setState(() {
+                //                 productVarientList = productVarientListSearch
+                //                     .where((element) =>
+                //                     element.product_name
+                //                         .toString()
+                //                         .toLowerCase()
+                //                         .contains(value.toLowerCase()))
+                //                     .toList();
+                //               });
+                //             },
+                //           ),
+                //         )
+                //       ],
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -1123,12 +1186,15 @@ class _ItemsPageState extends State<ItemsPage>
 
     bool allow = (prefs.getString("allowmultishop").toString()!="1") ;
     if (value == 0) {
+      db.insert(vae);
+      print("CARTITEN:::"+vae.toString());
+
       if(allow) {
         db.getVendorcount()
             .then((value) {
           print("VENDORCOUNT"+value.toString());
-          if (value != null && value < 3) {
-            db.insert(vae);
+          if (value != null && value <= 3) {
+            //db.insert(vae);
             getCartCount();
           }
           else {
@@ -1313,6 +1379,7 @@ class _ItemsPageState extends State<ItemsPage>
     setState(() {
 
       message = prefs.getString("message")!;
+      curency = prefs.getString("curency")!;
     });
   }
   void setList(List<ProductWithVarient> tagObjs) {
@@ -1609,3 +1676,45 @@ showMyDialog2(BuildContext context) {
 //     });
 //   }
 // }
+
+
+
+class BackendService {
+  static Future<List<ProductWithVarient>> getSuggestions(String query,
+      dynamic vendor_id) async {
+    if (query.isEmpty && query.length < 2) {
+      print('Query needs to be at least 3 chars');
+      return Future.value([]);
+    }
+
+    var url = storesearch;
+    Uri myUri = Uri.parse(url);
+    var response = await http.post(myUri, body: {
+      'vendor_id': vendor_id.toString(),
+      'prod_name': query
+    });
+
+    List<ProductWithVarient> vendors = [];
+    List<ProductWithVarient> vendors1 = [];
+
+    if (response.statusCode == 200) {
+      Iterable json1 = jsonDecode(response.body)['product'];
+      Iterable json2 = jsonDecode(response.body)['cat'];
+
+
+      if (json1.isNotEmpty) {
+        vendors.clear();
+        vendors =
+        List<ProductWithVarient>.from(json1.map((model) => ProductWithVarient.fromJson(model)));
+      }
+      if (json2.isNotEmpty) {
+        vendors1.clear();
+        vendors1 =
+        List<ProductWithVarient>.from(json2.map((model) => ProductWithVarient.fromJson(model)));
+        vendors.addAll(vendors1);
+      }
+    }
+
+    return Future.value(vendors);
+  }
+}

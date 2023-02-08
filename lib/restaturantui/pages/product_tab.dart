@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
+import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:jhatfat/Themes/colors.dart';
@@ -45,6 +46,9 @@ class _ProductTabDataState extends State<ProductTabData> {
   bool isSlideFetch = false;
   bool isFetch = false;
   bool isFetchs = false;
+  final scrollDirection = Axis.vertical;
+
+  late AutoScrollController controller;
 
   @override
   void initState() {
@@ -52,6 +56,10 @@ class _ProductTabDataState extends State<ProductTabData> {
     getCartItem();
     hitSliderUrl();
     hitResturantItem();
+    controller = AutoScrollController(
+        viewportBoundaryGetter: () =>
+            Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
+        axis: scrollDirection);
     super.initState();
   }
   void getCartItem() async {
@@ -219,453 +227,344 @@ class _ProductTabDataState extends State<ProductTabData> {
         .of(context)
         .size
         .height;
-    return ListView(
-      physics: BouncingScrollPhysics(),
-      shrinkWrap: true,
-      primary: true,
-      children: <Widget>[
-
-        Visibility(
-          visible: (!isSlideFetch && listImage.length > 0)
-              ? true
-              : false,
-          child: Container(
-            width: width,
-            height: 160.0,
-            child: Padding(
-              padding: EdgeInsets.only(top: 10, bottom: 5),
-              child: (listImage != null && listImage.length > 0)
-                  ? ListView.builder(
-                itemCount: listImage.length,
-                scrollDirection: Axis.horizontal,
-                physics: BouncingScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {},
-                    child: Container(
-                      width: 170.0,
-                      margin: (index !=
-                          (listImage.length - 1))
-                          ? EdgeInsets.only(left: fixPadding)
-                          : EdgeInsets.only(
-                          left: fixPadding,
-                          right: fixPadding),
-                      decoration: BoxDecoration(
-                        borderRadius:
-                        BorderRadius.circular(10.0),
-                      ),
-                      child: Image.network(
-                        '${imageBaseUrl}${listImage[index].bannerImage}',
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                  );
-                },
-              )
-                  : ListView.builder(
-                itemCount: 10,
-                scrollDirection: Axis.horizontal,
-                physics: BouncingScrollPhysics(),
-                itemBuilder: (context, index) {
-                  // final item = listImages[index];
-                  return InkWell(
-                    onTap: () {},
-                    child: Container(
-                      width: 170.0,
-                      margin: (index != (10 - 1))
-                          ? EdgeInsets.only(left: fixPadding)
-                          : EdgeInsets.only(
-                          left: fixPadding,
-                          right: fixPadding),
-                      decoration: BoxDecoration(
-                        // image: DecorationImage(
-                        //   image: AssetImage(imageBaseUrl+item.banner_image),
-                        //   fit: BoxFit.cover,
-                        // ),
-                        borderRadius:
-                        BorderRadius.circular(10.0),
-                      ),
-                      child: Shimmer(
-                        duration: Duration(seconds: 3),
-                        //Default value
-                        color: Colors.white,
-                        //Default value
-                        enabled: true,
-                        //Default value
-                        direction:
-                        ShimmerDirection.fromLTRB(),
-                        //Default Value
-                        child: Container(
-                          color: kTransparentColor,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-        heightSpace,
-        heightSpace,
-        (categoryList2 != null && categoryList2.length > 0)
-            ?
-    Column(
-    mainAxisAlignment: MainAxisAlignment.start,
-    children: <Widget>[
+    return
+      Scaffold(
+        body:
             Container(
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width * 0.85,
-              height: 52,
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.only(left: 5),
-
-              child: TypeAheadField(
-                textFieldConfiguration: TextFieldConfiguration(
-                  autofocus: false,
-                  style:
-                  DefaultTextStyle
-                      .of(context)
-                      .style
-                      .copyWith(fontStyle: FontStyle.italic),
-                  decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                        borderSide: BorderSide(color: Colors.black)),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                        borderSide: BorderSide(color: Colors.black)),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: kHintColor,
-                    ),
-                    hintText: 'Search Dishes...',
-                  ),
-                ),
-                suggestionsCallback: (pattern) async {
-                  return await BackendService.getSuggestions(pattern,widget.item.vendor_id);
-                },
-                itemBuilder: (context, Vendors suggestion) {
-                  return ListTile(
-                      title: Text('${suggestion.str1}'),
-                      subtitle: Text('${suggestion.str2}'
-                      )
-                  );
-                },
-                hideOnError: true,
-                onSuggestionSelected: (Vendors detail) {
-                  for(int i=0;i<categoryList.length;i++)
-                  {
-                    if(detail.product_id.toString()==categoryList[i].product_id.toString() ||
-                        detail.str1.toString().trim().toLowerCase()==categoryList[i].product_name.toString().trim().toLowerCase()
-                    )
-                    {
-                           CallSearch(categoryList[i],i);
-                           print("CLICKED: " + categoryList[i].toString());
-                    }
-
-                    // else{
-                    //   print("CLICKED: " +detail.product_id.toString());
-                    //   print("CLICKED: " +categoryList[i].product_id.toString());
-                    //   print("CLICKED: " +detail.str1.toString().trim().toLowerCase());
-                    //   print("CLICKED: " +categoryList[i].product_name.toString().trim().toLowerCase());
-                    // }
-                  }
-                //  print("clicked "+detai);
-                },
-              ),
-            ),
-            ListView.separated(
-            shrinkWrap: true,
-            primary: false,
-                controller: scrollController,
-                itemBuilder: (context, index) {
-             var item = categoryList2[index];
-              //var item = categoryList2[index].product_id;
-              print('${item.toString()}');
-              return Container(
-                color: kWhiteColor,
-                width: width,
-                child: Column(
-                  children: [
-                    Container(
-                      width: width,
-                      color: kWhiteColor,
-                      child: Padding(
-                        padding: EdgeInsets.all(fixPadding),
-                        child: Text(
-                          '${item.cat_name}',
-                          style: headingStyle,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      color: kWhiteColor,
-                      child: JuiceList(item,
-                          categoryList.where((element) => element
-                              .resturant_cat_id == item.resturant_cat_id)
-                              .toList(), widget.currencySymbol, () {
-                            widget.onVerificationDone();
-                          }),
-                    ),
-                    Container(
-                      height: 10.0,
-                      color: kWhiteColor,
-                    ),
-                  ],
-                ),
-              );
-            },
-            separatorBuilder: (context, index) {
-              return Column(
-                children: [
-                  heightSpace,
-                  heightSpace,
-                ],
-              );
-            },
-            itemCount: categoryList2.length)
-    ]
-        )
-            : ListView.separated(
-            shrinkWrap: true,
-            primary: false,
-            itemBuilder: (context, index) {
-              return Column(
-                children: [
-                  Container(
-                    color: kWhiteColor,
-                    child: Padding(
-                      padding: EdgeInsets.all(fixPadding),
-                      child: Shimmer(
-                        duration: Duration(seconds: 3),
-                        color: Colors.white,
-                        enabled: true,
-                        direction: ShimmerDirection.fromLTRB(),
-                        child: Container(
-                          width: 100.0,
-                          height: 20.0,
-                          color: kTransparentColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    color: kWhiteColor,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(
-                              right: fixPadding, left: fixPadding),
-                          child: Shimmer(
-                            duration: Duration(seconds: 3),
-                            color: Colors.white,
-                            enabled: true,
-                            direction: ShimmerDirection.fromLTRB(),
-                            child: Container(
-                              width: 100.0,
-                              height: 20.0,
-                              color: kTransparentColor,
-                            ),
-                          ),
-                        ),
-                        ColumnBuilder(
-                          itemCount: 2,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          itemBuilder: (context, index) {
-                            // final item = restaurantsList[index];
-                            return Container(
-                              width: width,
-                              height: 105.0,
-                              margin: EdgeInsets.all(fixPadding),
-                              decoration: BoxDecoration(
-                                color: kWhiteColor,
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                              child: Stack(
-                                children: <Widget>[
-                                  Positioned(
-                                    right: fixPadding,
-                                    child: InkWell(
-                                      onTap: () {},
-                                      child: Shimmer(
-                                        duration: Duration(seconds: 3),
-                                        color: Colors.white,
-                                        enabled: true,
-                                        direction:
-                                        ShimmerDirection.fromLTRB(),
-                                        child: Container(
-                                          width: 22.0,
-                                          height: 22.0,
-                                          color: kTransparentColor,
-                                        ),
-                                      ),
+              margin: EdgeInsets.only(bottom: 80),
+              child:
+                (categoryList2 != null && categoryList2.length > 0)
+                    ?
+                ListView.separated(
+                    shrinkWrap: true,
+                    primary: false,
+                    controller: controller,
+                    itemBuilder: (context, index) {
+                      var item = categoryList2[index];
+                      //var item = categoryList2[index].product_id;
+                      print('${item.toString()}');
+                      return AutoScrollTag(
+                          key: ValueKey(index),
+                          controller: controller,
+                          index: index,
+                          child:
+                          Container(
+                            color: kWhiteColor,
+                            width: width,
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: width,
+                                  color: kWhiteColor,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(fixPadding),
+                                    child: Text(
+                                      '${item.cat_name}',
+                                      style: headingStyle,
                                     ),
                                   ),
-                                  Row(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.center,
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Shimmer(
-                                        duration: Duration(seconds: 3),
-                                        color: Colors.white,
-                                        enabled: true,
-                                        direction:
-                                        ShimmerDirection.fromLTRB(),
-                                        child: Container(
-                                          width: 90.0,
-                                          height: 100.0,
-                                          color: kTransparentColor,
-                                        ),
+                                ),
+                                Container(
+                                  color: kWhiteColor,
+                                  child: JuiceList(item,
+                                      categoryList.where((element) => element
+                                          .resturant_cat_id == item.resturant_cat_id)
+                                          .toList(), widget.currencySymbol, () {
+                                        widget.onVerificationDone();
+                                      }),
+                                ),
+                                Container(
+                                  height: 10.0,
+                                  color: kWhiteColor,
+                                ),
+                              ],
+                            ),
+                          ));
+                    },
+                    separatorBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          heightSpace,
+                          heightSpace,
+                        ],
+                      );
+                    },
+                    itemCount: categoryList2.length)
+                    :
+                ListView.separated(
+                    shrinkWrap: true,
+                    primary: false,
+                    itemBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          Container(
+                            color: kWhiteColor,
+                            child: Padding(
+                              padding: EdgeInsets.all(fixPadding),
+                              child: Shimmer(
+                                duration: Duration(seconds: 3),
+                                color: Colors.white,
+                                enabled: true,
+                                direction: ShimmerDirection.fromLTRB(),
+                                child: Container(
+                                  width: 100.0,
+                                  height: 20.0,
+                                  color: kTransparentColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            color: kWhiteColor,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      right: fixPadding, left: fixPadding),
+                                  child: Shimmer(
+                                    duration: Duration(seconds: 3),
+                                    color: Colors.white,
+                                    enabled: true,
+                                    direction: ShimmerDirection.fromLTRB(),
+                                    child: Container(
+                                      width: 100.0,
+                                      height: 20.0,
+                                      color: kTransparentColor,
+                                    ),
+                                  ),
+                                ),
+                                ColumnBuilder(
+                                  itemCount: 2,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  itemBuilder: (context, index) {
+                                    // final item = restaurantsList[index];
+                                    return Container(
+                                      width: width,
+                                      height: 105.0,
+                                      margin: EdgeInsets.all(fixPadding),
+                                      decoration: BoxDecoration(
+                                        color: kWhiteColor,
+                                        borderRadius: BorderRadius.circular(5.0),
                                       ),
-                                      Container(
-                                        width: width -
-                                            ((fixPadding * 2) + 100.0),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  right: fixPadding * 2,
-                                                  left: fixPadding,
-                                                  bottom: fixPadding),
+                                      child: Stack(
+                                        children: <Widget>[
+                                          Positioned(
+                                            right: fixPadding,
+                                            child: InkWell(
+                                              onTap: () {},
                                               child: Shimmer(
-                                                duration:
-                                                Duration(seconds: 3),
+                                                duration: Duration(seconds: 3),
                                                 color: Colors.white,
                                                 enabled: true,
-                                                direction: ShimmerDirection
-                                                    .fromLTRB(),
+                                                direction:
+                                                ShimmerDirection.fromLTRB(),
                                                 child: Container(
-                                                  height: 20.0,
+                                                  width: 22.0,
+                                                  height: 22.0,
                                                   color: kTransparentColor,
                                                 ),
                                               ),
                                             ),
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: fixPadding,
-                                                  right: fixPadding),
-                                              child: Shimmer(
-                                                duration:
-                                                Duration(seconds: 3),
+                                          ),
+                                          Row(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                            children: <Widget>[
+                                              Shimmer(
+                                                duration: Duration(seconds: 3),
                                                 color: Colors.white,
                                                 enabled: true,
-                                                direction: ShimmerDirection
-                                                    .fromLTRB(),
+                                                direction:
+                                                ShimmerDirection.fromLTRB(),
                                                 child: Container(
-                                                  height: 20.0,
+                                                  width: 90.0,
+                                                  height: 100.0,
                                                   color: kTransparentColor,
                                                 ),
                                               ),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                  top: fixPadding,
-                                                  left: fixPadding),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment
-                                                    .spaceBetween,
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment
-                                                    .center,
-                                                children: <Widget>[
-                                                  Shimmer(
-                                                    duration: Duration(
-                                                        seconds: 3),
-                                                    color: Colors.white,
-                                                    enabled: true,
-                                                    direction:
-                                                    ShimmerDirection
-                                                        .fromLTRB(),
-                                                    child: Container(
-                                                      width: 100.0,
-                                                      height: 20.0,
-                                                      color:
-                                                      kTransparentColor,
-                                                    ),
-                                                  ),
-                                                  InkWell(
-                                                    onTap: () {
-                                                      // productDescriptionModalBottomSheet(
-                                                      //     context, height);
-                                                    },
-                                                    child: Container(
-                                                      height: 20.0,
-                                                      width: 20.0,
-                                                      decoration:
-                                                      BoxDecoration(
-                                                        borderRadius:
-                                                        BorderRadius
-                                                            .circular(
-                                                            10.0),
-                                                        color:
-                                                        kTransparentColor,
-                                                      ),
+                                              Container(
+                                                width: width -
+                                                    ((fixPadding * 2) + 100.0),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          right: fixPadding * 2,
+                                                          left: fixPadding,
+                                                          bottom: fixPadding),
                                                       child: Shimmer(
-                                                        duration: Duration(
-                                                            seconds: 3),
+                                                        duration:
+                                                        Duration(seconds: 3),
                                                         color: Colors.white,
                                                         enabled: true,
-                                                        direction:
-                                                        ShimmerDirection
+                                                        direction: ShimmerDirection
                                                             .fromLTRB(),
                                                         child: Container(
-                                                          width: 15.0,
-                                                          height: 15.0,
-                                                          color:
-                                                          kTransparentColor,
+                                                          height: 20.0,
+                                                          color: kTransparentColor,
                                                         ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: fixPadding,
+                                                          right: fixPadding),
+                                                      child: Shimmer(
+                                                        duration:
+                                                        Duration(seconds: 3),
+                                                        color: Colors.white,
+                                                        enabled: true,
+                                                        direction: ShimmerDirection
+                                                            .fromLTRB(),
+                                                        child: Container(
+                                                          height: 20.0,
+                                                          color: kTransparentColor,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          top: fixPadding,
+                                                          left: fixPadding),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                        children: <Widget>[
+                                                          Shimmer(
+                                                            duration: Duration(
+                                                                seconds: 3),
+                                                            color: Colors.white,
+                                                            enabled: true,
+                                                            direction:
+                                                            ShimmerDirection
+                                                                .fromLTRB(),
+                                                            child: Container(
+                                                              width: 100.0,
+                                                              height: 20.0,
+                                                              color:
+                                                              kTransparentColor,
+                                                            ),
+                                                          ),
+                                                          InkWell(
+                                                            onTap: () {
+                                                              // productDescriptionModalBottomSheet(
+                                                              //     context, height);
+                                                            },
+                                                            child: Container(
+                                                              height: 20.0,
+                                                              width: 20.0,
+                                                              decoration:
+                                                              BoxDecoration(
+                                                                borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                    10.0),
+                                                                color:
+                                                                kTransparentColor,
+                                                              ),
+                                                              child: Shimmer(
+                                                                duration: Duration(
+                                                                    seconds: 3),
+                                                                color: Colors.white,
+                                                                enabled: true,
+                                                                direction:
+                                                                ShimmerDirection
+                                                                    .fromLTRB(),
+                                                                child: Container(
+                                                                  width: 15.0,
+                                                                  height: 15.0,
+                                                                  color:
+                                                                  kTransparentColor,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    height: 10.0,
-                    color: kWhiteColor,
-                  ),
-                ],
-              );
-            },
-            separatorBuilder: (context, index) {
-              return Column(
-                children: [
-                  heightSpace,
-                  heightSpace,
-                ],
-              );
-            },
-            itemCount: 10),
-      ],
-    );
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            height: 10.0,
+                            color: kWhiteColor,
+                          ),
+                        ],
+                      );
+                    },
+                    separatorBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          heightSpace,
+                          heightSpace,
+                        ],
+                      );
+                    },
+                    itemCount: 10),
+            ),
+        floatingActionButton:
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 10,vertical: 50),
+                child: FloatingActionButton.extended(
+                  onPressed: () { _showPopupMenu();},
+                  icon: Icon(Icons.menu),
+                  label: Text("Menu"),),
+              )
+            )
+    
+      );
+  }
+  _showPopupMenu(){
+    showMenu<int>(
+      context: context,
+      elevation:10,
+      position: RelativeRect.fromLTRB(1200,1200,1200,1200),      //position where you want to show the menu on screen
+      items: List.generate(
+        categoryList2.length,
+            (index) => PopupMenuItem(
+          value: index,
+          child: Text(
+            '${categoryList2[index].cat_name}',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Roboto',
+            ),
+          ),
+        ),
+      ),
+    ).then((value) async {
+      if (value != null) {
+        print(categoryList2[value].cat_name);
+        await controller.scrollToIndex(value, preferPosition: AutoScrollPosition.begin);
+      }
+    });
   }
 
   showAlertDialog(BuildContext context, PopularItem item, currencySymbol,

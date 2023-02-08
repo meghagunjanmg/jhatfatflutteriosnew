@@ -48,6 +48,7 @@ var vendorBanner = baseUrl + "vendorbanner";
 var Search_key = baseUrl + "search";
 var restSearch_key = baseUrl + "searchrest";
 var RestSearch_key = baseUrl + "restsearch";
+var storesearch = baseUrl + "storesearch";
 var orderdetails = baseUrl + "orderdetails";
 var parceldetails = baseUrl + "parceldetails";
 var onGoingOrdersUrl = baseUrl + "ongoingorders";

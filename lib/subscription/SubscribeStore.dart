@@ -329,7 +329,7 @@ class _SubscribeStore extends State<SubscribeStore> {
                                                 alignment: Alignment.center,
                                                 color: kCardBackgroundColor,
                                                 child: Text(
-                                                  'Store Closed Now\nStore open at ${nearStores[index].opening_time.toString()}',
+                                                  'Store open at ${nearStores[index].opening_time.toString()}',
                                                   style: TextStyle(
                                                       color: red_color,
                                                       fontSize: 15),

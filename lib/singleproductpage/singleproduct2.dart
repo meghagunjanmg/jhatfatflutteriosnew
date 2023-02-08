@@ -160,25 +160,25 @@ class SingleProductState2 extends State<SingleProductPage_2> {
                           getCartCount();
                         });
                       }),
-                  Positioned(
-                      right: 5,
-                      top: 2,
-                      child: Visibility(
-                        visible: isCartCount,
-                        child: CircleAvatar(
-                          minRadius: 4,
-                          maxRadius: 8,
-                          backgroundColor: kMainColor,
-                          child: Text(
-                            '$cartCount',
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontSize: 7,
-                                color: kWhiteColor,
-                                fontWeight: FontWeight.w200),
-                          ),
-                        ),
-                      ))
+                  // Positioned(
+                  //     right: 5,
+                  //     top: 2,
+                  //     child: Visibility(
+                  //       visible: isCartCount,
+                  //       child: CircleAvatar(
+                  //         minRadius: 4,
+                  //         maxRadius: 8,
+                  //         backgroundColor: kMainColor,
+                  //         child: Text(
+                  //           '$cartCount',
+                  //           overflow: TextOverflow.ellipsis,
+                  //           style: TextStyle(
+                  //               fontSize: 7,
+                  //               color: kWhiteColor,
+                  //               fontWeight: FontWeight.w200),
+                  //         ),
+                  //       ),
+                  //     ))
                 ],
               ),
             ),
@@ -438,45 +438,45 @@ class SingleProductState2 extends State<SingleProductPage_2> {
                                                   .productVarintList[
                                               index]
                                                   .add_qnty++;
-                                              addOrMinusProduct(
-                                                widget
-                                                    .productWithVarient
-                                                    .is_id,
-                                                widget
-                                                    .productWithVarient
-                                                    .is_pres,
-                                                widget
-                                                    .productWithVarient
-                                                    .isbasket,
-                                                widget
-                                                    .productWithVarient,
-                                                widget
-                                                    .productWithVarient
-                                                    .product_name,
-                                                widget
-                                                    .productVarintList[
-                                                index]
-                                                    .unit,
-                                                double.parse(
-                                                    '${widget
-                                                        .productVarintList[index]
-                                                        .price}'),
-                                                int.parse(
-                                                    '${widget
-                                                        .productVarintList[index]
-                                                        .quantity}'),
-                                                widget
-                                                    .productVarintList[
-                                                index]
-                                                    .add_qnty,
-                                                widget
-                                                    .productVarintList[
-                                                index]
-                                                    .varient_image,
-                                                widget
-                                                    .productVarintList[
-                                                index]
-                                                    .varient_id,
+                                                  addOrMinusProduct(
+                                                      widget
+                                                          .productWithVarient
+                                                          .is_id,
+                                                      widget
+                                                          .productWithVarient
+                                                          .is_pres,
+                                                      widget
+                                                          .productWithVarient
+                                                          .isbasket,
+                                                      widget
+                                                          .productWithVarient
+                                                          .product_name,
+                                                      widget
+                                                          .productVarintList[
+                                                      index]
+                                                          .unit,
+                                                      double.parse(
+                                                          '${widget
+                                                              .productVarintList[index]
+                                                              .price}'),
+                                                      int.parse(
+                                                          '${widget
+                                                              .productVarintList[index]
+                                                              .quantity}'),
+                                                      widget
+                                                          .productVarintList[
+                                                      index]
+                                                          .add_qnty,
+                                                      widget
+                                                          .productVarintList[
+                                                      index]
+                                                          .varient_image,
+                                                      widget
+                                                          .productVarintList[
+                                                      index]
+                                                          .varient_id,
+                                                      widget.productVarintList[index]
+                                                          .vendor_id
                                               );
                                             } else {
                                               Toast.show(
@@ -693,8 +693,11 @@ class SingleProductState2 extends State<SingleProductPage_2> {
 
       bool allow = (prefs.getString("allowmultishop").toString() != "1");
       if (value == 0) {
-        if (v != null && v < 3) {
-          db.insert(vae);
+        db.insert(vae);
+        print("CARTITEN:::"+vae.toString());
+
+        if (v != null && v <= 3) {
+          ///db.insert(vae);
           getCartCount();
         }
         else {

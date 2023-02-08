@@ -225,6 +225,26 @@ class _SlideUpPanelRestState extends State<SlideUpPanelRest> {
                           ),
                         ]),
                   ),
+
+                  (widget.ongoingOrders.gst>0)?
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 20.0),
+                    child: Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'GST',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                          Text(
+                            '${widget.currency} ${widget.ongoingOrders.gst.toStringAsFixed(2)}',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ]),
+                  ): Container(),
                   (widget.ongoingOrders.surgecharge>0)?
                   Container(
                     color: Colors.white,
@@ -311,7 +331,7 @@ class _SlideUpPanelRestState extends State<SlideUpPanelRest> {
                             style: Theme.of(context).textTheme.caption,
                           ),
                           Text(
-                            '${widget.currency} ${widget.ongoingOrders.paid_by_wallet}',
+                            '- ${widget.currency} ${widget.ongoingOrders.paid_by_wallet}',
                             style: Theme.of(context).textTheme.caption,
                           ),
                         ]),

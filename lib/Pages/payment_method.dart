@@ -448,8 +448,9 @@ class PaymentPageState extends State<PaymentPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          (newtotalAmount < maxincash) ?
                           Visibility(
-                            visible: (newtotalAmount < maxincash) ? true : false,
+                            visible:true,
                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children:[
@@ -479,8 +480,35 @@ class PaymentPageState extends State<PaymentPage> {
                                         });
                                         placedOrder("success", "COD");
                                       }),
-                                ]),),
-
+                                ]),):
+                          Visibility(
+                              visible: true,
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children:[
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 8.0, horizontal: 16.0),
+                                      color: kCardBackgroundColor,
+                                      child: Text(
+                                        'CASH',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .caption!
+                                            .copyWith(
+                                            color: kDisabledColor,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.67),
+                                      ),
+                                    ),
+                                    ListTile(
+                                      leading: Image.asset('images/payment/amount.png',width: 25,height: 25,),
+                                      title: Text('Cash on Delivery',style: TextStyle(color: Colors.black54,fontWeight: FontWeight.bold),),
+                                      textColor: Colors.black,
+                                      subtitle: Text('not available for order above ${maxincash}',style: TextStyle(fontSize:12,color: Colors.grey,fontWeight: FontWeight.normal),),
+                                    ),
+                                  ])
+                          ),
                           (totalAmount > 0.0 &&
                               paymentVia != null &&
                               paymentVia.length > 0)

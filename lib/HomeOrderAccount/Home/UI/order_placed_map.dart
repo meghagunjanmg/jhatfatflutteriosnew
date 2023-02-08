@@ -70,14 +70,6 @@ class _OrderMapState extends State<OrderMap> {
   @override
   void initState() {
     super.initState();
-
-    _originLatitude = double.parse(
-        double.parse((widget.ongoingOrders.vendor_lat.toString()))
-            .toStringAsFixed(4));
-    _originLongitude = double.parse(
-        double.parse((widget.ongoingOrders.vendor_lng.toString()))
-            .toStringAsFixed(4));
-
     _destLatitude = double.parse(
         double.parse((widget.ongoingOrders.delivery_lat.toString()))
             .toStringAsFixed(4));
@@ -85,6 +77,14 @@ class _OrderMapState extends State<OrderMap> {
         double.parse((widget.ongoingOrders.delivery_lng.toString()))
             .toStringAsFixed(4));
 
+
+    _originLatitude = double.parse(
+        double.parse((widget.ongoingOrders.vendor_lat.toString()))
+            .toStringAsFixed(4));
+    _originLongitude = double.parse(
+        double.parse((widget.ongoingOrders.vendor_lng.toString()))
+            .toStringAsFixed(4));
+    //_listenLocation();
     getDirections();
 
   }
@@ -102,9 +102,9 @@ class _OrderMapState extends State<OrderMap> {
         'latitude': currentlocation.latitude,
         'longitude': currentlocation.longitude,
         'name': 'john'
-      }, SetOptions(merge: true));
-      _originLatitude = currentlocation.latitude!;
-      _originLongitude = currentlocation.longitude!;
+      });
+      // _originLatitude = currentlocation.latitude!;
+      // _originLongitude = currentlocation.longitude!;
     });
   }
 
@@ -124,6 +124,8 @@ class _OrderMapState extends State<OrderMap> {
       print(e);
     }
   }
+
+
   orderdetail() async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
@@ -443,15 +445,9 @@ class _OrderMapState extends State<OrderMap> {
             stream: FirebaseFirestore.instance.collection('location')
                 .snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              mymap();
               if (snapshot.hasData) {
                 if (_added) {
-                  _originLatitude = snapshot.data!.docs.singleWhere(
-                          (element) =>
-                      element.id == widget.user_id)['latitude'];
-                  _originLongitude = snapshot.data!.docs.singleWhere(
-                          (element) =>
-                      element.id == widget.user_id)['longitude'];
+                  mymap(snapshot);
                 }
                 return
                   Column(
@@ -466,7 +462,7 @@ class _OrderMapState extends State<OrderMap> {
                               initialCameraPosition: CameraPosition(
                                   target: LatLng(_originLatitude,
                                       _originLongitude),
-                                  zoom: 14),
+                                  zoom: 15),
                               onMapCreated: (
                                   GoogleMapController controller) async {
                                 setState(() {
@@ -744,6 +740,7 @@ class _OrderMapState extends State<OrderMap> {
                                                     .delivery_date} | ${widget
                                                     .ongoingOrders.time_slot}'
                                                     : '',
+
                                                 style: Theme
                                                     .of(context)
                                                     .textTheme
@@ -892,21 +889,31 @@ class _OrderMapState extends State<OrderMap> {
     markers[markerId] = marker;
   }
 
-  void mymap() async {
-    Timer(Duration(minutes: 120), () async {
+  void mymap(AsyncSnapshot<QuerySnapshot> snapshot) async {
+      _originLatitude = snapshot.data!.docs.singleWhere(
+              (element) =>
+          element.id == widget.user_id)['latitude'];
+      _originLongitude = snapshot.data!.docs.singleWhere(
+              (element) =>
+          element.id == widget.user_id)['longitude'];
+
+    Timer(Duration(minutes: 4), () async {
       await _controller!
           .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
           target: LatLng(
             _originLatitude,
             _originLongitude,
           ),
-          zoom: 14)));
+          zoom: 15)));
     });
-    _addMarker(LatLng(_originLatitude, _originLongitude), "source",
-        await BitmapDescriptor.fromAssetImage(
-            ImageConfiguration(size: Size(90, 90)), 'assets/delivery.png'));
-    _addMarker(LatLng(_destLatitude, _destLongitude), "dest",
-        BitmapDescriptor.defaultMarkerWithHue(90));
+    // _addMarker(LatLng(_originLatitude, _originLongitude), "source",
+    //     await BitmapDescriptor.fromAssetImage(
+    //         ImageConfiguration(size: Size(90, 90)), 'assets/delivery.png'));
+    // _addMarker(LatLng(_destLatitude, _destLongitude), "dest",
+    //     BitmapDescriptor.defaultMarkerWithHue(90));
+
+    getDirections();
+
   }
 
 
@@ -919,6 +926,12 @@ class _OrderMapState extends State<OrderMap> {
       PointLatLng(_destLatitude, _destLongitude),
       travelMode: TravelMode.driving,
     );
+
+    _addMarker(LatLng(_originLatitude, _originLongitude), "source",
+        await BitmapDescriptor.fromAssetImage(
+            ImageConfiguration(size: Size(10, 10)), 'assets/delivery.png'));
+    _addMarker(LatLng(_destLatitude, _destLongitude), "dest",
+        BitmapDescriptor.defaultMarkerWithHue(30));
 
     if (result.points.isNotEmpty) {
       result.points.forEach((PointLatLng point) {

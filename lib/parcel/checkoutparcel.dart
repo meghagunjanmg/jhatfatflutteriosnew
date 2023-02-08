@@ -286,7 +286,7 @@ class ParcelCheckoutState extends State<ParcelCheckOut> {
                   MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                      'Parcel Charges per km',
+                      'Parcel Charges',
                       style: Theme
                           .of(context)
                           .textTheme
@@ -396,7 +396,7 @@ class ParcelCheckoutState extends State<ParcelCheckOut> {
                     children: [
                       Text('Amount to be paid '),
                       Text(
-                          '${currency}'+'${(widget.charges * widget.distance) + surge_charges + night_charges + conv_charges}'),
+                          '${currency}'+'${widget.charges + surge_charges + night_charges + conv_charges}'),
                     ],
                   ),
                 ],
@@ -479,7 +479,7 @@ class ParcelCheckoutState extends State<ParcelCheckOut> {
               .toList();
           double? c = double.tryParse(widget.charges.toString());
           double? d = double.tryParse(widget.distance.toString());
-          double? t =( c! * d! ) + surge_charges + night_charges + conv_charges;
+          double? t = c! + surge_charges + night_charges + conv_charges;
 
               Navigator.push(context, MaterialPageRoute(builder: (context) {
             return PaymentParcelPage(

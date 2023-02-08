@@ -230,6 +230,14 @@ class SetLocationState extends State<SetLocationss> {
       position: LatLng(lat, lng),
       icon: BitmapDescriptor.defaultMarker,
     );
+
+    GeoData data = await Geocoder2.getDataFromCoordinates(
+        latitude: lat,
+        longitude: lng,
+        googleMapApiKey: apiKey);
+    setState(() {
+      currentAddress = data.address;
+    });
     setState(() {
       markers[MarkerId('location')] = marker;
       _goToTheLake(lat, lng);

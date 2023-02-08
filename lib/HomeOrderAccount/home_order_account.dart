@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:circular_bottom_navigation/circular_bottom_navigation.dart';
-import 'package:circular_bottom_navigation/tab_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -48,7 +46,7 @@ class HomeOrderAccount extends StatefulWidget {
 class _HomeOrderAccountState extends State<HomeOrderAccount> {
   int _currentIndex = 0;
   double bottomNavBarHeight = 60.0;
-  late CircularBottomNavigationController _navigationController;
+  //late CircularBottomNavigationController _navigationController;
   String ClosedImage = '';
   List<BannerDetails> ClosedBannerImage = [];
   Adminsetting? admins;
@@ -66,8 +64,8 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
     super.initState();
     _requestPermission();
     getData();
-    _navigationController =
-    new CircularBottomNavigationController(_currentIndex);
+    // _navigationController =
+    // new CircularBottomNavigationController(_currentIndex);
     getCurrency();
 
     _children = [
@@ -126,14 +124,14 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
       print(e);
     });
   }
-
-  List<TabItem> tabItems = List.of([
-    new TabItem(Icons.home, "Home", Colors.blue, labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
-     new TabItem(Icons.restaurant, "Resturant", Colors.blue, labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
-   ///  new TabItem(Icons.reorder, "Order", Colors.blue,labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
-     new TabItem(Icons.pin_drop, "Pick & Drop", Colors.blue,labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
-     new TabItem(Icons.shopping_cart, "Cart", Colors.blue, labelStyle: TextStyle(fontWeight: FontWeight.bold,fontSize: 10)),
-  ]);
+  //
+  // List<TabItem> tabItems = List.of([
+  //   new TabItem(Icons.home, "Home", Colors.blue, labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
+  //    new TabItem(Icons.restaurant, "Resturant", Colors.blue, labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
+  //  ///  new TabItem(Icons.reorder, "Order", Colors.blue,labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
+  //    new TabItem(Icons.pin_drop, "Pick & Drop", Colors.blue,labelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10)),
+  //    new TabItem(Icons.shopping_cart, "Cart", Colors.blue, labelStyle: TextStyle(fontWeight: FontWeight.bold,fontSize: 10)),
+  // ]);
 
 
   void onTapped(int index) {
@@ -166,39 +164,84 @@ class _HomeOrderAccountState extends State<HomeOrderAccount> {
         index: _currentIndex,
         children: _children,
       ),
-      bottomNavigationBar: bottomNav(context),
+      bottomNavigationBar: bottom2(context),
     ));
   }
+  // Widget bottomNav(BuildContext context) {
+  //   return Container(
+  //     width: MediaQuery.of(context).size.width,
+  //     height: 80,
+  //     color: kWhiteColor,
+  //     child: CircularBottomNavigation(
+  //       tabItems,
+  //       controller: _navigationController,
+  //       barHeight: 50,
+  //       circleSize: 40,
+  //       barBackgroundColor: kWhiteColor,
+  //       iconsSize: 20,
+  //       circleStrokeWidth: 5,
+  //       animationDuration: const Duration(milliseconds: 300),
+  //       selectedCallback: (int? selectedPos) {
+  //         setState(() {
+  //           _currentIndex = selectedPos!;
+  //         });
+  //
+  //         if(selectedPos==3){
+  //           Navigator.pushAndRemoveUntil(
+  //               context,
+  //               MaterialPageRoute(
+  //                   builder: (context) => HomeOrderAccount(3,1)),
+  //                   (Route<dynamic> route) => false);
+  //         }
+  //       },
+  //     ),
+  //   );
+  //
+  // }
 
-  Widget bottomNav(BuildContext context) {
+  Widget bottom2(BuildContext context){
     return Container(
-      width: MediaQuery.of(context).size.width,
       height: 70,
-      color: kWhiteColor,
-      child: CircularBottomNavigation(
-        tabItems,
-        controller: _navigationController,
-        barHeight: 45,
-        circleSize: 40,
-        barBackgroundColor: kWhiteColor,
-        iconsSize: 20,
-        circleStrokeWidth: 5,
-        animationDuration: const Duration(milliseconds: 300),
-        selectedCallback: (int? selectedPos) {
-          setState(() {
-            _currentIndex = selectedPos!;
-          });
-
-          if(selectedPos==3){
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => HomeOrderAccount(3,1)),
-                    (Route<dynamic> route) => false);
-          }
-        },
+      child: BottomNavigationBar(
+        elevation: 20,
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _currentIndex,
+        backgroundColor: Colors.white,
+        selectedItemColor: kMainColor,
+        unselectedItemColor: Colors.black,
+    selectedLabelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10),
+    unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal,fontSize: 10),
+    onTap: (value) {
+    // Respond to item press.
+    setState(() => _currentIndex = value);
+    if(value==3){
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomeOrderAccount(3,1)),
+                      (Route<dynamic> route) => false);
+            }
+    },
+    items: [
+    BottomNavigationBarItem(
+    label: 'Home',
+    icon: Icon(Icons.home),
+    ),
+    BottomNavigationBarItem(
+      label: 'Restaurant',
+    icon: Icon(Icons.restaurant),
+    ),
+    BottomNavigationBarItem(
+        label: 'Pick & Drop',
+    icon: Icon(Icons.location_on),
+    ),
+      BottomNavigationBarItem(
+        label: 'Cart',
+        icon: Icon(Icons.shopping_cart),
       ),
+    ],
+    )
     );
-
   }
+
 }

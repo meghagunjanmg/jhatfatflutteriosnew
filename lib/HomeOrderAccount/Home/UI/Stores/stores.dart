@@ -158,25 +158,25 @@ class StoresPageState extends State<StoresPage> {
                             });
 
                         }),
-                    Positioned(
-                        right: 5,
-                        top: 2,
-                        child: Visibility(
-                          visible: isCartCount,
-                          child: CircleAvatar(
-                            minRadius: 4,
-                            maxRadius: 8,
-                            backgroundColor: kMainColor,
-                            child: Text(
-                              '$cartCount',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 7,
-                                  color: kWhiteColor,
-                                  fontWeight: FontWeight.w200),
-                            ),
-                          ),
-                        ))
+                    // Positioned(
+                    //     right: 5,
+                    //     top: 2,
+                    //     child: Visibility(
+                    //       visible: isCartCount,
+                    //       child: CircleAvatar(
+                    //         minRadius: 4,
+                    //         maxRadius: 8,
+                    //         backgroundColor: kMainColor,
+                    //         child: Text(
+                    //           '$cartCount',
+                    //           overflow: TextOverflow.ellipsis,
+                    //           style: TextStyle(
+                    //               fontSize: 7,
+                    //               color: kWhiteColor,
+                    //               fontWeight: FontWeight.w200),
+                    //         ),
+                    //       ),
+                    //     ))
                   ],
                 ),
               ),
@@ -383,7 +383,8 @@ class StoresPageState extends State<StoresPage> {
                                                               "OFF")
                                                           ? true
                                                           : false,
-                                                      child: Container(
+                                                      child:
+                                                      Container(
                                                         margin: EdgeInsets.all(8),
                                                         height: 80,
                                                         width: MediaQuery.of(context)
@@ -393,7 +394,7 @@ class StoresPageState extends State<StoresPage> {
                                                         alignment: Alignment.center,
                                                         color: kCardBackgroundColor,
                                                         child: Text(
-                                                        'Store Closed Now\nStore open at ${nearStores[index].opening_time.toString()}',
+                                                        'Store open at ${nearStores[index].opening_time.toString()}',
                                                           style: TextStyle(
                                                               color: red_color,
                                                               fontSize: 15),

@@ -64,7 +64,8 @@ Future productDescriptionModalBottomSheet(context, height, PopularItem item, cur
                       ((double.parse('${items.deal_price}') * qty)),
                   DatabaseHelper.addQnty: qty,
                   DatabaseHelper.unit: items.variant[index].unit,
-                  DatabaseHelper.quantitiy: items.variant[index].quantity
+                  DatabaseHelper.quantitiy: items.variant[index].quantity,
+                  DatabaseHelper.vendor_id: items.variant[index].vendor_id,
                 };
                 if (value == 0) {
                   db.insertRaturantOrder(vae).then((valueaa) {

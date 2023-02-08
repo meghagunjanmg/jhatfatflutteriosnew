@@ -62,11 +62,11 @@ class OrderPlaced extends StatelessWidget {
       },
 
       child: Scaffold(
-          body: Column(
+          body:
+          SingleChildScrollView(
+            child:
+          Column(
             children: <Widget>[
-              Spacer(
-                flex: 1,
-              ),
               Padding(
                 padding: EdgeInsets.all(60.0),
                 child: Image.asset(
@@ -76,7 +76,7 @@ class OrderPlaced extends StatelessWidget {
                 ),
               ),
               Text(
-                'Order id - $order_id has been Placed \n Please keep $currency $rem_price!!',
+                'Order id - $order_id has been Placed !!',
                 textAlign: TextAlign.center,
                 style: Theme
                     .of(context)
@@ -93,9 +93,6 @@ class OrderPlaced extends StatelessWidget {
                     .textTheme
                     .subtitle2!
                     .copyWith(color: kDisabledColor),
-              ),
-              Spacer(
-                flex: 2,
               ),
               Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),
@@ -116,7 +113,6 @@ class OrderPlaced extends StatelessWidget {
                   child: Text("Start Tracking")
               ),
         ),
-
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 20),
                 child: ElevatedButton(
@@ -141,7 +137,7 @@ class OrderPlaced extends StatelessWidget {
             ],
           ),
         ),
-      );
+      ));
   }
 
   void CallAPI(String orderid,BuildContext context) async {
@@ -161,7 +157,7 @@ class OrderPlaced extends StatelessWidget {
                 .map((tagJson) => TodayOrderParcel.fromJson(tagJson))
                 .toList();
             //Navigator.popUntil(context, (route) => false);
-            Navigator.pushAndRemoveUntil(context,
+            Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) {
                   return OrderMapParcelPage(
                       pageTitle:
@@ -171,7 +167,7 @@ class OrderPlaced extends StatelessWidget {
                       currency: currency,
                       user_id: orders[0].cartId.toString()
                   );
-                }), (Route<dynamic> route) => false);
+                }));
 
           }
         }
@@ -207,7 +203,8 @@ class OrderPlaced extends StatelessWidget {
                     print("NAME " + i.toString() + " " + vendor);
                   }
                   VendorName.toSet().toList();
-                  Navigator.pushAndRemoveUntil(context,
+
+                  Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) {
                         return  OrderMapPage(
                           pageTitle:
@@ -220,7 +217,7 @@ class OrderPlaced extends StatelessWidget {
                               .cart_id
                               .toString(),
                         );
-                      }), (Route<dynamic> route) => false);
+                      }));
 
 
                 }
@@ -230,7 +227,7 @@ class OrderPlaced extends StatelessWidget {
                       .map((tagJson) =>
                       OrderHistoryRestaurant.fromJson(tagJson))
                       .toList();
-                  Navigator.pushAndRemoveUntil(context,
+                  Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) {
                         return OrderMapRestPage(
                           pageTitle:
@@ -240,7 +237,7 @@ class OrderPlaced extends StatelessWidget {
                           currency: currency,
                           user_id: orders[0].cart_id.toString(),
                         );
-                      }), (Route<dynamic> route) => false);
+                      }));
                 }
               }
             }

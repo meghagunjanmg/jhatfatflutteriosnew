@@ -1,3 +1,5 @@
+import 'cartitem.dart';
+
 class OrderArray{
 
   int qty;
@@ -48,5 +50,23 @@ class OrderAdonArray{
   @override
   String toString() {
     return '{\"addon_id\": $addonid}';
+  }
+}
+
+
+class CartArray{
+
+  dynamic vendor_id;
+  dynamic vendor_name;
+  List<CartItem> cartitems;
+  dynamic subtotal;
+  dynamic discount;
+
+  CartArray(
+      this.vendor_id, this.vendor_name, this.cartitems, this.subtotal,this.discount);
+
+  @override
+  String toString() {
+    return 'CartArray{vendor_id: $vendor_id, vendor_name: $vendor_name, cartitems: $cartitems, subtotal: $subtotal,discount: $discount}';
   }
 }

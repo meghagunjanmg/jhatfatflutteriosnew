@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
@@ -19,6 +20,10 @@ import 'package:jhatfat/bean/vendorbanner.dart';
 import 'package:jhatfat/databasehelper/dbhelper.dart';
 import 'package:jhatfat/dealofferpack/dealproduct.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../bean/productlistvarient.dart';
+import '../../../../bean/venderbean.dart';
+import '../../../../singleproductpage/singleproductpage.dart';
 
 class AppCategory extends StatefulWidget {
   final String pageTitle;
@@ -49,7 +54,7 @@ class AppCategoryState extends State<AppCategory> {
   bool isFetch = false;
   int cartCount = 0;
   String message = "";
-
+  String curency = "";
   bool isNoCategoryTrue = false;
 
   TextEditingController searchController = TextEditingController();
@@ -68,6 +73,7 @@ class AppCategoryState extends State<AppCategory> {
     CategoryList('', '', '', '', '', '', '', ''),
     CategoryList('', '', '', '', '', '', '', '')
   ];
+  ProductWithVarient? productWithVarient;
 
   @override
   void initState() {
@@ -136,6 +142,8 @@ class AppCategoryState extends State<AppCategory> {
 
   bool isSearchOpen = false;
 
+
+
   @override
   void dispose() {
     super.dispose();
@@ -172,79 +180,26 @@ class AppCategoryState extends State<AppCategory> {
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(isSearchOpen ? 60 : 112.0),
-          child: isSearchOpen
-              ? Padding(
-                  padding: EdgeInsets.only(top: 5.0),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 15,
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 52,
-                        padding: EdgeInsets.only(left: 5),
-                        decoration: BoxDecoration(
-                          color: scaffoldBgColor,
-                          // borderRadius: BorderRadius.circular(50)
-                        ),
-                        child: TextFormField(
-                          controller: searchController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            prefixIcon: Icon(
-                              Icons.search,
-                              color: kHintColor,
-                            ),
-                            hintText: 'Search category...',
-                            suffixIcon: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  isSearchOpen = !isSearchOpen;
-                                });
-                              },
-                              icon: Icon(
-                                Icons.close,
-                                color: kHintColor,
-                              ),
-                            ),
-                          ),
-                          cursorColor: kMainColor,
-                          autofocus: false,
-                          onChanged: (value) {
-                            setState(() {
-                              categoryLists = categoryListsSearch
-                                  .where((element) => element.category_name
-                                      .toString()
-                                      .toLowerCase()
-                                      .contains(value.toLowerCase()))
-                                  .toList();
-                            });
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              : CustomAppBar(
+          child:
+          CustomAppBar(
                   titleWidget: Text(
                     pageTitle,
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
                   actions: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 2.0),
-                      child: IconButton(
-                          icon: Icon(
-                            Icons.search,
-                            color: kHintColor,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isSearchOpen = !isSearchOpen;
-                            });
-                          }),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(right: 2.0),
+                    //   child: IconButton(
+                    //       icon: Icon(
+                    //         Icons.search,
+                    //         color: kHintColor,
+                    //       ),
+                    //       onPressed: () {
+                    //         setState(() {
+                    //           isSearchOpen = !isSearchOpen;
+                    //         });
+                    //       }),
+                    // ),
                     Padding(
                       padding: const EdgeInsets.only(right: 6.0),
                       child: Stack(
@@ -260,25 +215,25 @@ class AppCategoryState extends State<AppCategory> {
                                   getCartCount();
                                 });
                               }),
-                          Positioned(
-                              right: 5,
-                              top: 2,
-                              child: Visibility(
-                                visible: isCartCount,
-                                child: CircleAvatar(
-                                  minRadius: 4,
-                                  maxRadius: 8,
-                                  backgroundColor: kMainColor,
-                                  child: Text(
-                                    '$cartCount',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 7,
-                                        color: kWhiteColor,
-                                        fontWeight: FontWeight.w200),
-                                  ),
-                                ),
-                              ))
+                          // Positioned(
+                          //     right: 5,
+                          //     top: 2,
+                          //     child: Visibility(
+                          //       visible: isCartCount,
+                          //       child: CircleAvatar(
+                          //         minRadius: 4,
+                          //         maxRadius: 8,
+                          //         backgroundColor: kMainColor,
+                          //         child: Text(
+                          //           '$cartCount',
+                          //           overflow: TextOverflow.ellipsis,
+                          //           style: TextStyle(
+                          //               fontSize: 7,
+                          //               color: kWhiteColor,
+                          //               fontWeight: FontWeight.w200),
+                          //         ),
+                          //       ),
+                          //     ))
                         ],
                       ),
                     ),                  ],
@@ -335,12 +290,74 @@ class AppCategoryState extends State<AppCategory> {
         body:
         Container(
           height:
-              MediaQuery.of(context).size.height - (isSearchOpen ? 83 : 135),
+              MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: SingleChildScrollView(
             primary: true,
             child: Column(
               children: [
+                Container(
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width * 0.85,
+                  height: 50,
+                  margin: EdgeInsets.all(10),
+                  padding: EdgeInsets.only(left: 5),
+
+                  child: TypeAheadField(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      autofocus: false,
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                            borderSide: BorderSide(color: Colors.black)),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                            borderSide: BorderSide(color: Colors.black)),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: kHintColor,
+                        ),
+                        hintText: 'Search Items...',
+                      ),
+                    ),
+                    suggestionsCallback: (pattern) async {
+                      return await BackendService.getSuggestions(pattern,widget.vendor_id);
+                    },
+                    itemBuilder: (context, ProductWithVarient suggestion) {
+                      return ListTile(
+                          title: Text('${suggestion.str1}'),
+                          subtitle: Text('${suggestion.str2}'
+                          )
+                      );
+                    },
+                    hideOnError: true,
+                    onSuggestionSelected: (ProductWithVarient detail) {
+                      if(detail.category_id!=null){
+                        hitNavigator(
+                            context,
+                            pageTitle,
+                            vendor_id,
+                            detail.category_name,
+                            detail.category_id,
+                            widget.distance);
+                      }
+
+                      else if (detail.product_id!=null){
+                        Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) {
+                              return SingleProductPage(
+                                detail,
+                                curency,
+                              );
+                            }));
+                      }
+                    },
+                  ),
+                ),
+
                 (vendorCategoryId==18 && Platform.isAndroid)?
                 Container(
                     color: kMainColor,
@@ -643,6 +660,48 @@ class AppCategoryState extends State<AppCategory> {
     setState(() {
 
       message = prefs.getString("message")!;
+      curency = prefs.getString("curency")!;
     });
+  }
+
+}
+
+class BackendService {
+  static Future<List<ProductWithVarient>> getSuggestions(String query,
+      dynamic vendor_id) async {
+    if (query.isEmpty && query.length < 2) {
+      print('Query needs to be at least 3 chars');
+      return Future.value([]);
+    }
+
+    var url = storesearch;
+    Uri myUri = Uri.parse(url);
+    var response = await http.post(myUri, body: {
+      'vendor_id': vendor_id.toString(),
+      'prod_name': query
+    });
+
+    List<ProductWithVarient> vendors = [];
+    List<ProductWithVarient> vendors1 = [];
+
+    if (response.statusCode == 200) {
+      Iterable json1 = jsonDecode(response.body)['product'];
+      Iterable json2 = jsonDecode(response.body)['cat'];
+
+
+      if (json1.isNotEmpty) {
+        vendors.clear();
+        vendors =
+        List<ProductWithVarient>.from(json1.map((model) => ProductWithVarient.fromJson(model)));
+      }
+      if (json2.isNotEmpty) {
+        vendors1.clear();
+        vendors1 =
+        List<ProductWithVarient>.from(json2.map((model) => ProductWithVarient.fromJson(model)));
+        vendors.addAll(vendors1);
+      }
+    }
+
+    return Future.value(vendors);
   }
 }

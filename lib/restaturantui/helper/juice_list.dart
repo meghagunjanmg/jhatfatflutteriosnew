@@ -699,7 +699,9 @@ Future productDescriptionModalBottomSheets(
                     ((double.parse('${items.price}') * qty)),
                     DatabaseHelper.addQnty: qty,
                     DatabaseHelper.unit: items.unit,
-                    DatabaseHelper.quantitiy: items.quantity
+                    DatabaseHelper.quantitiy: items.quantity,
+                    DatabaseHelper.vendor_id: items.vendor_id,
+
                   };
                   if (value == 0) {
                     db.insertRaturantOrder(vae).then((valueaa) {

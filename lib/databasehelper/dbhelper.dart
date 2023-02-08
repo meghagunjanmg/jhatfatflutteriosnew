@@ -5,8 +5,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
-  static final _databaseName = "jhatfatsss.db";
-  static final _databaseVersion = 2;
+  static final _databaseName = "jhatfattable.db";
+  static final _databaseVersion = 1;
 
   static final table = 'producttable';
   static final pharmatable = 'pharmaproduct';
@@ -125,7 +125,8 @@ class DatabaseHelper {
             $quantitiy INTEGER NOT NULL,
             $unit TEXT NOT NULL,
             $price REAL NOT NULL,
-            $addQnty INTEGER NOT NULL
+            $addQnty INTEGER NOT NULL,
+            $vendor_id TEXT NOT NULL
           )
           ''');
     batch.execute('''
@@ -316,6 +317,13 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db.rawQuery(
         'SELECT $varientId FROM $faviourteProdcutRest WHERE $productId=$id');
+  }
+
+
+
+  Future<List<Map<String, dynamic>>> getVendorProduct(dynamic id) async {
+    Database db = await instance.database;
+    return await db.query(table,where: '$vendor_id=$id');
   }
 
   Future<List<Map<String, dynamic>>> queryAllRows() async {
@@ -510,6 +518,12 @@ class DatabaseHelper {
   Future<dynamic> calculateTotal() async {
     Database db = await instance.database;
     var result = db.rawQuery("SELECT SUM($price) as Total FROM $table");
+    return result;
+  }
+
+  Future<dynamic> calculateVendorTotal(dynamic id) async {
+    Database db = await instance.database;
+    var result = db.rawQuery("SELECT SUM($price) as Total FROM $table WHERE $vendor_id=$id GROUP BY $vendor_id");
     return result;
   }
 

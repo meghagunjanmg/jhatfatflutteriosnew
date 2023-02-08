@@ -354,12 +354,6 @@ class _OtpVerifyState extends State<OtpVerify> {
       return;
     }
 
-    if(Platform.isIOS) {
-      if (smsOTP == "123456") {
-        hitService(smsOTP, context);
-      }
-    }
-
     try {
       final AuthCredential credential = PhoneAuthProvider.credential(
         verificationId: verificationId,

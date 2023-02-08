@@ -25,6 +25,7 @@ class OrderHistoryRestaurant{
   dynamic surgecharge;
   dynamic nightcharge;
   dynamic convcharge;
+  dynamic gst;
   dynamic price_without_delivery;
 
 
@@ -54,6 +55,7 @@ class OrderHistoryRestaurant{
       this.nightcharge,
       this.convcharge,
       this.price_without_delivery,
+      this.gst,
       );
 
   factory OrderHistoryRestaurant.fromJson(dynamic json){
@@ -62,12 +64,12 @@ class OrderHistoryRestaurant{
     if(jsonList!=null && jsonList.length>0){
       data1 = jsonList.map((e) => ProductItemList.fromJson(e)).toList();
     }
-    return OrderHistoryRestaurant(json['order_status'], json['delivery_date'], json['time_slot'], json['payment_method'], json['payment_status'], json['paid_by_wallet'], json['cart_id'], json['price'], json['delivery_charge'], json['remaining_amount'], json['coupon_discount'], json['delivery_boy_name'], json['delivery_boy_phone'], json['vendor_name'], json['address'],json['delivery_lat'],json['delivery_lng'],json['vendor_lat'],json['vendor_lng'], data1,  json['surgecharge'] ,json['nightcharge']   , json ['convcharge'],json['price_without_delivery'] );
+    return OrderHistoryRestaurant(json['order_status'], json['delivery_date'], json['time_slot'], json['payment_method'], json['payment_status'], json['paid_by_wallet'], json['cart_id'], json['price'], json['delivery_charge'], json['remaining_amount'], json['coupon_discount'], json['delivery_boy_name'], json['delivery_boy_phone'], json['vendor_name'], json['address'],json['delivery_lat'],json['delivery_lng'],json['vendor_lat'],json['vendor_lng'], data1,  json['surgecharge'] ,json['nightcharge']   , json ['convcharge'],json['price_without_delivery'],json['gst'] );
   }
 
   @override
   String toString() {
-    return '{order_status: $order_status, delivery_date: $delivery_date, time_slot: $time_slot, payment_method: $payment_method, payment_status: $payment_status, paid_by_wallet: $paid_by_wallet, cart_id: $cart_id, price: $price, delivery_charge: $delivery_charge, remaining_amount: $remaining_amount, coupon_discount: $coupon_discount, delivery_boy_name: $delivery_boy_name, delivery_boy_phone: $delivery_boy_phone, vendor_name: $vendor_name, address: $address,delivery_lat: $delivery_lat,delivery_lng: $delivery_lng,vendor_lat: $vendor_lat,vendor_lng: $vendor_lng, data: $data,surgecharge :$surgecharge,nightcharge:$nightcharge,convcharge:$convcharge,price_without_delivery:$price_without_delivery }';
+    return '{order_status: $order_status, delivery_date: $delivery_date, time_slot: $time_slot, payment_method: $payment_method, payment_status: $payment_status, paid_by_wallet: $paid_by_wallet, cart_id: $cart_id, price: $price, delivery_charge: $delivery_charge, remaining_amount: $remaining_amount, coupon_discount: $coupon_discount, delivery_boy_name: $delivery_boy_name, delivery_boy_phone: $delivery_boy_phone, vendor_name: $vendor_name, address: $address,delivery_lat: $delivery_lat,delivery_lng: $delivery_lng,vendor_lat: $vendor_lat,vendor_lng: $vendor_lng, data: $data,surgecharge :$surgecharge,nightcharge:$nightcharge,convcharge:$convcharge,price_without_delivery:$price_without_delivery,gst: $gst }';
   }
 }
 

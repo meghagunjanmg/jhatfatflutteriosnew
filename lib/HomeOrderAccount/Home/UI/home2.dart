@@ -51,11 +51,11 @@ import 'appcategory/appcategory.dart';
 
 class HomePage2 extends StatelessWidget {
   int value;
-  HomePage2(this.value);
+  HomePage2(this.value, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Home(this.value);
+    return Home(value);
   }
 
 }
@@ -591,10 +591,90 @@ class _HomeState extends State<Home> {
                 builder: (context) {
                   return InkWell(
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute
-                        (builder: (context) =>
-                      new AppCategory(pickBannerImage[0].vendorCategoryId,pickBannerImage[0].vendorName,
-                          pickBannerImage[0].vendorId, "22")));
+                      if(pickBannerImage[0].vendorCategoryId=='18' || pickBannerImage[0].vendorCategoryId==18){
+                        showModalBottomSheet<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Container(
+                              height: 500,
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Image.asset("images/id.png"),
+                                    Padding(padding: EdgeInsets.all(10),child:Text('You need to be above 18 years of age',style: TextStyle(
+                                        color:Colors.red, fontSize:18, fontWeight: FontWeight.w400)),
+                                    ),
+                                    Padding(padding: EdgeInsets.all(10),child:
+                                    Text('Do not buy tobacco products on behalf of underage persons.',style: TextStyle(
+                                        color: Colors.blueGrey, fontSize:16)
+                                    ),
+                                    ),
+                                    Padding(padding: EdgeInsets.all(10),child:Text('Your location must not be in and around school or college premises.',style: TextStyle(
+                                        color: Colors.blueGrey, fontSize:16)),
+                                    ),
+                            Divider(),
+                                    Padding(padding: EdgeInsets.all(10),child:Text('Jhatfat reserves the right to report your account in case you are below 18 years of age and purchasing cigrattes',style: TextStyle(
+                                        color: Colors.blueGrey, fontSize:14)),
+                                    ),
+                                    new GestureDetector(onTap: (){Navigator.popAndPushNamed(context, PageRoutes.tncPage);}, child:    Padding(padding: EdgeInsets.all(10),child:Text('Read T&C',style: TextStyle(
+                                        color: Colors.green, fontSize:12)),
+                                    ),),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Spacer(),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(30.0),
+                                            ),
+                                            primary: kWhiteColor,
+                                            padding: EdgeInsets.all(10),),
+                                          child: const Text("No,I'm not",style: TextStyle(
+                                              color: Color(0xffeca53d), fontWeight: FontWeight.w400),),
+                                          onPressed: () => Navigator.pop(context),
+                                        ),
+                                        Spacer(),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(30.0),
+                                            ),
+                                            primary: kMainColor,
+                                            padding: EdgeInsets.all(10),
+                                          ),
+
+                                          child: const Text("Yes,I'm above 18"),
+                                          onPressed: () => {
+                                            Navigator.pop(context),
+                                          Navigator.push(context, MaterialPageRoute
+                                          (builder: (context) =>
+                                          new AppCategory(pickBannerImage[0].vendorCategoryId,pickBannerImage[0].vendorName,
+                                          pickBannerImage[0].vendorId, "22")))
+                                          },
+                                        ),
+                                        Spacer(),
+
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                      else
+                      {
+                        Navigator.push(context, MaterialPageRoute
+                          (builder: (context) =>
+                        new AppCategory(pickBannerImage[0].vendorCategoryId,pickBannerImage[0].vendorName,
+                            pickBannerImage[0].vendorId, "22")));
+
+                        }
+
                     },
                     child: Padding(
                       padding: EdgeInsets.symmetric(
@@ -719,14 +799,55 @@ class _HomeState extends State<Home> {
     ]),
       ),
                   SizedBox(
-                      height: 150,
+                      height: 180,
                       width: MediaQuery. of(context). size. width,
                       child:
     ListView.builder(
-      itemCount: (substores.length/2).toInt()+1,
+      itemCount: substores.length,
     scrollDirection: Axis.horizontal,
     itemBuilder: (BuildContext context, int index) =>
-        Padding(padding: const EdgeInsets.all(2.0),
+        ((substores[index].onlineStatus ==
+    "off" ||
+            substores[index].onlineStatus == "Off" ||
+            substores[index].onlineStatus ==
+        "OFF"))?
+        Container(padding: const EdgeInsets.all(2.0),
+            child: InkWell(onTap: () {},
+            child:
+            Card(
+              color: Colors.grey,
+                elevation: 2,
+                child:
+                Container(
+                    color: Colors.grey,
+                    width: 120.0,
+                  child:
+                  Stack(
+                    children: [
+                      ListTile(
+                        title: Image.network('${imageBaseUrl}${substores[index].vendorLogo}',
+                          width: 100.0,
+                          height: 100.0,),
+                        subtitle:
+                        Text(substores[index].vendorName!, maxLines: 4, overflow: TextOverflow.ellipsis,style: TextStyle(fontSize: 12,fontWeight: FontWeight.normal,color: kMainTextColor))
+                      ),
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: Container(
+                          height: 20,
+                          color: Colors.white,
+                          child: Text("Store Closed Now", style:  orderMapAppBarTextStyle
+                              .copyWith(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 18,fontFamily: 'OpenSans'),),
+                        ),
+                      )
+                  ],
+                  )
+
+                )),
+          )
+        ):
+
+          Padding(padding: const EdgeInsets.all(2.0),
           child: InkWell(onTap: () {
     Navigator.push(context, MaterialPageRoute
     (builder: (context) =>
@@ -735,7 +856,11 @@ class _HomeState extends State<Home> {
     substores[index].vendorName.toString(), substores[index].vendorId,
     substores[index].distance)));
           },
-            child: Container(
+            child:
+            Card(
+              elevation: 2,
+              child:
+            Container(
               width: 120.0,
               child: ListTile(
                   title: Image.network('${imageBaseUrl}${substores[index].vendorLogo}',
@@ -743,10 +868,10 @@ class _HomeState extends State<Home> {
                     height: 100.0,),
                   subtitle: Container(
                     alignment: Alignment.topCenter,
-                    child: Text(substores[index].vendorName!),
+                    child:Text(substores[index].vendorName!, maxLines: 4, overflow: TextOverflow.ellipsis,style: TextStyle(fontSize: 12,fontWeight: FontWeight.normal,color: kMainTextColor)),
                   )
               ),
-            ),
+            )),
           ),
         ),
     ),

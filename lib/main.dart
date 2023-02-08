@@ -148,6 +148,7 @@ class PushNotificationService {
       requestBadgePermission: true,
       requestAlertPermission: true,
     );
+
     var initSetttings =
     InitializationSettings(android: androidSettings, iOS: iOSSettings);
     flutterLocalNotificationsPlugin.initialize(initSetttings,

@@ -28,6 +28,7 @@ class SingleProductPage extends StatefulWidget {
 
 class SingleProductState extends State<SingleProductPage> {
   var currentIndex = 0;
+  dynamic v;
 
   String message = '';
   bool isCartCount = false;
@@ -169,25 +170,25 @@ class SingleProductState extends State<SingleProductPage> {
                           getCartCount();
                         });
                       }),
-                  Positioned(
-                      right: 5,
-                      top: 2,
-                      child: Visibility(
-                        visible: isCartCount,
-                        child: CircleAvatar(
-                          minRadius: 4,
-                          maxRadius: 8,
-                          backgroundColor: kMainColor,
-                          child: Text(
-                            '$cartCount',
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontSize: 7,
-                                color: kWhiteColor,
-                                fontWeight: FontWeight.w200),
-                          ),
-                        ),
-                      ))
+                  // Positioned(
+                  //     right: 5,
+                  //     top: 2,
+                  //     child: Visibility(
+                  //       visible: isCartCount,
+                  //       child: CircleAvatar(
+                  //         minRadius: 4,
+                  //         maxRadius: 8,
+                  //         backgroundColor: kMainColor,
+                  //         child: Text(
+                  //           '$cartCount',
+                  //           overflow: TextOverflow.ellipsis,
+                  //           style: TextStyle(
+                  //               fontSize: 7,
+                  //               color: kWhiteColor,
+                  //               fontWeight: FontWeight.w200),
+                  //         ),
+                  //       ),
+                  //     ))
                 ],
               ),
             ),
@@ -198,14 +199,16 @@ class SingleProductState extends State<SingleProductPage> {
         children: [
           Expanded(
               flex: 4,
-              child: Container(
+              child:
+              Container(
                 alignment: Alignment.center,
                 child:
                     Padding(
                   padding: EdgeInsets.only(bottom: 10.0),
                   child: Image(
-                    image: NetworkImage(imageBaseUrl +
-                        widget.productWithVarient.products_image),
+                    image: NetworkImage(
+                        imageBaseUrl+widget.productWithVarient.products_image
+                    ),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -647,10 +650,12 @@ class SingleProductState extends State<SingleProductPage> {
     );
   }
 
-  void addOrMinusProduct(is_id,is_pres,isbasket,product_name, unit, price, quantity, itemCount,
-      varient_image, varient_id,vendorid) async {
-//    addMinus = true;
+
+  void addOrMinusProduct(is_id, is_pres, isbasket, product_name, unit, price,
+      quantity, itemCount,
+      varient_image, varient_id, vendorid) async {
     DatabaseHelper db = DatabaseHelper.instance;
+
     Future<int?> existing = db.getcount(int.parse('${varient_id}'));
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? store_name = prefs.getString('store_name');
@@ -671,25 +676,23 @@ class SingleProductState extends State<SingleProductPage> {
         DatabaseHelper.addedBasket: 0,
         DatabaseHelper.varientId: int.parse('${varient_id}')
       };
+
       bool allow = (prefs.getString("allowmultishop").toString()!="1") ;
       if (value == 0) {
+        db.insert(vae);
+        print("CARTITEN:::"+vae.toString());
+
         if(allow) {
           db.getVendorcount()
               .then((value) {
             print("VENDORCOUNT"+value.toString());
-            if (value != null && value < 3) {
-              db.insert(vae);
+            if (value != null && value <= 3) {
+              //db.insert(vae);
               getCartCount();
             }
             else {
+              db.delete(int.parse('${varient_id}'));
               showMyDialog2(context);
-              for (int i = 0; i < widget.productVarintList.length; i++) {
-                if(widget.productVarintList[i].varient_id==varient_id) {
-                  setState(() {
-                    widget.productVarintList[i].add_qnty = 0;
-                  });
-                }
-              }
             }
           }
           );
@@ -714,8 +717,8 @@ class SingleProductState extends State<SingleProductPage> {
     }).catchError((e) {
       print(e);
     });
-  }
 
+  }
 
   Future<void> getData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
